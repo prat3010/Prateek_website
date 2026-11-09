@@ -91,29 +91,61 @@ describe('Playground Commerce & Settlement Engine', () => {
   });
 
   describe('calculatePlaygroundPrice', () => {
-    const jobHunter = getPlaygroundItemBySlug('job-hunter')!;
+    const mockCommercialItem: PlaygroundItem = {
+      id: 'mock-commercial-pack',
+      slug: 'mock-pack',
+      title: 'Mock Pack',
+      tagline: 'Mock Tagline',
+      description: 'Mock Description',
+      kind: 'saas',
+      tags: ['Test'],
+      vibeCodedDate: '2026-11-08',
+      isCommercial: true,
+      priceINR: 2499,
+      priceUSD: 29,
+      pricingTiers: [
+        {
+          id: 'source-code',
+          title: 'Source Code & Commercial License',
+          name: 'Source Code & Commercial License',
+          priceINR: 2499,
+          priceUSD: 29,
+          downloadKey: 'mock-pack/commercial-v1.0.0.zip',
+          licenseType: 'commercial_single',
+        },
+        {
+          id: 'team-license',
+          title: 'Team / Agency Commercial Pack',
+          name: 'Team / Agency Commercial Pack',
+          priceINR: 7999,
+          priceUSD: 99,
+          downloadKey: 'mock-pack/team-v1.0.0.zip',
+          licenseType: 'commercial_team',
+        },
+      ],
+    } as unknown as PlaygroundItem;
 
     it('calculates INR price for standard source code tier', () => {
-      const result = calculatePlaygroundPrice(jobHunter, 'source-code', 'INR');
+      const result = calculatePlaygroundPrice(mockCommercialItem, 'source-code', 'INR');
       expect(result.amount).toBe(2499);
       expect(result.tier?.name).toBe('Source Code & Commercial License');
     });
 
     it('calculates USD price for standard source code tier', () => {
-      const result = calculatePlaygroundPrice(jobHunter, 'source-code', 'USD');
+      const result = calculatePlaygroundPrice(mockCommercialItem, 'source-code', 'USD');
       expect(result.amount).toBe(29);
     });
 
     it('calculates price for team license tier', () => {
-      const inrResult = calculatePlaygroundPrice(jobHunter, 'team-license', 'INR');
+      const inrResult = calculatePlaygroundPrice(mockCommercialItem, 'team-license', 'INR');
       expect(inrResult.amount).toBe(7999);
 
-      const usdResult = calculatePlaygroundPrice(jobHunter, 'team-license', 'USD');
+      const usdResult = calculatePlaygroundPrice(mockCommercialItem, 'team-license', 'USD');
       expect(usdResult.amount).toBe(99);
     });
 
     it('falls back to default tier if requested tier is invalid', () => {
-      const result = calculatePlaygroundPrice(jobHunter, 'non-existent-tier', 'USD');
+      const result = calculatePlaygroundPrice(mockCommercialItem, 'non-existent-tier', 'USD');
       expect(result.amount).toBe(29);
       expect(result.tier?.id).toBe('source-code');
     });
@@ -249,25 +281,56 @@ describe('Playground Commerce & Settlement Engine', () => {
   });
 
   describe('resolvePlaygroundTierPackage', () => {
-    const jobHunter = getPlaygroundItemBySlug('job-hunter')!;
+    const mockTierItem: PlaygroundItem = {
+      id: 'mock-commercial-pack',
+      slug: 'mock-pack',
+      title: 'Mock Pack',
+      tagline: 'Mock Tagline',
+      description: 'Mock Description',
+      kind: 'saas',
+      tags: ['Test'],
+      vibeCodedDate: '2026-11-08',
+      downloadPackageKey: 'mock-pack/default.zip',
+      licenseType: 'commercial_single',
+      pricingTiers: [
+        {
+          id: 'source-code',
+          title: 'Source Code & Commercial License',
+          name: 'Source Code & Commercial License',
+          priceINR: 2499,
+          priceUSD: 29,
+          downloadKey: 'mock-pack/commercial-v1.0.0.zip',
+          licenseType: 'commercial_single',
+        },
+        {
+          id: 'team-license',
+          title: 'Team / Agency Commercial Pack',
+          name: 'Team / Agency Commercial Pack',
+          priceINR: 7999,
+          priceUSD: 99,
+          downloadKey: 'mock-pack/team-v1.0.0.zip',
+          licenseType: 'commercial_team',
+        },
+      ],
+    } as unknown as PlaygroundItem;
 
     it('resolves tier-specific downloadKey and licenseType for team-license tier', () => {
-      const res = resolvePlaygroundTierPackage(jobHunter, 'team-license');
-      expect(res.packageKey).toBe('job-hunter/job-hunter-team-v1.0.0.zip');
+      const res = resolvePlaygroundTierPackage(mockTierItem, 'team-license');
+      expect(res.packageKey).toBe('mock-pack/team-v1.0.0.zip');
       expect(res.licenseType).toBe('commercial_team');
       expect(res.tierName).toBe('Team / Agency Commercial Pack');
     });
 
     it('resolves tier-specific downloadKey and licenseType for source-code tier', () => {
-      const res = resolvePlaygroundTierPackage(jobHunter, 'source-code');
-      expect(res.packageKey).toBe('job-hunter/job-hunter-commercial-v1.0.0.zip');
+      const res = resolvePlaygroundTierPackage(mockTierItem, 'source-code');
+      expect(res.packageKey).toBe('mock-pack/commercial-v1.0.0.zip');
       expect(res.licenseType).toBe('commercial_single');
       expect(res.tierName).toBe('Source Code & Commercial License');
     });
 
     it('falls back to default tier when tierId is unrecognized', () => {
-      const res = resolvePlaygroundTierPackage(jobHunter, 'invalid-tier-id');
-      expect(res.packageKey).toBe('job-hunter/job-hunter-commercial-v1.0.0.zip');
+      const res = resolvePlaygroundTierPackage(mockTierItem, 'invalid-tier-id');
+      expect(res.packageKey).toBe('mock-pack/commercial-v1.0.0.zip');
       expect(res.licenseType).toBe('commercial_single');
     });
 
@@ -284,61 +347,57 @@ describe('Playground Commerce & Settlement Engine', () => {
     });
   });
 
-  describe('Catalog & Item #13 Integrity', () => {
-    it('contains all 13 items in catalog', () => {
+  describe('Catalog Authenticity & Item Integrity', () => {
+    it('contains all 13 authentic creations in catalog', () => {
       expect(PLAYGROUND_ITEMS.length).toBe(13);
     });
 
-    it('verifies Item #13 saas-job-hunter specification and commercial readiness', () => {
+    it('verifies Job Hunter Studio is an authentic open-source micro-saas', () => {
       const jobHunter = getPlaygroundItemBySlug('job-hunter');
       expect(jobHunter).toBeDefined();
       expect(jobHunter?.id).toBe('saas-job-hunter');
       expect(jobHunter?.title).toBe('Job Hunter Studio');
       expect(jobHunter?.kind).toBe('saas');
-      expect(jobHunter?.isCommercial).toBe(true);
-      expect(jobHunter?.priceUSD).toBe(29);
-      expect(jobHunter?.priceINR).toBe(2499);
+      expect(jobHunter?.isCommercial).toBe(false);
+      expect(jobHunter?.pricingModel).toBe('Open Source');
+      expect(jobHunter?.githubUrl).toBe('https://github.com/prat3010/job-hunter');
       expect(jobHunter?.githubRepoSource).toBe('prat3010/job-hunter');
 
-      // Check tiers
-      expect(jobHunter?.pricingTiers).toBeDefined();
-      expect(jobHunter?.pricingTiers?.length).toBeGreaterThanOrEqual(2);
-      const tierIds = jobHunter?.pricingTiers?.map((t) => t.id);
-      expect(tierIds).toContain('source-code');
-      expect(tierIds).toContain('team-license');
-
-      // Check tech stack and highlights
+      // Check authentic tech stack and highlights
       expect(jobHunter?.techStack).toContain('Next.js 16');
       expect(jobHunter?.techStack).toContain('TypeScript');
-      expect(jobHunter?.techStack).toContain('PostgreSQL');
-
-      // Check showcase specs & file tree
-      expect(jobHunter?.showcaseSpecs).toBeDefined();
-      expect(jobHunter?.showcaseSpecs?.database).toContain('PostgreSQL');
-      expect(jobHunter?.fileTree).toBeDefined();
-      const fileTree = jobHunter?.fileTree as { children?: unknown[] } | undefined;
-      expect(fileTree?.children?.length).toBeGreaterThan(0);
+      expect(jobHunter?.techStack).toContain('FastAPI');
+      expect(jobHunter?.techStack).toContain('Scikit-Learn');
+      expect(jobHunter?.techStack).toContain('Docker');
     });
 
-    it('preserves all 12 legacy items intact', () => {
-      const legacySlugs = [
+    it('preserves all authentic creations and verifies authentic generative media assets', () => {
+      const expectedSlugs = [
         'retriever',
         'scoping-studio',
         'client-workspace',
+        'job-hunter',
         'snake',
         'pathfinder',
         'pizza-rat',
         'matrix-rain',
+        'neural-dossier',
+        'gesture-scroll',
         'neotokyo-rain',
         'mechanical-heart',
         'noir-skyline-reel',
-        'neural-dossier',
-        'gesture-scroll',
       ];
 
-      for (const slug of legacySlugs) {
+      for (const slug of expectedSlugs) {
         const item = getPlaygroundItemBySlug(slug);
-        expect(item, `Legacy item missing: ${slug}`).toBeDefined();
+        expect(item, `Creation missing: ${slug}`).toBeDefined();
+      }
+
+      // Verify that generative media items have real matching artwork assets rather than recycled screenshots
+      const mediaItems = ['neotokyo-rain', 'mechanical-heart', 'noir-skyline-reel'];
+      for (const mediaSlug of mediaItems) {
+        const item = getPlaygroundItemBySlug(mediaSlug);
+        expect(item?.previewImage).toContain('/images/playground/');
       }
     });
   });

@@ -1,200 +1,243 @@
-# 🕹️ Architecture Runbook: Adding a Project, Game, or SaaS to The Playground
+# 🕹️ Architecture Runbook: Adding a Project, Game, or Micro-SaaS to The Playground
 
-**Objective:** Standard Operating Procedure (SOP) for adding any new creation—Micro-SaaS product, retro arcade game, generative AI prompt showcase, or Retriever cognitive tool—to **The Playground** (`/playground` and `/playground/[slug]`).
+**Objective:** Standard Operating Procedure (SOP) for registering, packaging, and publishing any creation—free interactive arcade game, generative AI prompt showcase, Retriever cognitive tool, or commercial Micro-SaaS codebase—to **The Playground** (`/playground` and `/playground/[slug]`).
 
-Future autonomous AI agents and pair-programmers MUST follow this runbook whenever the developer asks to *"add a new game"*, *"showcase a new SaaS"*, *"share an AI prompt/artwork"*, or *"add an interactive toy"*.
+Future autonomous AI agents and pair-programmers MUST follow this runbook whenever the developer asks to *"add a new game"*, *"publish a new SaaS product"*, *"share an AI prompt/artwork"*, or *"package a downloadable code template"*.
 
 ---
 
 ## 🏛️ System Architecture Overview
 
-The Playground replaces ad-hoc terminal clutter and legacy project grids with a unified, polymorphic showcase.
+The Playground operates as a dual-engine platform: a free viral interactive laboratory and a production-truth commercial digital goods store.
 
 | Component | File Path | Purpose |
 |---|---|---|
-| **Single Source of Truth (SSoT)** | `src/data/playgroundItems.ts` | Polymorphic TypeScript registry for all items |
-| **Catalog Showcase Grid** | `src/app/playground/page.tsx` | Search, filter pills, adaptive responsive cards |
-| **Dynamic Runner Route** | `src/app/playground/[slug]/page.tsx` | Arcade cabinet shell, media inspector, SaaS preview |
+| **Master Publishing Control Plane** | `scripts/sync_tabs/playground.py` | Streamlit Synchronizer tab for metadata, pricing, ZIP uploads & SHA-256 hashing |
+| **Database & Private Storage** | Supabase `playground_products` & `playground-releases` | Cloud database records and private encrypted package archives |
+| **Local Fallback SSoT** | `src/data/playgroundItems.json` & `playgroundItems.ts` | Local JSON catalog and polymorphic TypeScript interfaces |
+| **Component Registry** | `src/components/playground/registry.ts` | Dynamic code-splitting registry mapping component names to client runtimes |
+| **Catalog Showcase Grid** | `src/app/playground/page.tsx` & `PlaygroundGrid.tsx` | Search, 4-tier taxonomy filter pills, adaptive responsive cards |
+| **Dynamic Runner Route** | `src/app/playground/[slug]/page.tsx` | Arcade cabinet shell, media inspector, architecture stage, and commercial runner |
 | **Arcade Cabinet Shell** | `src/components/playground/viewers/ArcadeCabinetShell.tsx` | Retro bezel, CRT scanlines, 8-bit sound synthesizer, fullscreen |
-| **Prompt Engineering Lightbox** | `src/components/playground/viewers/MediaPromptLightbox.tsx` | 1-click prompt copier, negative prompt, generation parameters |
-| **Retriever AI Chat Proxy** | `src/app/api/playground/chat/route.ts` | Rate-limited bridge to Oracle Cloud VPS (`https://rag.prateeq.in`) |
+| **Authentic Architecture Stage** | `src/components/playground/PlaygroundArchitectureStage.tsx` | Verifiable quickstart guide (`./launch.sh`), repo file tree, and system specs |
+| **Prompt Engineering Lightbox** | `src/components/playground/viewers/MediaPromptLightbox.tsx` | 1-click prompt copier, negative prompt, generation parameters (<Portal> escape) |
+| **Guest Checkout Modal** | `src/components/playground/PlaygroundCheckoutModal.tsx` | Frictionless guest checkout (Name + Email + Razorpay UPI/Cards/LUT-export) |
+| **Digital Fulfillment Engine** | `/api/playground/checkout/*` & `/api/playground/download` | Concurrency-safe atomic settlement, perpetual licensing, tokenized re-downloads |
 
 ---
 
-## 🌐 Hosting & Bandwidth Tiers (Zero Unnecessary Signups)
+## 🛠️ Publishing Standard Operating Procedures
 
-100% of current projects are hosted comfortably on the existing **free Vercel Hobby tier** + **free Oracle Cloud VPS (`rag.prateeq.in`)**. No new accounts or billing setups are required.
+### 🌟 Primary Publishing Path: The Streamlit Synchronizer (Recommended)
 
-When choosing where to place a new project's assets, apply the 3-Tier Rule:
+Always prefer the Streamlit Synchronizer dashboard for managing catalog items and uploading release assets:
 
-### Tier 1: Native Next.js Component (Default for < 10 MB)
-- **Best For:** React canvas games (Snake, Pathfinder, Tetris), Three.js WebGL shaders, Tailwind/CSS tools, forms.
-- **Location:** `src/components/playground/items/Playground<Name>.tsx`.
-- **Render Mode:** `renderMode: 'native'`.
-- **Bandwidth Impact:** Zero extra requests (bundled into Next.js dynamic chunks).
-
-### Tier 2: Static Drop-in Asset (< 20 MB)
-- **Best For:** Self-contained HTML5 builds, Phaser engines, Godot Web exports under 20 MB.
-- **Location:** `public/playground/apps/<slug>/index.html`.
-- **Render Mode:** `renderMode: 'iframe'` with `iframeUrl: '/playground/apps/<slug>/index.html'`.
-- **Note:** `src/proxy.ts` automatically excludes `/playground/assets/` and `/playground/apps/` from triggering Supabase `page_visits` telemetry.
-
-### Tier 3: Cloudflare Pages for Heavy WASM / WebGL Builds (> 20 MB)
-- **Best For:** Large 3D engines, Unity WebGL, Unreal HTML5, or heavy asset packs that exceed 20 MB.
-- **Why Cloudflare Pages?** Unlimited free bandwidth, 25 MB file sizes, global edge caching.
-- **Domain Configuration:**
-  - Build deployed to Cloudflare Pages.
-  - Custom domain mapped to: **`playground.prateeq.in`** (or `subdomain.pages.dev`).
-  - `next.config.ts` Content Security Policy (CSP) is **ALREADY PRE-CONFIGURED** with:
-    ```ts
-    frame-src 'self' https://playground.prateeq.in https://*.pages.dev;
-    ```
-- **Registration in Code:**
-  ```ts
-  {
-    id: 'heavy-game-slug',
-    slug: 'heavy-game',
-    kind: 'interactive-toy',
-    renderMode: 'iframe',
-    iframeUrl: 'https://playground.prateeq.in/heavy-game',
-    // ...
-  }
-  ```
-  *(Zero backend or frontend code changes required! Just point the URL in `playgroundItems.ts`)*.
+1. Launch the Synchronizer:
+   ```bash
+   streamlit run scripts/synchronizer.py
+   ```
+2. Navigate to **`🎮 Playground & Micro-SaaS`** in the navigation sidebar.
+3. Choose **`➕ Publish New Micro-SaaS Product`** or select an existing item to edit.
+4. Fill in metadata, taxonomy classification, and tech stack tags.
+5. If publishing a commercial digital good:
+   - Check **`Is Commercial Product (Requires Payment)`**.
+   - Set Base Price in **INR (₹)** and **USD ($)**.
+   - Configure multi-tier licensing JSON if offering multiple tiers (e.g. Developer License vs Team/Agency License).
+   - Upload the distribution `.zip` archive via the file uploader. The synchronizer automatically streams the package to private bucket `playground-releases/{slug}/{filename}`, calculates the authentic SHA-256 hash, and sets the file size.
+6. Click **`💾 Save & Sync to Supabase + JSON`**.
+   - This atomically commits to Supabase table `playground_products`, writes `src/data/playgroundItems.json`, and triggers Next.js cache revalidation via `/api/revalidate?tag=playground-items`.
 
 ---
 
-## 🛠️ Step-by-Step Recipes
+### 🎮 Recipe A: Adding a Free Interactive Game / Toy
 
-### 🎮 Recipe A: Adding an Interactive Game / Toy
-1. **Create the component adapter:**
+1. **Create the native canvas component:**
    Create `src/components/playground/items/Playground<GameName>.tsx`:
    ```tsx
    'use client';
    import React from 'react';
+   import type { PlaygroundComponentProps } from '@/components/playground/registry';
 
-   export default function PlaygroundMyGame() {
+   export default function PlaygroundMyGame({ item }: PlaygroundComponentProps) {
      return (
-       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-         {/* Game Canvas or Logic */}
+       <div 
+         data-lenis-prevent 
+         style={{ width: '100%', height: '100%', position: 'relative' }}
+       >
+         {/* Canvas / WebGL context mounted here */}
        </div>
      );
    }
    ```
-2. **Register the item in `src/data/playgroundItems.ts`:**
-   ```ts
+   *Note: Always add `data-lenis-prevent` to the root container to isolate keyboard navigation (arrow keys/WASD) from page scroll listeners.*
+
+2. **Register the component in the registry:**
+   In `src/components/playground/registry.ts`, register the dynamic import:
+   ```typescript
+   export const PLAYGROUND_COMPONENT_REGISTRY: Record<string, ComponentType<PlaygroundComponentProps>> = {
+     // ... existing entries
+     PlaygroundMyGame: dynamic(
+       () => import('@/components/playground/items/PlaygroundMyGame'),
+       { ssr: false, loading: LoadingSkeleton }
+     ),
+   };
+   ```
+
+3. **Register the item via Streamlit Synchronizer or `playgroundItems.json`:**
+   ```json
    {
-     id: 'toy-my-game',
-     slug: 'my-game',
-     title: 'My Retro Game',
-     tagline: 'A fast-paced 60fps arcade game vibe-coded in React.',
-     description: 'Detailed description of gameplay, engine, and lore.',
-     kind: 'interactive-toy',
-     renderMode: 'native',
-     componentName: 'PlaygroundMyGame',
-     controlsGuide: [
-       { key: 'W/A/S/D', label: 'Movement' },
-       { key: 'SPACE', label: 'Fire' },
+     "id": "toy-my-game",
+     "slug": "my-game",
+     "title": "My Retro Game 2088",
+     "tagline": "A fast-paced 60fps arcade game vibe-coded in React.",
+     "description": "Detailed description of gameplay, engine, and lore.",
+     "kind": "interactive-toy",
+     "taxonomy": "toys-and-games",
+     "isCommercial": false,
+     "renderMode": "native",
+     "componentName": "PlaygroundMyGame",
+     "controlsGuide": [
+       { "key": "W/A/S/D", "label": "Directional Movement" },
+       { "key": "SPACE", "label": "Fire Primary Weapon" }
      ],
-     soundSupported: true,
-     hasLeaderboard: false,
-     tags: ['React Canvas', 'Retro Arcade', 'Vibe-Coded'],
-     terminalCommands: ['mygame', 'play-mygame'],
-     vibeCodedDate: '2026-10-04',
+     "soundSupported": true,
+     "hasLeaderboard": false,
+     "tags": ["HTML5 Canvas", "Retro Arcade", "Web Audio API"],
+     "terminalCommands": ["mygame", "play"],
+     "vibeCodedDate": "2026-11-09",
+     "status": "live"
    }
-   ```
-3. **Mount in runner `src/app/playground/[slug]/page.tsx`:**
-   Add the component check inside `if (item.kind === 'interactive-toy')`:
-   ```tsx
-   toy.componentName === 'PlaygroundMyGame' ? (
-     <PlaygroundMyGame />
-   ) : ...
-   ```
-4. **(Optional) Add Terminal shortcut:**
-   In `src/components/ui/useTerminalCommands.ts`, add:
-   ```ts
-   case 'mygame':
-     return {
-       lines: [
-         { text: '🎮 Launching My Retro Game in Playground...', type: 'info' },
-         { text: 'Link: /playground/my-game', type: 'link', url: '/playground/my-game' },
-       ],
-     };
    ```
 
 ---
 
-### 🚀 Recipe B: Adding a Micro-SaaS App or Prototype
-1. **Register the item in `src/data/playgroundItems.ts`:**
-   ```ts
+### 📦 Recipe B: Adding a Commercial Micro-SaaS or Codebase Product
+
+1. **Prepare the distribution package:**
+   - Build and bundle the real source code, Docker Compose files, documentation, and starter scripts into a clean archive:
+     ```bash
+     zip -r release-v1.0.0.zip . -x "node_modules/*" ".git/*" ".env" "__pycache__/*"
+     ```
+   - Compute the real cryptographic SHA-256 hash:
+     ```bash
+     sha256sum release-v1.0.0.zip
+     ```
+     *(Zero placeholder hashes allowed: the hash must match the actual file bytes).*
+
+2. **Publish the product via the Synchronizer or `playgroundItems.json`:**
+   ```json
    {
-     id: 'saas-my-tool',
-     slug: 'my-tool',
-     title: 'CloudCost Estimator',
-     tagline: 'Instant AWS vs GCP vs Hetzner infrastructure pricing analyzer.',
-     description: 'A full-stack Micro-SaaS that calculates real-time multi-cloud egress and compute pricing with zero authentication required.',
-     kind: 'saas',
-     appUrl: 'https://cost.prateeq.in', // or internal route '/tools/cost'
-     isEmbeddable: false,
-     pricingModel: 'Free',
-     techStack: ['Next.js 16', 'Tailwind', 'Cloudflare Workers'],
-     githubUrl: 'https://github.com/prat3010/cloud-cost',
-     highlights: [
-       'Real-time egress rate matrices across 14 regions',
-       'Single-click JSON invoice export',
+     "id": "saas-my-tool",
+     "slug": "my-tool",
+     "title": "CloudCost Estimator Pro",
+     "tagline": "Autonomous multi-cloud infrastructure pricing analyzer & FinOps engine.",
+     "description": "Full-stack Micro-SaaS that calculates real-time multi-cloud egress and compute pricing with zero simulated data.",
+     "kind": "saas",
+     "taxonomy": "commercial",
+     "isCommercial": true,
+     "priceINR": 2499,
+     "priceUSD": 29,
+     "pricingModel": "Commercial Release + Open Core",
+     "pricingTiers": [
+       {
+         "id": "developer-license",
+         "title": "Developer Source Code License",
+         "name": "Developer Source Code License",
+         "priceINR": 2499,
+         "priceUSD": 29,
+         "licenseType": "commercial_single",
+         "downloadKey": "my-tool/release-v1.0.0.zip",
+         "features": [
+           "Full production source code with MIT-commercial license",
+           "1-click native launcher (./launch.sh) and Docker Compose",
+           "Perpetual updates & tokenized guest re-downloads"
+         ]
+       },
+       {
+         "id": "agency-license",
+         "title": "Agency & Team Distribution License",
+         "name": "Agency & Team Distribution License",
+         "priceINR": 7999,
+         "priceUSD": 99,
+         "licenseType": "commercial_team",
+         "downloadKey": "my-tool/release-team-v1.0.0.zip",
+         "features": [
+           "Unlimited developer seats across organization",
+           "White-label client presentation mode",
+           "Direct GitHub collaborator private repository invite"
+         ]
+       }
      ],
-     tags: ['Micro-SaaS', 'Cloud FinOps', 'Next.js'],
-     vibeCodedDate: '2026-10-04',
+     "componentName": null,
+     "appUrl": "/playground/my-tool",
+     "githubUrl": "https://github.com/prat3010/my-tool",
+     "githubRepoSource": "prat3010/my-tool",
+     "techStack": ["Next.js 16", "TypeScript", "FastAPI", "Docker"],
+     "highlights": [
+       "Real-time egress rate matrices across 14 cloud regions",
+       "Single-click JSON/PDF invoice export",
+       "Containerized Docker Compose multi-service architecture"
+     ],
+     "downloadPackageKey": "my-tool/release-v1.0.0.zip",
+     "fileSize": "14.2 MB",
+     "checksumSha256": "8a4f91b...",
+     "version": "1.0.0",
+     "licenseType": "commercial_single",
+     "tags": ["Micro-SaaS", "FinOps", "FastAPI", "Docker"],
+     "vibeCodedDate": "2026-11-09",
+     "status": "live"
    }
    ```
-2. The catalog card (`SaasCard.tsx`) and dynamic page (`/playground/[slug]`) will automatically generate the status badge, feature highlights, tech pills, and launch buttons.
+   *(Setting `componentName: null` automatically activates the authentic `PlaygroundArchitectureStage`, presenting genuine quickstart commands, architecture trees, and system requirements).*
 
 ---
 
-### 🎨 Recipe C: Adding AI Generative Art / Videos & Prompts
-1. Save thumbnail/preview to `public/images/<image-name>.webp` (or provide external CDN URL).
-2. **Register in `src/data/playgroundItems.ts`:**
-   ```ts
+### 🎨 Recipe C: Adding AI Generative Media & Prompts
+
+1. Save optimized WebP image/video to `public/images/playground/<image-name>.webp`.
+2. Register item in Synchronizer or `playgroundItems.json`:
+   ```json
    {
-     id: 'art-cyber-samurai',
-     slug: 'cyber-samurai',
-     title: 'Neo-Tokyo Ronin at Dawn',
-     tagline: 'Photorealistic cyberpunk portrait generated with Flux.1 Schnell.',
-     description: 'Volumetric cinematic lighting through holographic neon signage reflecting off carbon-fiber armor plating.',
-     kind: 'generative-media',
-     mediaType: 'image',
-     mediaUrl: '/images/cyber-samurai.webp',
-     thumbnailUrl: '/images/cyber-samurai.webp',
-     model: 'Flux.1 Schnell',
-     prompt: 'cinematic medium shot of cybernetic ronin standing on rain-slicked balcony overlooking Neo-Tokyo skyline, holographic signs casting magenta and cyan rim light, carbon fiber armor weave, 8k resolution, Leica M11 50mm f/1.2 lens',
-     negativePrompt: 'blurry, oversaturated, cartoon, extra limbs',
-     parameters: {
-       aspectRatio: '16:9',
-       seed: 88492019,
-       steps: 28,
-       cfgScale: 4.5,
+     "id": "art-cyber-samurai",
+     "slug": "cyber-samurai",
+     "title": "Neo-Tokyo Ronin at Dawn",
+     "tagline": "Photorealistic cyberpunk portrait generated with Flux 1.1 Pro.",
+     "description": "Volumetric cinematic lighting through holographic neon signage reflecting off carbon-fiber armor plating.",
+     "kind": "generative-media",
+     "taxonomy": "toys-and-games",
+     "isCommercial": false,
+     "mediaType": "image",
+     "mediaUrl": "/images/playground/cyber-samurai.webp",
+     "thumbnailUrl": "/images/playground/cyber-samurai.webp",
+     "previewImage": "/images/playground/cyber-samurai.webp",
+     "model": "Flux 1.1 Pro",
+     "prompt": "cinematic medium shot of cybernetic ronin standing on rain-slicked balcony overlooking Neo-Tokyo skyline...",
+     "negativePrompt": "blurry, oversaturated, cartoon, extra limbs",
+     "parameters": {
+       "aspectRatio": "16:9",
+       "seed": 88492019,
+       "steps": 28,
+       "cfgScale": 4.5,
+       "sampler": "Euler A"
      },
-     resolution: '3840x2160',
-     tags: ['Flux.1', 'Cyberpunk', 'Cinematic Photography'],
-     vibeCodedDate: '2026-10-04',
+     "resolution": "3840x2160 (4K UHD)",
+     "tags": ["Flux 1.1 Pro", "Cyberpunk", "Cinematic Photography"],
+     "vibeCodedDate": "2026-11-09",
+     "metricsBadge": "FLUX 1.1 PRO",
+     "status": "live"
    }
    ```
-3. Clicking the card in `/playground` opens the **MediaPromptLightbox** with 1-click prompt copying. Navigating to `/playground/cyber-samurai` renders the full-resolution studio showcase.
 
 ---
 
-### 🧠 Recipe D: Adding a Retriever Cognitive AI App
-1. When connecting to Oracle Cloud VPS (`https://rag.prateeq.in` at `130.210.35.134`), proxy all chat queries through `/api/playground/chat`.
-2. The proxy handles sliding-window rate limiting (20 requests/minute per client IP) and injects the portfolio API key securely without exposing secrets to the browser.
-3. Register the item under `kind: 'cognitive-tool'` with `backendEngine: 'retriever-oracle'`.
+## 🔒 Security & Quality Verification Checklist
 
----
-
-## 🔒 Security & Performance Checklist
-Before committing any changes:
-- [ ] **CSS Containing Block:** Any modal or full-screen overlay must use `<Portal>` (`src/components/ui/Portal.tsx`) to avoid being trapped by `ScrollSection`'s `will-change: transform` (ADR 05).
-- [ ] **Lenis Smooth Scroll:** Any canvas, scrollable table, or game viewport must include `data-lenis-prevent` to prevent Lenis smooth scroll from intercepting arrow keys or gestures.
-- [ ] **No Secrets in Client:** Never hardcode Supabase `SERVICE_ROLE_KEY` or Retriever master admin keys into client components.
+Before committing changes:
+- [ ] **No Simulated CLIs:** Zero `setTimeout` loops spitting fake compile logs. Genuine shell commands only.
+- [ ] **No Fake Reviews or Testimonials:** Zero fabricated metrics or synthetic customer quotes.
+- [ ] **Real SHA-256 Hashes:** Cryptographic hashes must match genuine binary bytes.
+- [ ] **CSS Containing Block:** Any modal or full-screen overlay must use `<Portal>` to escape `ScrollSection` containing block traps (ADR 05).
+- [ ] **Lenis Scroll Isolation:** Any canvas or game stage must include `data-lenis-prevent` (ADR 47).
 - [ ] **Run Quality Verification:**
   ```bash
   npx tsc --noEmit

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Sparkles, Rocket, Gamepad2, Brain, Eye, Layers, ShoppingBag } from 'lucide-react';
+import { Search, Sparkles, Rocket, Gamepad2, Brain, Eye, Layers } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -22,14 +22,13 @@ const PLAYGROUND_PAGE_TITLE_TEXTS: ScramblerProps['texts'] = {
 };
 
 interface CategoryFilter {
-  id: 'all' | 'commercial' | PlaygroundKind;
+  id: 'all' | 'saas' | 'interactive-toy' | 'generative-media' | 'cognitive-tool' | 'experiment';
   label: string;
   icon: React.ReactNode;
 }
 
 const CATEGORIES: CategoryFilter[] = [
   { id: 'all', label: 'All Creations', icon: <Layers size={14} /> },
-  { id: 'commercial', label: 'Commercial Products', icon: <ShoppingBag size={14} /> },
   { id: 'saas', label: 'SaaS & Apps', icon: <Rocket size={14} /> },
   { id: 'interactive-toy', label: 'Games & Labs', icon: <Gamepad2 size={14} /> },
   { id: 'generative-media', label: 'AI Art & Prompts', icon: <Sparkles size={14} /> },
@@ -39,17 +38,15 @@ const CATEGORIES: CategoryFilter[] = [
 
 export default function PlaygroundGrid() {
   const { isNoir, audience } = useTheme();
-  const [activeCategory, setActiveCategory] = useState<'all' | 'commercial' | PlaygroundKind>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | PlaygroundKind>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeLightboxItem, setActiveLightboxItem] = useState<GenerativeMediaPlaygroundItem | null>(null);
 
   const filteredItems = useMemo(() => {
     return PLAYGROUND_ITEMS.filter((item) => {
       // 1. Category filter
-      if (activeCategory === 'commercial') {
-        if (!item.isCommercial) return false;
-      } else if (activeCategory !== 'all') {
-        if (item.kind !== activeCategory) return false;
+      if (activeCategory !== 'all' && item.kind !== activeCategory) {
+        return false;
       }
       // 2. Search query
       if (searchQuery.trim()) {
@@ -57,8 +54,7 @@ export default function PlaygroundGrid() {
         const matchesTitle = item.title.toLowerCase().includes(query);
         const matchesTagline = item.tagline.toLowerCase().includes(query);
         const matchesTags = item.tags.some((t) => t.toLowerCase().includes(query));
-        const matchesModel = item.kind === 'generative-media' ? item.model.toLowerCase().includes(query) : false;
-        return matchesTitle || matchesTagline || matchesTags || matchesModel;
+        return matchesTitle || matchesTagline || matchesTags;
       }
       return true;
     });
@@ -95,7 +91,7 @@ export default function PlaygroundGrid() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, technology, prompt or model..."
+              placeholder="Search by name, technology, or tag..."
               className={styles.searchInput}
               aria-label="Search creations in the playground"
             />
@@ -106,8 +102,6 @@ export default function PlaygroundGrid() {
               const isActive = activeCategory === cat.id;
               const count = cat.id === 'all' 
                 ? PLAYGROUND_ITEMS.length 
-                : cat.id === 'commercial'
-                ? PLAYGROUND_ITEMS.filter((i) => i.isCommercial).length
                 : PLAYGROUND_ITEMS.filter((i) => i.kind === cat.id).length;
 
               return (

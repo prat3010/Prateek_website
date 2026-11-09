@@ -11,7 +11,6 @@ export interface PlaygroundStageRendererProps {
   isCommercial?: boolean;
 }
 
-const HeadlessStage = PLAYGROUND_COMPONENT_REGISTRY.PlaygroundHeadlessStage;
 const Snake = PLAYGROUND_COMPONENT_REGISTRY.PlaygroundSnake;
 const Pathfinder = PLAYGROUND_COMPONENT_REGISTRY.PlaygroundPathfinder;
 const PizzaRat = PLAYGROUND_COMPONENT_REGISTRY.PlaygroundPizzaRat;
@@ -39,5 +38,5 @@ export default function PlaygroundStageRenderer({
   if (componentName === 'PlaygroundNeuralDossier') {
     return <NeuralDossier item={item} slug={slug} isCommercial={isCommercial} />;
   }
-  return <HeadlessStage item={item} slug={slug} isCommercial={isCommercial} />;
+  return null;
 }

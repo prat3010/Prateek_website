@@ -190,8 +190,8 @@
     "taxonomy": "toys-and-games",
     "isCommercial": false,
     "mediaType": "image",
-    "mediaUrl": "/images/project-rag-lab.webp",
-    "thumbnailUrl": "/images/project-rag-lab.webp",
+    "mediaUrl": "/images/playground/art-neotokyo-rain.webp",
+    "thumbnailUrl": "/images/playground/art-neotokyo-rain.webp",
     "model": "Flux 1.1 Pro",
     "prompt": "cinematic wide 35mm photograph of neo-tokyo alleyway in torrential monsoon rain, glowing amber and cyan neon sign reflections pooling in wet asphalt puddles, volumetric mist, dense overhead cable bundles, f/1.4 aperture, film grain, photorealistic octane render, 8k",
     "negativePrompt": "blurry, plastic skin, oversaturated, deformed geometry, low resolution, watermark, cartoon 3d",
@@ -207,7 +207,7 @@
     "vibeCodedDate": "2026-09-12",
     "featured": true,
     "metricsBadge": "FLUX 1.1 PRO",
-    "previewImage": "/images/project-rag-lab.webp"
+    "previewImage": "/images/playground/art-neotokyo-rain.webp"
   },
   {
     "id": "art-mechanical-heart",
@@ -219,8 +219,8 @@
     "taxonomy": "toys-and-games",
     "isCommercial": false,
     "mediaType": "image",
-    "mediaUrl": "/images/project-synchronizer.webp",
-    "thumbnailUrl": "/images/project-synchronizer.webp",
+    "mediaUrl": "/images/playground/art-mechanical-heart.webp",
+    "thumbnailUrl": "/images/playground/art-mechanical-heart.webp",
     "model": "Midjourney v6.1",
     "prompt": "intricate biomechanical clockwork heart forged from brushed brass and obsidian, micro-gears ticking inside transparent sapphire crystal chamber, ruby escapements, dramatic museum chiaroscuro lighting, depth of field macro lens, 8k --ar 1:1 --v 6.1 --style raw",
     "negativePrompt": "low detail, flat lighting, plastic render, noisy, text",
@@ -234,7 +234,7 @@
     "tags": ["Midjourney v6.1", "Macro Photography", "Steampunk", "Horology"],
     "vibeCodedDate": "2026-09-18",
     "metricsBadge": "MIDJOURNEY v6.1",
-    "previewImage": "/images/project-synchronizer.webp"
+    "previewImage": "/images/playground/art-mechanical-heart.webp"
   },
   {
     "id": "art-noir-skyline-reel",
@@ -246,8 +246,8 @@
     "taxonomy": "toys-and-games",
     "isCommercial": false,
     "mediaType": "image",
-    "mediaUrl": "/images/hero-noir.webp",
-    "thumbnailUrl": "/images/hero-noir.webp",
+    "mediaUrl": "/images/playground/art-noir-skyline-reel.webp",
+    "thumbnailUrl": "/images/playground/art-noir-skyline-reel.webp",
     "model": "Runway Gen-3 Alpha",
     "prompt": "slow cinematic drone tracking shot sweeping past gargoyle spires on an art-deco skyscraper, heavy twilight fog rolling between illuminated office windows, 24fps motion blur, Kodak Tri-X 400 film stock aesthetic",
     "parameters": {
@@ -258,7 +258,7 @@
     "tags": ["Runway Gen-3", "Cinematic Video", "Noir Aesthetic", "Drone Motion"],
     "vibeCodedDate": "2026-09-25",
     "metricsBadge": "RUNWAY GEN-3",
-    "previewImage": "/images/hero-noir.webp"
+    "previewImage": "/images/playground/art-noir-skyline-reel.webp"
   },
   {
     "id": "ai-neural-dossier",
@@ -306,102 +306,30 @@
     "id": "saas-job-hunter",
     "slug": "job-hunter",
     "title": "Job Hunter Studio",
-    "tagline": "Autonomous multi-board job scraping, resume tailoring & automated application dispatcher.",
-    "description": "A production-grade job discovery and autonomous outreach engine. Integrates JobSpy crawlers across LinkedIn, Indeed, Glassdoor, and ZipRecruiter with AI resume tailoring, headless browser submissions, and automated email dispatching.",
+    "tagline": "Autonomous job board scraper, TF-IDF profile matcher & multi-channel pitch engine.",
+    "description": "A production-grade, full-stack micro-SaaS designed to automate software engineering and freelance job discovery. Features 11 concurrent scrapers (Hacker News, WeWorkRemotely, RemoteOK, direct ATS boards), Scikit-Learn TF-IDF candidate profile vectorization, supervised reply propensity modeling, Kanban pipeline tracking, and multi-provider BYOK LLM pitch synthesis.",
     "kind": "saas",
-    "taxonomy": "commercial",
-    "isCommercial": true,
-    "priceINR": 2499,
-    "priceUSD": 29,
-    "pricingModel": "Commercial Release + Open Core",
-    "techStack": ["Next.js 16", "TypeScript", "Python 3.12", "Playwright", "FastAPI", "JobSpy", "Docker", "Resend", "PostgreSQL"],
+    "taxonomy": "ecosystem",
+    "isCommercial": false,
+    "pricingModel": "Open Source",
+    "techStack": ["Next.js 16", "TypeScript", "Python 3.12", "FastAPI", "Scikit-Learn", "SQLite", "Docker"],
     "githubRepoSource": "prat3010/job-hunter",
     "githubUrl": "https://github.com/prat3010/job-hunter",
     "appUrl": "/playground/job-hunter",
     "isEmbeddable": false,
     "componentName": null,
-    "downloadPackageKey": "job-hunter/job-hunter-commercial-v1.0.0.zip",
-    "fileSize": "14.8 MB",
-    "checksumSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "version": "1.0.0",
-    "licenseType": "commercial_single",
-    "tags": ["Micro-SaaS", "JobSpy", "Playwright", "FastAPI", "Automation", "Resend"],
-    "vibeCodedDate": "2026-11-08",
+    "tags": ["Micro-SaaS", "FastAPI", "Scikit-Learn", "TF-IDF", "Next.js 16", "Docker", "BYOK AI"],
+    "vibeCodedDate": "2026-11-07",
     "featured": true,
     "status": "live",
-    "metricsBadge": "FLAGSHIP COMMERCIAL PACK",
-    "previewImage": "/images/project-synchronizer.webp",
+    "metricsBadge": "FASTAPI + SCIKIT",
+    "previewImage": "/images/project-ai-tool.webp",
     "highlights": [
-      "Multi-board scraping across LinkedIn, Indeed, Glassdoor & ZipRecruiter via JobSpy",
-      "Autonomous cover letter & resume keyword optimization tailored to job description",
-      "Docker Compose turnkey deployment with automated rate-limiting & proxy rotation",
-      "Commercial Resale & Modification License with continuous upstream GitHub pull access"
-    ],
-    "pricingTiers": [
-      {
-        "id": "source-code",
-        "title": "Source Code & Commercial License",
-        "name": "Source Code & Commercial License",
-        "priceINR": 2499,
-        "priceUSD": 29,
-        "features": [
-          "Complete Python 3.12 + FastAPI + Playwright Source Code",
-          "Docker Compose turnkey stack with proxy rotation",
-          "Automated LinkedIn, Indeed, Glassdoor & ZipRecruiter scrapers",
-          "Resend automated cover letter email dispatch engine",
-          "Commercial single-developer license with upstream GitHub repository invite"
-        ],
-        "licenseType": "commercial_single",
-        "downloadKey": "job-hunter/job-hunter-commercial-v1.0.0.zip"
-      },
-      {
-        "id": "team-license",
-        "title": "Team / Agency Commercial Pack",
-        "name": "Team / Agency Commercial Pack",
-        "priceINR": 7999,
-        "priceUSD": 99,
-        "features": [
-          "Everything in Source Code & Commercial License",
-          "Multi-seat agency usage & distribution rights",
-          "Priority GitHub issue support & architecture review",
-          "Custom ATS scraper connector templates"
-        ],
-        "licenseType": "commercial_team",
-        "downloadKey": "job-hunter/job-hunter-team-v1.0.0.zip"
-      }
-    ],
-    "showcaseSpecs": {
-      "architecture": "Hexagonal Clean Architecture (Python 3.12)",
-      "database": "PostgreSQL 16 + pgvector",
-      "crawlerEngine": "JobSpy Multi-Board Scraping",
-      "automation": "Playwright Stealth Chromium",
-      "notification": "Resend Transactional Email API"
-    },
-    "fileTree": {
-      "name": "job-hunter",
-      "type": "directory",
-      "children": [
-        {
-          "name": "src",
-          "type": "directory",
-          "children": [
-            { "name": "crawlers", "type": "directory" },
-            { "name": "tailor", "type": "directory" },
-            { "name": "dispatch", "type": "directory" }
-          ]
-        },
-        { "name": "docker-compose.yml", "type": "file" },
-        { "name": "pyproject.toml", "type": "file" }
-      ]
-    },
-    "showcaseProjects": [
-      {
-        "title": "ApexTalent Autonomous Search",
-        "url": "https://github.com/prat3010/job-hunter",
-        "description": "Applied to 142 tech lead roles with 18% interview conversion.",
-        "author": "Beta Builder @prat3010",
-        "stats": "142 Applied // 26 Interviews"
-      }
+      "Dynamic resume ingestion with Scikit-Learn TF-IDF semantic profile matching",
+      "11 concurrent scrapers across HN, WeWorkRemotely, RemoteOK, and direct ATS boards",
+      "Multi-provider BYOK AI pitch gateway (Gemini, OpenAI, Groq, Anthropic, local Ollama)",
+      "Interactive Next.js 16 Kanban command center with 1-click native launcher (./launch.sh)",
+      "Containerized Docker Compose multi-service architecture with local SQLite persistence"
     ]
   }
 ]

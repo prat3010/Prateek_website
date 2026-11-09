@@ -147,6 +147,7 @@ for p in projects_raw:
     p.setdefault('longDescription_business', '')
     p.setdefault('systemRole', '')
     p.setdefault('telemetryBadge', '')
+    p.setdefault('sshCommand', '')
 if projects_raw:
     projects_to_upsert = filter_drift_protected_rows('projects', projects_raw, projects_file, 'slug')
     if projects_to_upsert:
@@ -163,6 +164,7 @@ if projects_raw:
                 cp.pop('architectureHighlights', None)
                 cp.pop('challenges', None)
                 cp.pop('keyDeliverables', None)
+                cp.pop('sshCommand', None)
                 core_projects.append(cp)
             upsert('projects', core_projects, 'slug')
 print(f'  {len(projects_raw)} projects processed')

@@ -23,7 +23,6 @@ import {
 } from '@/data/playgroundItems';
 import ArcadeCabinetShell from '@/components/playground/viewers/ArcadeCabinetShell';
 import PlaygroundStageRenderer from '@/components/playground/PlaygroundStageRenderer';
-import PlaygroundCommercialView from '@/components/playground/PlaygroundCommercialView';
 import styles from './PlaygroundDetail.module.css';
 
 const GitHubIcon = ({ size = 16 }: { size?: number }) => (
@@ -75,11 +74,6 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
 
   if (!item) {
     notFound();
-  }
-
-  // ─── 🛒 0. COMMERCIAL PRODUCTS (FLAGSHIP LAUNCH & CODE PACKS) ───
-  if (item.isCommercial) {
-    return <PlaygroundCommercialView item={item} />;
   }
 
   // ─── 🎮 1. INTERACTIVE TOYS & ARCADE GAMES ───
@@ -267,10 +261,35 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
             {saas.pricingModel && (
               <span className={styles.statusBadge}>{saas.pricingModel}</span>
             )}
+            {saas.metricsBadge && (
+              <span className={styles.statusBadge}>{saas.metricsBadge}</span>
+            )}
           </div>
           <h1 className={styles.title}>{saas.title}</h1>
           <p className={styles.tagline}>{saas.tagline}</p>
         </header>
+
+        {saas.previewImage && (
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            height: '320px',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            marginBottom: '28px',
+            border: '1.5px solid var(--color-border)',
+            boxShadow: 'var(--shadow-comic-sm)',
+          }}>
+            <Image
+              src={saas.previewImage}
+              alt={saas.title}
+              fill
+              priority
+              sizes="(max-width: 1200px) 100vw, 1200px"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
+        )}
 
         <div className={styles.saasCard}>
           <div>
@@ -314,12 +333,60 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
             </div>
           </div>
 
+          {saas.slug === 'job-hunter' && (
+            <div>
+              <div className={styles.sectionLabel}>Quickstart & Local Execution</div>
+              <div style={{
+                marginTop: '8px',
+                padding: '16px',
+                borderRadius: '8px',
+                background: 'rgba(0, 0, 0, 0.55)',
+                border: '1px solid var(--border-muted, rgba(255, 255, 255, 0.1))',
+                fontFamily: 'var(--font-jetbrains-mono, monospace)',
+                fontSize: '0.85rem',
+                lineHeight: 1.7,
+              }}>
+                <div style={{ color: 'var(--color-primary)', fontWeight: 600, marginBottom: '6px' }}>
+                  # Method 1: 1-Click Native Launcher (Python 3.10+ &amp; Node 18+):
+                </div>
+                <div style={{ color: '#38bdf8' }}>git clone https://github.com/prat3010/job-hunter.git</div>
+                <div style={{ color: '#38bdf8' }}>cd job-hunter &amp;&amp; ./launch.sh</div>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: '6px', marginBottom: '14px' }}>
+                  Concurrently boots FastAPI backend (:8000) with SQLite and Next.js 16 frontend (:3000).
+                </div>
+
+                <div style={{ color: 'var(--color-primary)', fontWeight: 600, marginBottom: '6px' }}>
+                  # Method 2: Containerized Execution with Docker Compose:
+                </div>
+                <div style={{ color: '#38bdf8' }}>docker compose up -d</div>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: '6px' }}>
+                  Frontend Command Center: http://localhost:3000 | Interactive FastAPI Docs: http://localhost:8000/docs
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className={styles.ctaRow}>
-            <Link href={saas.appUrl} className={styles.primaryCta}>
-              <span>Launch Live Product</span>
-              <ExternalLink size={16} />
-            </Link>
-            {saas.githubUrl && (
+            {saas.appUrl.startsWith('/playground') ? (
+              saas.githubUrl && (
+                <a
+                  href={saas.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.primaryCta}
+                >
+                  <GitHubIcon size={16} />
+                  <span>Inspect Source on GitHub</span>
+                </a>
+              )
+            ) : (
+              <Link href={saas.appUrl} className={styles.primaryCta}>
+                <span>Launch Live Product</span>
+                <ExternalLink size={16} />
+              </Link>
+            )}
+
+            {saas.githubUrl && !saas.appUrl.startsWith('/playground') && (
               <a
                 href={saas.githubUrl}
                 target="_blank"

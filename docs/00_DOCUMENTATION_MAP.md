@@ -47,7 +47,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **45** | **[`45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md`](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md)** | Turn-Key Enterprise SaaS Connectors & Document-Level ACL Inheritance (M125), Battery No. 39, Google Drive, Notion, Confluence, Jira, Microsoft 365 delta crawlers & sublinear JSONB ACL (?|) filtering. |
 | **46** | **[`46_Visual_DAG_Workflow_Canvas_PRD.md`](46_Visual_DAG_Workflow_Canvas_PRD.md)** | Visual DAG Workflow Canvas & Agentic Graph Composer (M126), Battery No. 40, React 19 / Next.js 16 SVG Studio, Kahn's cycle detection, stage-by-stage pipeline executor & token cost attribution. |
 | **47** | **[`47_Sovereign_Air_Gapped_Appliance_PRD.md`](47_Sovereign_Air_Gapped_Appliance_PRD.md)** | Sovereign Air-Gapped Appliance & Embedded Edge Engine (M127), Battery No. 41, Hardware-Rooted AES-256-GCM Vector Sealing (TPM/Secure Enclave), zero-egress network sentinel & offline Whisper/Piper full-duplex voice RAG. |
-| **48** | **[`48_The_Playground_Universal_Creation_Showcase_PRD.md`](48_The_Playground_Universal_Creation_Showcase_PRD.md)** | The Playground Universal Creation Showcase, Polymorphic SSoT Registry, Arcade Cabinet Shell, AI Prompt Engineering Lightbox & Cloudflare Pages 3-Tier Zero-Cost Hosting. |
+| **48** | **[`48_The_Playground_Universal_Creation_Showcase_PRD.md`](48_The_Playground_Universal_Creation_Showcase_PRD.md)** | The Playground Universal Creation Showcase & Digital Goods Platform (v2.0.0), Dual-Engine Architecture, Arcade Cabinet Shell, AI Prompt Engineering Lightbox & [Commerce Infrastructure](specs/PRD_PLAYGROUND_COMMERCE.md). |
 
 
 ---
@@ -75,6 +75,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 - 📚 **[`commercial/PRATEEQ_ENGINEERING_CATALOG_SOW_KNOWLEDGE.md`](commercial/PRATEEQ_ENGINEERING_CATALOG_SOW_KNOWLEDGE.md):** Complete SOW deliverables knowledge base for client contracts.
 - 📈 **[`commercial/REVENUE_EXECUTION_PLAN.md`](commercial/REVENUE_EXECUTION_PLAN.md):** High-ticket service pricing, sales cadence, and target revenue milestones.
 - 💼 **[`commercial/HIGH_TICKET_COMMERCIAL_PLAYBOOK.md`](commercial/HIGH_TICKET_COMMERCIAL_PLAYBOOK.md):** Algorithmic CPQ pricing strategy, 50% escrow milestones, and change-order governance.
+- 🛒 **[`specs/PRD_PLAYGROUND_COMMERCE.md`](specs/PRD_PLAYGROUND_COMMERCE.md):** Playground Commerce & Digital Fulfillment PRD (Frictionless Guest Checkout, HMAC verification, Tokenized Re-downloads, Supabase Private Storage Releases).
 
 ---
 

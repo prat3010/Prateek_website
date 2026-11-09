@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ExternalLink, CheckCircle2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { ExternalLink, CheckCircle2, ArrowRight } from 'lucide-react';
 import type { SaasPlaygroundItem } from '@/data/playgroundItems';
 import styles from '../PlaygroundGrid.module.css';
 
@@ -20,11 +20,6 @@ interface SaasCardProps {
 
 export default function SaasCard({ item, index }: SaasCardProps) {
   const indexStr = index !== undefined ? String(index + 1).padStart(2, '0') : '01';
-  const isCommercial = item.isCommercial;
-
-  const priceBadgeText = isCommercial 
-    ? (item.priceINR && item.priceUSD ? `₹${item.priceINR.toLocaleString()} / $${item.priceUSD}` : 'COMMERCIAL')
-    : (item.metricsBadge || item.pricingModel || 'LIVE SAAS');
 
   return (
     <article className={`${styles.card} ${styles.cardSaas}`}>
@@ -33,13 +28,11 @@ export default function SaasCard({ item, index }: SaasCardProps) {
         <div className={styles.narrativeBox}>
           <span className={styles.narrativePrefix}>EXP. {indexStr}</span>
           <span className={styles.narrativeDivider}>{'//'}</span>
-          <span className={styles.narrativeLabel}>
-            {isCommercial ? 'MICRO-SAAS PACK' : 'SAAS LAB'}
-          </span>
+          <span className={styles.narrativeLabel}>SAAS LAB</span>
         </div>
         <div className={styles.comicBadgeStamp}>
-          <span className={styles.comicRarityPip}>{isCommercial ? '⚡' : '★'}</span>
-          <span className={styles.comicBadgeText}>{priceBadgeText}</span>
+          <span className={styles.comicRarityPip}>★</span>
+          <span className={styles.comicBadgeText}>{item.metricsBadge || item.pricingModel || 'LIVE SAAS'}</span>
         </div>
       </div>
 
@@ -65,18 +58,10 @@ export default function SaasCard({ item, index }: SaasCardProps) {
         </div>
 
         <div className={styles.cardFooter}>
-          {isCommercial ? (
-            <Link href={`/playground/${item.slug}`} className={styles.actionBtn}>
-              <ShoppingBag size={14} />
-              <span>Explore Pack</span>
-              <ArrowRight size={14} />
-            </Link>
-          ) : (
-            <Link href={item.appUrl} className={styles.actionBtn}>
-              <span>Launch App</span>
-              <ExternalLink size={14} />
-            </Link>
-          )}
+          <Link href={item.appUrl} className={styles.actionBtn}>
+            <span>{item.appUrl.startsWith('/playground') ? 'Explore Project' : 'Launch App'}</span>
+            {item.appUrl.startsWith('/playground') ? <ArrowRight size={14} /> : <ExternalLink size={14} />}
+          </Link>
 
           {item.githubUrl && (
             <a
@@ -87,7 +72,7 @@ export default function SaasCard({ item, index }: SaasCardProps) {
               aria-label={`Source code for ${item.title}`}
             >
               <GitHubIcon size={14} />
-              <span>{isCommercial ? 'Open-Core' : 'Source'}</span>
+              <span>Source</span>
             </a>
           )}
         </div>

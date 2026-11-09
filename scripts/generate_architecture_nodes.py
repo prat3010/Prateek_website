@@ -1293,46 +1293,6 @@ NODES = {
 - [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 """,
 
-    "UI_EdgeSwarmPanel.md": """# UI: `EdgePanel.tsx` (Sovereign Edge Swarm Studio)
-
-#ui #edge #crdt #swarm #retriever #m98 #m101
-
-> **Edge Device Swarm Observability, SQLite Snapshots & Enclave Attestation Status.**
-
-- **Path:** `retriever/apps/web/src/app/edge/page.tsx` & `src/components/rag/EdgePanel.tsx`
-- **Features:**
-  - Real-time display of registered edge peer devices and health status
-  - 1-click SQLite replica snapshot distribution and delta sync metrics
-  - Hardware KMS remote attestation status and emergency memory sanitization trigger
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever_API: v1/edge](Retriever_API_v1_edge.md)
-- [Retriever_API: v1/enclave](Retriever_API_v1_enclave.md)
-- [Engine: Sovereign Edge Sync](Engine_Sovereign_Edge_Sync.md)
-- [Engine: Confidential Micro-Enclave](Engine_Confidential_Micro_Enclave.md)
-""",
-
-    "UI_CapabilityStudioPanel.md": """# UI: `ScaffoldPanel.tsx` (Capability Studio & Metaprogrammer)
-
-#ui #scaffold #metaprogramming #ast #retriever #m97
-
-> **Autonomous AST Capability Scaffolding Studio & Hot-Reload Playground.**
-
-- **Path:** `retriever/apps/web/src/app/scaffold/page.tsx` & `src/components/rag/ScaffoldPanel.tsx`
-- **Features:**
-  - Natural language specification input for new cognitive capabilities
-  - AST preview of synthesized FastAPI routers, domain abstractions, and Pytest suites
-  - Non-destructive dry-run syntax verification and 1-click hot-reloaded disk application
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever_API: v1/scaffold](Retriever_API_v1_scaffold.md)
-- [Engine: Autonomous Metaprogrammer](Engine_Autonomous_Metaprogrammer.md)
-""",
-
     # -------------------------------------------------------------
     # 5. DATABASE SCHEMAS (12 Nodes)
     # -------------------------------------------------------------
@@ -1822,25 +1782,6 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: REST API edge.md](../../../retriever/docs/api/edge.md)
 - [Engine: Sovereign Edge Sync](Engine_Sovereign_Edge_Sync.md)
-- [UI: EdgeSwarmPanel](UI_EdgeSwarmPanel.md)
-""",
-
-    "Retriever_API_v1_multicloud.md": """# Retriever API: `apps/api/src/routers/multicloud.py`
-
-#retriever #api #multicloud #libsql #failover #m99
-
-> **Multi-Cloud Failover & Distributed LibSQL Active-Active Replication Router (Milestone 99).**
-
-- **Endpoints:**
-  - `GET /v1/admin/multicloud/status` — Cluster replication health & primary region
-  - `POST /v1/admin/multicloud/failover` — Trigger manual or automated Raft failover
-  - `POST /v1/admin/multicloud/probe` — Latency ping probe across cloud regions
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API multicloud.md](../../../retriever/docs/api/multicloud.md)
-- [Engine: MultiCloud Replication](Engine_MultiCloud_Replication.md)
 """,
 
     "Retriever_API_v1_voice.md": """# Retriever API: `apps/api/src/routers/voice.py`
@@ -1859,45 +1800,6 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: REST API voice.md](../../../retriever/docs/api/voice.md)
 - [Engine: Sovereign Edge Voice](Engine_Sovereign_Edge_Voice.md)
-""",
-
-    "Retriever_API_v1_enclave.md": """# Retriever API: `apps/api/src/routers/enclave.py`
-
-#retriever #api #enclave #kms #attestation #confidential #m101
-
-> **Micro-Enclave KMS & Remote Attestation Router (Milestone 101).**
-
-- **Endpoints:**
-  - `GET /v1/admin/edge/attestation/nonce` — Issue anti-replay attestation challenge
-  - `POST /v1/admin/edge/attestation/verify` — Validate PCR0 hardware evidence & signature
-  - `POST /v1/tenants/{tenantId}/edge/seal` — AES-256-GCM memory sealing with HKDF key derivation
-  - `POST /v1/tenants/{tenantId}/edge/unseal` — Authenticated payload decryption
-  - `POST /v1/admin/edge/enclave/wipe` — Zero-knowledge volatile memory wipe
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API enclave.md](../../../retriever/docs/api/enclave.md)
-- [Engine: Confidential Micro-Enclave](Engine_Confidential_Micro_Enclave.md)
-""",
-
-    "Retriever_API_v1_scaffold.md": """# Retriever API: `apps/api/src/routers/scaffold.py`
-
-#retriever #api #scaffold #metaprogramming #ast #m97
-
-> **Autonomous Metaprogrammer & Capability Studio Router (Milestone 97).**
-
-- **Endpoints:**
-  - `POST /v1/scaffold/generate` — Synthesize AST router, adapter, and test files
-  - `POST /v1/scaffold/validate` — AST syntax & forbidden import validation
-  - `POST /v1/scaffold/apply` — Atomic disk write & hot-reload injection
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API scaffold.md](../../../retriever/docs/api/scaffold.md)
-- [Engine: Autonomous Metaprogrammer](Engine_Autonomous_Metaprogrammer.md)
-- [UI: CapabilityStudioPanel](UI_CapabilityStudioPanel.md)
 """,
 
     "Retriever_API_v1_serverless_gpu.md": """# Retriever API: `apps/api/src/routers/serverless_gpu.py`
@@ -2101,26 +2003,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: REST API edge.md](../../../retriever/docs/api/edge.md)
 - [Retriever_API: v1/edge](Retriever_API_v1_edge.md)
-- [UI: EdgeSwarmPanel](UI_EdgeSwarmPanel.md)
 - [99_DECISIONS (ADR 35)](../99_DECISIONS.md#adr-35-sovereign-edge-vector-synchronization-offline-first-sqlite-crdt-swarms)
-""",
-
-    "Engine_MultiCloud_Replication.md": """# Engine: Multi-Cloud Active-Active LibSQL Failover (Milestone 99)
-
-#engine #multicloud #libsql #failover #disaster_recovery #m99
-
-> **Zero-Downtime Distributed Database Replication & Autonomous Raft Leader Election.**
-
-- **Domain Core:** `apps/api/src/domain/abstractions/multicloud.py` (`CloudRegion`, `LibsqlReplicaStatus`, `RaftClusterState`)
-- **Adapters:** `apps/api/src/adapters/multicloud/libsql_failover_adapter.py`
-- **Role:** Synchronizes transactions across Oracle Cloud VPS, Fly.io, and AWS edge nodes with automatic sub-5-second failover.
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API multicloud.md](../../../retriever/docs/api/multicloud.md)
-- [Retriever_API: v1/multicloud](Retriever_API_v1_multicloud.md)
-- [99_DECISIONS (ADR 36)](../99_DECISIONS.md#adr-36-multi-cloud-distributed-libsql-active-active-replication-and-automated-failover)
 """,
 
     "Engine_Sovereign_Edge_Voice.md": """# Engine: Sovereign Edge Voice Streaming & WebRTC (Milestone 100)
@@ -2139,25 +2022,6 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [Retriever: REST API voice.md](../../../retriever/docs/api/voice.md)
 - [Retriever_API: v1/voice](Retriever_API_v1_voice.md)
 - [99_DECISIONS (ADR 37)](../99_DECISIONS.md#adr-37-sovereign-edge-voice-streaming-sub-300ms-webrtc-audio-pipelines)
-""",
-
-    "Engine_Autonomous_Metaprogrammer.md": """# Engine: Autonomous Metaprogrammer & Capability Studio (Milestone 97)
-
-#engine #metaprogramming #ast #scaffold #retriever #m97
-
-> **Deterministic Python AST Code Synthesis, Architectural Linter Validation & Capability Scaffolding.**
-
-- **Domain Core:** `apps/api/src/domain/abstractions/scaffold.py` (`AstCapabilitySpec`, `ScaffoldGeneratedFile`, `AstValidationReport`)
-- **Adapters:** `apps/api/src/adapters/scaffold/python_ast_generator.py`
-- **Role:** Dynamically synthesizes clean hexagonal domain protocols, FastAPI routers, mock adapters, and Pytest suites from high-level capability specifications.
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API scaffold.md](../../../retriever/docs/api/scaffold.md)
-- [Retriever_API: v1/scaffold](Retriever_API_v1_scaffold.md)
-- [UI: CapabilityStudioPanel](UI_CapabilityStudioPanel.md)
-- [99_DECISIONS (ADR 34)](../99_DECISIONS.md#adr-34-autonomous-metaprogramming-and-self-scaffolding-capability-engine)
 """
 }
 

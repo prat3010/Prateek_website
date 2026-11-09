@@ -54,17 +54,11 @@ export const PLAYGROUND_COMPONENT_REGISTRY: Record<
     () => import('@/components/playground/items/PlaygroundNeuralDossier'),
     { ssr: false, loading: LoadingSkeleton }
   ) as unknown as ComponentType<PlaygroundComponentProps>,
-  // Default interactive stage for headless code packs, CLI tools, and starter kits
-  PlaygroundHeadlessStage: dynamic(
-    () => import('@/components/playground/items/PlaygroundHeadlessStage'),
-    { ssr: false, loading: LoadingSkeleton }
-  ) as unknown as ComponentType<PlaygroundComponentProps>,
 };
 
-export function resolvePlaygroundComponent(componentName?: string | null): ComponentType<PlaygroundComponentProps> {
+export function resolvePlaygroundComponent(componentName?: string | null): ComponentType<PlaygroundComponentProps> | null {
   if (componentName && PLAYGROUND_COMPONENT_REGISTRY[componentName]) {
     return PLAYGROUND_COMPONENT_REGISTRY[componentName];
   }
-  // Headless commercial fallback: renders CLI simulator, file tree, and architecture inspector
-  return PLAYGROUND_COMPONENT_REGISTRY.PlaygroundHeadlessStage;
+  return null;
 }

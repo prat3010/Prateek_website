@@ -1,11 +1,11 @@
 # PRD: The Playground Commerce, Fulfillment & Publishing Infrastructure
 
-**Document Version:** `v1.0.0`  
-**Status:** `PLANNED // SPEC-FIRST`  
+**Document Version:** `v2.0.0`  
+**Status:** `ACCEPTED // PRODUCTION-TRUTH SPECIFICATION`  
 **Authors:** Prateek Sharma (Principal Software Architect & Lead Product Engineer)  
 **Target Codebase:** `Prateek_website` (`prateeq.in`)  
 **Domain Surfaces:** `prateeq.in/playground`, `prateeq.in/playground/[slug]`, `prateeq.in/dashboard`, `scripts/synchronizer.py`  
-**Target Invariants:** Zero-Destruction of Existing Toys, Frictionless Guest Checkout (Zero Mandatory OAuth), Tokenized Guest Re-downloads (No-Auth Magic Link), Decoupled Component Registry & Headless Stages, Atomic Order Verification Concurrency, Private Storage Signed URLs, 100/100 Core Web Vitals  
+**Target Invariants:** 100% Production Truth, Zero Toyish Simulations, Zero Fabricated Testimonials, Zero Placeholder Checksums, Zero-Destruction of Existing Toys, Frictionless Guest Checkout (Zero Mandatory OAuth), Tokenized Guest Re-downloads (No-Auth Magic Link), Decoupled Component Registry & Architecture Stages, Atomic Order Verification Concurrency, Private Storage Signed URLs, 100/100 Core Web Vitals  
 
 ---
 
@@ -14,21 +14,21 @@
 ### 1.1 Strategic Objective & Business Context
 `prateeq.in` currently operates two commercial and experimental extremes:
 1. **High-Ticket Custom Client Engineering (`/scoping`):** High-touch client discovery wizard with instant SOW compilation, DAG topological pricing closure, and client dashboard milestone escrow.
-2. **Interactive Experimental Laboratory (`/playground`):** A polymorphic creation sandbox hosting 12 live vibe-coded experiments—spanning HTML5 Canvas retro arcade games, Three.js 3D models, computer vision utilities, and generative AI prompt engineering showcases.
+2. **Interactive Experimental Laboratory (`/playground`):** A polymorphic creation sandbox hosting live vibe-coded experiments—spanning HTML5 Canvas retro arcade games, Three.js 3D models, computer vision utilities, and generative AI prompt engineering showcases.
 
-**The Evolution:** We are transforming `/playground` into our **Self-Serve Digital Goods & Micro-SaaS Commerce Platform** without sacrificing its creative soul. The platform will monetize production-grade software assets—including standalone Micro-SaaS tools, turnkey starter templates, production source code licenses, and specialized AI prompts—while preserving 100% of our existing interactive toys and games as high-engagement, viral discovery drivers.
+**The Evolution:** We are structuring `/playground` as our **Production-Truth Digital Goods & Software Showcase Platform** without sacrificing its creative soul. The platform showcases and monetizes production-grade software assets—including standalone Micro-SaaS tools, turnkey starter templates, production source code licenses, and specialized AI prompts—while preserving 100% of our existing interactive toys and games as high-engagement, viral discovery drivers.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                              THE PRATEEQ COMMERCE FLYWHEEL                             │
 └────────────────────────────────────────────────────────────────────────────────────────┘
             Viral Inbound Traffic (Social, SEO, GitHub, Dev Communities)
-                                       │
-                                       ▼
-                     ┌───────────────────────────────────┐
-                     │     /playground Catalog Stage     │
-                     └─────────────────┬─────────────────┘
-                                       │
+                                        │
+                                        ▼
+                      ┌───────────────────────────────────┐
+                      │     /playground Catalog Stage     │
+                      └─────────────────┬─────────────────┘
+                                        │
         ┌──────────────────────────────┼──────────────────────────────┐
         ▼                              ▼                              ▼
 ┌───────────────┐              ┌───────────────┐              ┌───────────────┐
@@ -47,39 +47,41 @@
 └──────────────────┘           └────────┬─────────┘           └──────────────────┘
                                         │
                                         ▼ (Deferred Link via Email)
-                               ┌──────────────────┐
-                               │    /dashboard    │
-                               │  Client License  │
-                               │     Mission      │
-                               │     Control      │
-                               └──────────────────┘
+                                ┌──────────────────┐
+                                │    /dashboard    │
+                                │  Client License  │
+                                │     Mission      │
+                                │     Control      │
+                                └──────────────────┘
 ```
 
 ### 1.2 Core Architectural Principles & Scope Constraints
-1. **Zero New SaaS Brainstorming:** This specification focuses 100% on **commerce, fulfillment, storage security, and publishing infrastructure**. It establishes the rails through which software products are priced, showcased, transacted, protected, and delivered.
-2. **Zero-Destruction Catalog Invariant:** None of the 12 existing playground creations will be deleted, crippled, or forced behind paywalls. Free playable toys (Cyber Snake, Pizza Rat, Matrix Rain, 2D Pathfinder) continue serving as high-velocity organic discovery anchors.
+1. **Production Truth Law (Zero Fakes, Zero Simulations):** Every user-facing component, code sample, metric, and checkout flow must be authentic and verifiable. 
+   - **No Simulated CLIs:** Banned entirely. Terminal simulators with `setTimeout` loops spitting mock logs are prohibited. For command-line tools or backend services, display genuine, executable shell commands (`./launch.sh`, `docker compose up -d`).
+   - **No Fabricated Social Proof:** Banned entirely. Fictional testimonials, mock metrics, and simulated builder reviews (e.g. "ApexTalent Autonomous Search") are strictly forbidden. Only real, verified GitHub stats or genuine client case studies may be presented.
+   - **No Placeholder Checksums:** Cryptographic checksums must be computed from real, built release files via `sha256sum <file>`. Never use empty-string hashes (`e3b0c44...`) or placeholder strings.
+2. **Zero-Destruction Catalog Invariant:** None of the existing playground creations will be deleted, crippled, or forced behind paywalls. Free playable toys (Cyber Snake, Pizza Rat, Matrix Rain, 2D Pathfinder) continue serving as high-velocity organic discovery anchors.
 3. **Frictionless Guest Checkout (Zero Mandatory OAuth):** Customers are NEVER blocked by a Google OAuth sign-in gate to purchase digital goods. The checkout flow requires only `Name` and `Email`. Purchases are fulfilled instantly via signed URLs and transactional email, and automatically mapped to the customer's `/dashboard` if they authenticate with that email in the future.
 4. **Tokenized Guest Re-downloads (No-Auth Magic Link):** Guest customers who do not use Google OAuth (e.g. enterprise domain emails) or whose 24-hour initial signed URLs have expired can re-download their purchased packages at any time via a cryptographic token endpoint (`/api/playground/download?token=...&order=...`), subject to a max download quota, without ever being forced to register or log in.
 5. **Atomic Concurrency & Webhook Idempotency:** Browser fast-path verification and Razorpay asynchronous webhook notifications execute through strict atomic conditional status transitions (`WHERE status = 'pending'`). Licenses enforce a strict 1-to-1 unique constraint per order, guaranteeing zero duplicate license keys and zero duplicate email dispatches during network races.
-6. **Decoupled Component Registry & Polymorphic Headless Stages:** Dynamic metadata (pricing, releases, tags, copy) moves to database records in Supabase `playground_products` (with local JSON fallback `src/data/playgroundItems.json`). Interactive React runtimes are code-split via a static registry map, while downloadable code packs without canvas runtimes render an interactive `PlaygroundHeadlessStage` (CLI terminal simulator, file tree explorer, and architecture inspector).
+6. **Decoupled Component Registry & Architecture Stages:** Dynamic metadata moves to database records in Supabase `playground_products` (with local JSON fallback `src/data/playgroundItems.json`). Interactive React runtimes are code-split via a static registry map, while downloadable code packs and services without canvas runtimes render an authentic `PlaygroundArchitectureStage` (verified quickstart guides, repository file tree, and system specifications).
 7. **Private Storage & Time-Limited Fulfillment:** Commercial release packages (`.zip` binaries, source archives) reside in a private, RLS-secured Supabase Storage bucket (`playground-releases`). Download links are cryptographically signed with short TTLs (24 hours) to prevent hotlinking and unauthorized distribution.
 8. **Dual Fulfillment Rails (Direct ZIP + Optional GitHub Repo Access):** For code packages and boilerplates where developers need upstream `git pull` updates, fulfillment supports dual rails: instant signed ZIP download plus automated GitHub private repository invitation via GitHub API when a customer provides their GitHub handle.
-9. **Social Proof & "Built With" Showcase Surfaces:** Headless software stages incorporate real-world developer showcases, architecture diagrams, and customer implementation metrics to maximize trust and conversion.
-10. **Ecosystem Partner & Middleman Attribution:** Purchases support referral tracking (`?ref=partner_slug`), automatically routing commission credits to verified partners via the ecosystem's existing `commissionConfig.json` engine.
-11. **Unified Dual-Theme Design System 2.0:** All new commerce UI elements (checkout modals, sticky price bars, cart states, license displays) must strictly conform to the Azure (warm editorial print) and Noir (obsidian cyber-monospace) design language without hardcoded Tailwind palette drift.
+9. **Ecosystem Partner & Middleman Attribution:** Purchases support referral tracking (`?ref=partner_slug`), automatically routing commission credits to verified partners via the ecosystem's existing `commissionConfig.json` engine.
+10. **Unified Dual-Theme Design System 2.0:** All commerce UI elements (checkout modals, sticky price bars, cart states, license displays) must strictly conform to the Azure (warm editorial print) and Noir (obsidian cyber-monospace) design language without hardcoded Tailwind palette drift.
 
 ---
 
 ## 2. Catalog Architecture & Existing Item Audit Matrix
 
-### 2.1 The 13-Item Inventory & Commercial Launch Audit
-Currently, [playgroundItems.ts](../../src/data/playgroundItems.ts) exports a static TypeScript array (`PLAYGROUND_ITEMS`) containing 12 legacy items. The audit below maps each item from its current static declaration to its updated commercial status and structural taxonomy, crowned by **Item #13 (Job Hunter Studio)**—our flagship launch asset establishing the hybrid Open-Core + Commercial Bundle monetization model:
+### 2.1 The 13-Item Inventory & Production Audit Matrix
+Currently, `playgroundItems.json` contains 13 items. The audit below maps each item from its static declaration to its updated production status and structural taxonomy:
 
-| # | Item ID | Title | Slug | Current Kind | Updated Taxonomy Classification | Commercial Status | Component / Target Route | Action Required |
+| # | Item ID | Title | Slug | Current Kind | Updated Taxonomy Classification | Production Status | Component / Target Route | Action Required |
 |:---:|:---|:---|:---|:---|:---|:---|:---|:---|
-| 1 | `saas-retriever` | Retriever AI Studio | `retriever` | `saas` | **Ecosystem Gateway** | Free Showcase (Directs to SaaS) | App URL: `/rag` | Preserve preview; redirect or launch full SaaS app at `/rag`. |
-| 2 | `saas-scoping-studio` | Scoping Studio | `scoping-studio` | `saas` | **Ecosystem Gateway** | Free Showcase (Directs to CPQ) | App URL: `/scoping` | Preserve interactive discovery demo; direct clients to `/scoping`. |
-| 3 | `saas-client-workspace`| Client Mission Control | `client-workspace` | `saas` | **Ecosystem Gateway** | Free Showcase (Client Portal) | App URL: `/dashboard` | Retain demo card; direct active clients to authenticated portal. |
+| 1 | `saas-retriever` | Retriever AI Studio | `retriever` | `saas` | **Ecosystem Gateway** | Free Showcase (Directs to SaaS) | App URL: `/rag` | Live multi-tenant RAG platform; launch full SaaS app at `/rag`. |
+| 2 | `saas-scoping-studio` | Scoping Studio | `scoping-studio` | `saas` | **Ecosystem Gateway** | Free Showcase (Directs to CPQ) | App URL: `/scoping` | Interactive CPQ scoping wizard; direct clients to `/scoping`. |
+| 3 | `saas-client-workspace`| Client Mission Control | `client-workspace` | `saas` | **Ecosystem Gateway** | Free Showcase (Client Portal) | App URL: `/dashboard` | Client workspace portal; direct active clients to authenticated portal. |
 | 4 | `toy-snake` | Cyber Snake 2088 | `snake` | `interactive-toy` | **Interactive Toys & Games** | Free Playable Toy (100% Free) | `PlaygroundSnake.tsx` | Decouple into Component Registry. Retain Supabase leaderboard. |
 | 5 | `toy-pathfinder` | 2D Graph Pathfinder Lab | `pathfinder` | `interactive-toy` | **Interactive Toys & Games** | Free Playable Toy & Algorithm Lab | `PlaygroundPathfinder.tsx`| Decouple into Component Registry. Retain 13 heuristic visualizers. |
 | 6 | `toy-pizza-rat` | NYC Pizza Rat 3D | `pizza-rat` | `interactive-toy` | **Interactive Toys & Games** | Free Playable Toy (WebGL Easter Egg) | `PlaygroundPizzaRat.tsx` | Decouple into Component Registry. Retain Three.js inertia physics. |
@@ -89,12 +91,12 @@ Currently, [playgroundItems.ts](../../src/data/playgroundItems.ts) exports a sta
 | 10| `art-noir-skyline-reel`| Manhattan Nocturne Reel | `noir-skyline-reel`| `generative-media` | **Interactive Toys & Games** | Free Media & Prompt Asset | Native Media Viewer | Retain Runway Gen-3 Alpha drone sweep reel and prompt details. |
 | 11| `ai-neural-dossier` | Sovereign Neural Dossier | `neural-dossier` | `cognitive-tool` | **Ecosystem Gateway** | Free Live Intelligence Demo | `PlaygroundNeuralDossier.tsx` | Decouple into Component Registry; bridge to `/api/playground/chat`. |
 | 12| `exp-gesture-scroll` | GestureScroll Computer Vision | `gesture-scroll` | `experiment` | **Interactive Toys & Games** | Free CV Experiment | Native Experiment Viewer | Retain MediaPipe hand-tracking camera loop and GitHub links. |
-| 13| `saas-job-hunter` | Job Hunter Studio | `job-hunter` | `saas` | **Commercial Products** | Commercial Release ($29 / ₹2,499) + Open Core | `PlaygroundHeadlessStage` | **Flagship Commercial Launch Product.** Dual-model: Free GitHub core ([prat3010/job-hunter](https://github.com/prat3010/job-hunter)) + Commercial Turnkey Pack (Docker, LinkedIn/Indeed JobSpy crawlers, Resend auto-dispatcher, commercial resale license). |
+| 13| `saas-job-hunter` | Job Hunter Studio | `job-hunter` | `saas` | **Ecosystem Gateway** | Open Source / Open Core Showcase | `PlaygroundArchitectureStage` | **Flagship Open Source & Micro-SaaS Engine.** Dual-model: Free public GitHub repository ([prat3010/job-hunter](https://github.com/prat3010/job-hunter)) + optional commercial packaging. Real FastAPI + Scikit-Learn TF-IDF matching, 11 scrapers, Docker Compose, and native `./launch.sh`. |
 
-### 2.2 Decoupled Component Registry & Polymorphic Headless Stages
-**Problem:** In the current static implementation, [src/app/playground/[slug]/page.tsx](../../src/app/playground/%5Bslug%5D/page.tsx) statically imports every single React component (`PlaygroundSnake`, `PlaygroundPathfinder`, `PlaygroundPizzaRat`, `PlaygroundMatrixRain`, `PlaygroundNeuralDossier`). Storing components directly inside database records is impossible, while importing everything into the page route balloons the client JavaScript bundle. Furthermore, commercial software products often consist of downloadable source code packs, CLI boilerplates, and turnkey templates that **lack a browser canvas or game runtime**.
+### 2.2 Decoupled Component Registry & Authentic Architecture Stage
+**Problem:** Storing interactive components directly inside database records is impossible, while statically importing everything into the page route balloons the client JavaScript bundle. Furthermore, software products often consist of downloadable source code packs, CLI boilerplates, and services that **lack a browser canvas or game runtime**.
 
-**Solution:** Separate **Dynamic Record Metadata** from **Executable Client Runtimes** via a client-side Component Registry Map, with an automatic fallback to an interactive **`PlaygroundHeadlessStage`** whenever `component_name` is `null`:
+**Solution:** Separate **Dynamic Record Metadata** from **Executable Client Runtimes** via a client-side Component Registry Map, with an automatic fallback to an authentic **`PlaygroundArchitectureStage`** (or returning `null` stage canvas with clean technical documentation) whenever `component_name` is `null`:
 
 ```typescript
 // src/components/playground/registry.ts
@@ -132,44 +134,43 @@ export const PLAYGROUND_COMPONENT_REGISTRY: Record<
     () => import('@/components/playground/items/PlaygroundNeuralDossier'),
     { ssr: false, loading: () => <div className="playground-loading-skeleton" /> }
   ),
-  // Default interactive stage for headless code packs, CLI tools, and starter kits
-  PlaygroundHeadlessStage: dynamic(
-    () => import('@/components/playground/items/PlaygroundHeadlessStage'),
-    { ssr: false, loading: () => <div className="playground-loading-skeleton" /> }
-  ),
 };
 
-export function resolvePlaygroundComponent(componentName?: string | null): ComponentType<PlaygroundComponentProps> {
+export function resolvePlaygroundComponent(componentName?: string | null): ComponentType<PlaygroundComponentProps> | null {
   if (componentName && PLAYGROUND_COMPONENT_REGISTRY[componentName]) {
     return PLAYGROUND_COMPONENT_REGISTRY[componentName];
   }
-  // Headless commercial fallback: renders CLI simulator, file tree, and architecture inspector
-  return PLAYGROUND_COMPONENT_REGISTRY.PlaygroundHeadlessStage;
+  // Authentic behavior: If no browser canvas exists, return null rather than mounting a fake CLI simulator.
+  return null;
 }
 ```
 
-#### Headless Stage Surface Architecture (`PlaygroundHeadlessStage.tsx`)
-When a commercial item has no browser canvas (`component_name == null`), `/playground/[slug]` mounts the `PlaygroundHeadlessStage` offering four high-engagement tabbed inspection surfaces:
-1. **Interactive CLI Terminal Simulator:** Displays live simulated execution of the tool, package manager commands (`npx`, `cargo`, `docker run`), input payload parameters, and formatted stdout/stderr JSON responses.
-2. **Repository Architecture & File Tree Explorer:** Interactive expandable file tree demonstrating production directory layout (`src/`, `prisma/`, `docker-compose.yml`, test suites, license), giving developers confidence in codebase maturity before purchasing.
-3. **Specification & Dependency Matrix:** Live readout of language runtime requirements (e.g. Node 22 LTS, Python 3.12), included packages, binary bundle size, and SHA-256 integrity proof.
-4. **"Built With This" Showcase & Developer Proof:** Live gallery displaying community projects, production apps shipped with the template, and verified builder testimonials—acting as the primary conversion snowball.
+#### Authentic Stage Surface Architecture (`PlaygroundArchitectureStage.tsx`)
+When a software item has no browser canvas (`component_name == null`), `/playground/[slug]` presents four verifiable technical inspection surfaces:
+1. **Verifiable Quickstart & Execution Guide:** Displays genuine, reproducible commands for developers to run locally:
+   - Method 1 (1-Click Native Launcher): `git clone https://github.com/prat3010/job-hunter.git && cd job-hunter && ./launch.sh` (concurrently boots FastAPI on `:8000` with SQLite and Next.js 16 frontend on `:3000`).
+   - Method 2 (Containerized Execution): `docker compose up -d` (Command Center at `:3000`, interactive Swagger docs at `:8000/docs`).
+2. **Repository Architecture & File Tree Explorer:** Interactive expandable file tree demonstrating genuine directory layout (`src/`, `prisma/`, `docker-compose.yml`, test suites, license), matching the real repository structure.
+3. **Specification & Dependency Matrix:** Live readout of language runtime requirements (e.g. Node 20+, Python 3.12), included packages, and cryptographic SHA-256 integrity proof computed directly from the built release package.
+4. **Verifiable Project Metrics & Source Links:** Direct link to the open-source GitHub repository, verified live metrics, and real architecture highlights—strictly prohibiting synthetic reviews or fabricated companies.
 
 ### 2.3 Storefront Taxonomy & Filter Classification
-The `/playground` gallery filter bar will evolve from pure technical format pills (`saas`, `toy`, `media`) into audience-centric commercial & engagement streams:
+The `/playground` gallery filter bar provides clear, audience-centric navigation:
 
 ```typescript
 export type PlaygroundTaxonomy = 
   | 'all'              // Universal Showcase
   | 'commercial'       // Purchasable Micro-SaaS, Turnkey Starters, Source Codes
   | 'toys-and-games'   // Free Interactive Canvas Engines, Shaders, Puzzles
-  | 'ecosystem';       // Live Flagships (Retriever AI, Scoping Studio, Client Workspace)
+  | 'ecosystem';       // Live Flagships (Retriever AI, Scoping Studio, Client Workspace, Job Hunter)
 ```
 
 1. **`All Creations` (Default):** Complete unified view sorted by featured status and release date.
-2. **`Commercial Products` (`commercial`):** Filter for purchasable software assets, Micro-SaaS applications, and production-ready source code licenses with real-time price tags.
-3. **`Interactive Toys & Games` (`toys-and-games`):** Preserves the viral arcade and generative art space (Cyber Snake, 2D Pathfinder, Pizza Rat, Matrix Rain, MediaPipe, AI Prompts).
-4. **`Ecosystem Tools` (`ecosystem`):** Flagship architectural systems connecting into `/rag`, `/scoping`, and `/dashboard`.
+2. **`SaaS & Apps`:** Real applications, open-source platforms, and Micro-SaaS tools.
+3. **`Games & Labs`:** Real interactive browser canvas engines (Cyber Snake, 2D Pathfinder, Pizza Rat, Matrix Rain).
+4. **`AI Art & Prompts`:** Real prompt engineering studies with generation parameters.
+5. **`Cognitive Tools`:** Real telemetry and profile analytics tools (Neural Dossier).
+6. **`Experiments`:** Real browser experiments (MediaPipe GestureScroll).
 
 ---
 
@@ -265,7 +266,7 @@ CREATE TABLE IF NOT EXISTS playground_products (
   metrics_badge TEXT DEFAULT '',
   preview_image TEXT DEFAULT '',
   
-  -- Commercial Configuration (Strictly Optional for Backward Compatibility)
+  -- Commercial Configuration (Optional)
   is_commercial BOOLEAN NOT NULL DEFAULT FALSE,
   price_inr INTEGER DEFAULT NULL,
   price_usd INTEGER DEFAULT NULL,
@@ -280,14 +281,14 @@ CREATE TABLE IF NOT EXISTS playground_products (
   highlights JSONB NOT NULL DEFAULT '[]',
   controls_guide JSONB NOT NULL DEFAULT '[]',
   
-  -- Digital Goods & Asset Packaging
+  -- Digital Goods & Asset Packaging (Authentic Verification)
   download_package_key TEXT DEFAULT NULL, -- Path in private 'playground-releases' bucket
   github_repo_source TEXT DEFAULT NULL,   -- e.g. 'prat3010/job-hunter' for GitHub invite delivery rail
   file_size TEXT DEFAULT NULL,            -- e.g. '14.8 MB'
-  checksum_sha256 TEXT DEFAULT NULL,      -- SHA-256 binary hash
+  checksum_sha256 TEXT DEFAULT NULL,      -- Real SHA-256 binary hash computed from file bytes
   version TEXT DEFAULT '1.0.0',
   license_type TEXT DEFAULT 'free' CHECK (license_type IN ('free', 'personal', 'commercial_single', 'commercial_unlimited', 'cloud_pass')),
-  showcase_projects JSONB NOT NULL DEFAULT '[]', -- Array of { title, url, description, author, stats }
+  showcase_projects JSONB NOT NULL DEFAULT '[]', -- Array of verified projects / metrics only (No fake reviews)
   
   -- Dynamic Media & Cognitive Parameters
   parameters JSONB DEFAULT '{}',
@@ -391,12 +392,12 @@ CREATE POLICY "Allow users to read their own licenses"
 - **Storage Tier Constraints & Sizing:**
   - *Supabase Free Tier Constraint:* Single file maximum upload size is 50 MB.
   - *Supabase Pro Tier Capacity:* Single file upload size up to 5 GB.
-  - *PRD Production Quota:* 250 MB max per release archive. The synchronizer uploader validates binary size dynamically (rejecting files > 50 MB if deployed on Free tier, or allowing up to 250 MB on Pro tier) with clear in-dashboard diagnostics.
+  - *Production Quota:* 250 MB max per release archive. The synchronizer uploader validates binary size dynamically with clear diagnostics.
 - **Allowed MIME Types:** `application/zip`, `application/x-zip-compressed`, `application/gzip`, `application/x-tar`.
 - **Fulfillment Mechanism:** Signed URLs generated via Supabase Storage API (`createSignedUrl(path, 86400)`) with an expiration of 24 hours, supplemented by the tokenized guest renewal endpoint (`/api/playground/download`).
 
 ### 3.4 Data Access Layer & Local Fallback (`src/lib/data.ts`)
-In alignment with codebase conventions, playground products are cached aggressively via Next.js `unstable_cache` with an automatic local JSON fallback:
+Playground products are cached via Next.js `unstable_cache` with an automatic local JSON fallback:
 
 ```typescript
 // Additions to src/lib/data.ts
@@ -470,14 +471,14 @@ export const getPlaygroundProducts = unstable_cache(
 ## 4. The Publishing Engine (Streamlit Synchronizer Integration)
 
 ### 4.1 Architecture & Control Room Placement
-The local Streamlit Synchronizer (`scripts/synchronizer.py`) serves as our Master Content Control Plane. A dedicated tab module—[scripts/sync_tabs/playground.py](../../scripts/sync_tabs/playground.py)—will be introduced and registered into the synchronizer navigation bar:
+The local Streamlit Synchronizer (`scripts/synchronizer.py`) serves as our Master Content Control Plane. A dedicated tab module—`scripts/sync_tabs/playground.py`—is registered in the navigation bar:
 
 ```python
 # scripts/synchronizer.py registration
 nav_options = [
     "👤 Profile, Bio & Career",
     "🚀 Deployed Systems & Architecture",
-    "🎮 Playground & Micro-SaaS", # <-- NEW TAB
+    "🎮 Playground & Micro-SaaS", # <-- Synchronizer Tab
     "⚡ Skills Matrix",
     "📜 Verified Badges",
     "🖼️ Photos & Assets",
@@ -503,30 +504,30 @@ The tab provides an operational studio supporting two distinct operational modes
 │ STREAMLIT SYNCHRONIZER // 🎮 PLAYGROUND & MICRO-SAAS PUBLISHING ENGINE                  │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ Mode: (o) Edit Existing Item   ( ) ➕ Publish New Micro-SaaS Product                   │
-│ Select Creation: [ 📦 Code-Audit Pro SaaS (slug: code-audit-pro)                    ▼ ]│
+│ Select Creation: [ 📦 Job Hunter Studio (slug: job-hunter)                          ▼ ]│
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ [1. GENERAL METADATA]                                                                  │
-│ Title:       [ Code-Audit Pro SaaS MVP                                              ] │
-│ Slug:        [ code-audit-pro        ] Kind: [ saas ▼ ] Taxonomy: [ commercial    ▼ ] │
-│ Tagline:     [ Autonomous static code analysis and AST vulnerability scanner.       ] │
-│ Description: [ Full description with markdown support...                            ] │
+│ Title:       [ Job Hunter Studio                                                    ] │
+│ Slug:        [ job-hunter            ] Kind: [ saas ▼ ] Taxonomy: [ ecosystem     ▼ ] │
+│ Tagline:     [ Autonomous multi-board job aggregator and Scikit-Learn resume tailor.] │
+│ Description: [ Full technical overview with markdown support...                     ] │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ [2. COMMERCE & PRICING ENGINE]                                                         │
-│ [X] Is Commercial Product (Purchasable)                                                │
+│ [ ] Is Commercial Product (Purchasable)                                                │
 │ Pricing Strategy:                                                                      │
-│   • Base Price INR: [ ₹4,999  ]   • Base Price USD: [ $59    ]                         │
+│   • Base Price INR: [ ₹2,499  ]   • Base Price USD: [ $29    ]                         │
 │ Multi-Tier Licensing Setup:                                                            │
-│   Tier 1: Cloud Pass (Hosted Web Access)      -> INR: ₹1,499 | USD: $19                │
-│   Tier 2: Full Source Code + Commercial License -> INR: ₹4,999 | USD: $59              │
+│   Tier 1: Developer Source Code License       -> INR: ₹2,499 | USD: $29                │
+│   Tier 2: Team / Agency Distribution License  -> INR: ₹7,999 | USD: $99                │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ [3. DIGITAL PACKAGE RELEASE & CHECKSUM]                                                │
-│ Upload Distribution Package (.zip): [ Browse release-v1.0.4.zip...                  ] │
-│ • Computed Checksum: a8f5c3b99182...3e41 (SHA-256)                                     │
-│ • Calculated Size: 18.4 MB                                                             │
-│ • Target Supabase Bucket: playground-releases/code-audit-pro/release-v1.0.4.zip        │
+│ [3. DIGITAL PACKAGE RELEASE & AUTHENTIC CHECKSUM]                                      │
+│ Upload Distribution Package (.zip): [ Browse release-v1.0.0.zip...                  ] │
+│ • Computed Checksum: 8a4f91...c39e (Real SHA-256 computed from uploaded byte stream)   │
+│ • Calculated Size: 14.2 MB                                                             │
+│ • Target Supabase Bucket: playground-releases/job-hunter/release-v1.0.0.zip           │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ [4. PREVIEW ASSETS & INTERACTIVE RUNNER]                                               │
-│ Component Name: [ PlaygroundCodeAuditPro ] (Client Component Registry Identifier)      │
+│ Component Name: [ None ] (Renders authentic architecture & quickstart stage)           │
 │ Cover Image:    [ Browse cover.webp...   ] -> Auto-optimizes to WebP 80%               │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │ [ ACTIONS ]                                                                            │
@@ -536,8 +537,8 @@ The tab provides an operational studio supporting two distinct operational modes
 
 ### 4.3 Digital Release Uploader & Integrity Hashing
 When a digital release package (`.zip`) is uploaded through the Streamlit dashboard:
-1. **Tier-Aware Size Validation:** Validates that `file_size <= 250 MB` (or `<= 50 MB` if working against a Free tier Supabase project). Displays an explicit warning modal if limits are exceeded.
-2. **SHA-256 Computation:** Reads the byte stream in 64 KB chunks and generates an immutable hex checksum:
+1. **Tier-Aware Size Validation:** Validates that `file_size <= 250 MB` (or `<= 50 MB` if working against a Free tier Supabase project).
+2. **Real SHA-256 Computation:** Reads the byte stream in 64 KB chunks and generates an authentic hex checksum:
    ```python
    import hashlib
 
@@ -549,13 +550,10 @@ When a digital release package (`.zip`) is uploaded through the Streamlit dashbo
        uploaded_file.seek(0)
        return hasher.hexdigest()
    ```
-3. **Resilient Chunked Streaming Upload:** To prevent Streamlit UI freezes, socket timeouts, and high memory footprints on 50–250 MB archives:
-   - Uses an explicit `requests.Session` with a 300-second socket read/write timeout.
-   - Streams the binary directly from the temporary disk buffer into Supabase Storage API `POST /storage/v1/object/playground-releases/{slug}/{filename}` with `Content-Type: application/zip` and `x-upsert: true` headers using `SUPABASE_SERVICE_ROLE_KEY`.
-   - On completion, logs the remote storage path (`download_package_key`), file size string (e.g. `18.4 MB`), and verified SHA-256 hash directly into the metadata stage.
+3. **Resilient Chunked Streaming Upload:** Streams the binary directly from disk buffer into Supabase Storage API `POST /storage/v1/object/playground-releases/{slug}/{filename}` with `Content-Type: application/zip` and `x-upsert: true` headers using `SUPABASE_SERVICE_ROLE_KEY`.
 
 ### 4.4 Atomic Dual-Persistence & Cache Purging
-To guarantee zero-downtime consistency between cloud databases, local Git fallbacks, and the Next.js edge cache:
+To guarantee consistency between cloud databases, local Git fallbacks, and the Next.js cache:
 1. **Step 1 (Supabase Upsert):** Upserts the record into `playground_products` on conflict `slug`.
 2. **Step 2 (Atomic JSON Write):** Reads all playground products and writes `src/data/playgroundItems.json` atomically using temporary file renaming (`atomic_write_json`).
 3. **Step 3 (Next.js Cache Revalidation):** Triggers an authenticated purge request to the running Next.js app:
@@ -568,39 +566,30 @@ To guarantee zero-downtime consistency between cloud databases, local Git fallba
 ## 5. Storefront & Purchasing UX (`/playground` and `/playground/[slug]`)
 
 ### 5.1 The Showcase Gallery (`/playground`)
-The `/playground` gallery grid gains prominent visual differentiation between free interactive experiments and purchasable commercial software:
-
+The `/playground` gallery grid cleanly differentiates between free interactive experiments, open-source repositories, and purchasable software:
 1. **Badge Differentiation:**
-   - **Free Playable Toys:** Displays `Free to Play` or `Interactive Lab` with retro gaming icons.
-   - **Commercial Products:** Displays dynamic pricing chips (`₹4,999` / `$59`) with a glowing badge (`Commercial Release` or `Turnkey Source`).
-2. **Currency Sensitivity:** Honors the user's active currency cookie (`region: 'IN'` -> `INR`, International -> `USD`) with smooth numerical transitions via `@number-flow/react`.
-3. **Filter Navigation Bar:** Includes the new `Commercial Products` tab with real-time product count badges.
+   - **Free Playable Toys:** Displays `Free to Play` or `Interactive Lab` with gaming icons.
+   - **Open-Source Tools:** Displays tech stack badges (`FASTAPI + SCIKIT`, `Next.js 16`, `Open Source`).
+   - **Commercial Products:** Displays dynamic pricing chips (`₹2,499` / `$29`) with a verified badge.
+2. **Filter Navigation Bar:** Real categories with dynamic counts (`All Creations`, `SaaS & Apps`, `Games & Labs`, `AI Art & Prompts`, `Cognitive Tools`, `Experiments`).
 
 ### 5.2 Product Sandbox & Detail View (`/playground/[slug]`)
-On the dedicated item route, commercial products display a dual-surface layout:
-1. **The Interactive Sandbox Stage (Polymorphic):**
+On the dedicated item route, items display an authentic dual-surface layout:
+1. **The Interactive Stage (Polymorphic):**
    - **Interactive Toys & UI Tools (`component_name != null`):** Mounts the live code-split client component (e.g. `PlaygroundSnake`, `PlaygroundPizzaRat`), allowing the user to play the game or test sample inputs.
-   - **Headless Code Packs & Starters (`component_name == null`):** Mounts the `PlaygroundHeadlessStage` featuring the interactive CLI Terminal Simulator, Expandable Repository Architecture Tree, and System Requirement Specs.
-2. **The `StickyCommercialBar`:** An anchored bottom bar that tracks viewport scroll, presenting instantaneous purchase options without disrupting sandbox testing:
-
-```text
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ 📦 Code-Audit Pro SaaS MVP // Commercial Source License        v1.0.4 (18.4 MB)        │
-│ [ Cloud Access Pass: ₹1,499 ]  [ Full Source Code + Commercial License: ₹4,999 ]       │
-│                                              [ ⚡ Instant Guest Checkout -> ]          │
-└────────────────────────────────────────────────────────────────────────────────────────┘
-```
+   - **Headless Code Packs & Repositories (`component_name == null`):** Mounts the authentic technical overview featuring verified quickstart commands (`./launch.sh`, `docker compose up -d`), architecture highlights, and direct GitHub links.
+2. **The `StickyCommercialBar` (Only on active commercial products):** An anchored bottom bar that tracks viewport scroll, presenting instantaneous purchase options without disrupting reading.
 
 ### 5.3 The Frictionless Guest Checkout Modal (`PlaygroundCheckoutModal`)
-Clicking "Instant Guest Checkout" opens an accessible, high-performance modal container:
+Clicking "Instant Guest Checkout" on active commercial items opens an accessible modal container:
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
 │  ⚡ INSTANT CHECKOUT // SECURE DIGITAL FULFILLMENT            │
 │  PRATEEQ STUDIO DIGITAL GOODS                                │
 ├──────────────────────────────────────────────────────────────┤
-│  Product: Code-Audit Pro SaaS MVP (Full Source Code License) │
-│  Total:   ₹4,999 INR (Inclusive of all taxes & LUT export)   │
+│  Product: Job Hunter Studio (Developer Source Code License)  │
+│  Total:   ₹2,499 INR (Inclusive of all taxes & LUT export)   │
 ├──────────────────────────────────────────────────────────────┤
 │  Full Name *                                                 │
 │  [ Alex Vance                                              ] │
@@ -623,17 +612,17 @@ Clicking "Instant Guest Checkout" opens an accessible, high-performance modal co
 ```
 
 #### International Multi-Currency, LUT & Partner Attribution:
-- **Currency Toggle Kinetics:** Toggling between INR and USD dynamically recalculates the payable total using the product's configured `priceINR` vs `priceUSD` (or tier pricing), and dispatches the corresponding currency code to `/api/playground/checkout/create-order`.
+- **Currency Toggle Kinetics:** Toggling between INR and USD dynamically recalculates the payable total using configured `priceINR` vs `priceUSD`.
 - **Payment Method Routing:**
   - `INR`: Razorpay natively accepts UPI QR / Apps (Google Pay, PhonePe, Paytm), RuPay / Visa / Mastercard, and NetBanking.
-  - `USD / EUR / GBP`: Razorpay opens with International Card Acceptance (Visa, Mastercard, American Express) and Dynamic Currency Conversion (DCC).
+  - `USD / EUR / GBP`: Razorpay opens with International Card Acceptance and Dynamic Currency Conversion (DCC).
 - **Export of Services Under LUT:** For international cross-border sales, supply of digital goods/code licenses is invoiced under Indian GST Letter of Undertaking (LUT - Form GST RFD-11) without payment of integrated tax (Zero-Rated IGST Export). Invoices and email receipts automatically include Prateek Sharma's GSTIN and statutory export declaration.
-- **Middleman Referral Tracking (`?ref=...`):** The checkout modal automatically inspects active URL search params (`?ref=partner_slug`) and client cookies (`partner_ref`), appending `referralCode` to the order payload for sales partner commission attribution.
+- **Middleman Referral Tracking (`?ref=...`):** Inspects active URL search params (`?ref=partner_slug`) and client cookies (`partner_ref`), appending `referralCode` to the order payload for sales partner commission attribution.
 
 #### Enforced Codebase Conventions for Checkout Modal:
-- **Containing Block Safety (`<Portal>`):** The modal is rendered via `<Portal target="document.body">` ([src/components/ui/Portal.tsx](../../src/components/ui/Portal.tsx)) to escape the `will-change: transform` containing block of `ScrollSection` (ADR 05).
+- **Containing Block Safety (`<Portal>`):** Rendered via `<Portal target="document.body">` to escape the `will-change: transform` containing block of `ScrollSection` (ADR 05).
 - **Lenis Scroll Lock & Touch Isolation:** Implements `useLenis()` to freeze background scroll (`lenis.stop()` on mount, `lenis.start()` on unmount) and tags inner scroll areas with `data-lenis-prevent` (ADR 47).
-- **Tactile Button Kinetics:** The primary submit CTA is wrapped in `<MagneticButton strength={0.25}>` ([src/components/ui/MagneticButton.tsx](../../src/components/ui/MagneticButton.tsx)).
+- **Tactile Button Kinetics:** Primary submit CTA is wrapped in `<MagneticButton strength={0.25}>`.
 - **Dual-Theme Design System 2.0 Tokens:** Uses semantic variables (`var(--surface-elevated)`, `var(--border-muted)`, `var(--color-primary)`) to preserve visual fidelity across Azure and Noir modes.
 
 ---
@@ -767,9 +756,9 @@ export async function claimAndSettlePlaygroundOrder(
 
 ### 6.3 Secure Asset Delivery & Tokenized Guest Download Endpoint
 
-Commercial packages are never exposed via public CDN URLs. Fulfillment operates via two distinct mechanisms:
+Commercial packages are never exposed via public CDN URLs:
 1. **Short-TTL Ephemeral Signed URL (24 Hours):** Generated immediately upon checkout or dashboard access via `createSignedUrl`.
-2. **Tokenized Guest Download & Renewal Endpoint (`/api/playground/download`):** For guest users who do not use Google OAuth (e.g., corporate emails) or when the 24-hour initial link has expired:
+2. **Tokenized Guest Download & Renewal Endpoint (`/api/playground/download`):** For guest users who do not use Google OAuth:
 
 ```typescript
 // src/app/api/playground/download/route.ts
@@ -859,13 +848,13 @@ Upon confirmed settlement, Resend dispatches a transactional receipt and fulfill
 
 ### 6.6 Deferred Account Linking to `/dashboard`
 When a guest customer visits `prateeq.in/dashboard` in the future and signs in with Google OAuth:
-1. The dashboard authentication listener ([src/context/AuthContext.tsx](../../src/context/AuthContext.tsx)) extracts the verified user email (`user.email`).
+1. The dashboard authentication listener extracts the verified user email (`user.email`).
 2. The dashboard fetches client scopes AND executes a lookup:
    ```sql
    SELECT * FROM playground_orders 
    WHERE customer_email = $user_email AND status = 'paid';
    ```
-3. A new **"Digital Goods & Software Licenses"** tab automatically mounts inside the client workspace, giving the user perpetual access to re-generate signed download URLs, view active license keys, inspect software version changelogs, and connect/update their GitHub handle to re-trigger repository invites.
+3. A **"Digital Goods & Software Licenses"** tab mounts inside the client workspace ONLY when real paid orders exist for that email, giving the user perpetual access to re-generate signed download URLs, view active license keys, inspect software version changelogs, and update their GitHub handle.
 
 ### 6.7 Automated GitHub Repository Access Fulfillment (Developer Experience Rail)
 For boilerplates, starter kits, and code libraries where `github_repo_source` is configured (e.g. `prat3010/job-hunter`):
@@ -891,7 +880,7 @@ For boilerplates, starter kits, and code libraries where `github_repo_source` is
 3. **Resilience & Non-Blocking Design:** If the GitHub API fails (invalid handle, rate limit), the customer's purchase remains 100% fulfilled via the ZIP download rail and dashboard retry button.
 
 ### 6.8 Ecosystem Middleman & Affiliate Attribution Engine
-In alignment with the ecosystem's commercial partner playbook ([docs/HIGH_TICKET_COMMERCIAL_PLAYBOOK.md](file:///Users/prateeksharma/Developer/Prateek_Ecosystem_Vault/HIGH_TICKET_COMMERCIAL_PLAYBOOK.md)) and `commissionConfig.json`:
+In alignment with the ecosystem's commercial partner playbook and `commissionConfig.json`:
 1. **Referral Attribution (`?ref=partner_slug`):** When a visitor arrives via a registered Middleman partner link, the proxy / checkout listener captures the slug into a 30-day cookie (`partner_ref`).
 2. **Order Ledgering:** The checkout order creation route records `referral_code` in `playground_orders`.
 3. **Commission Calculation:** Upon settlement, the system credits the partner's account according to digital goods referral bands (Standard Tier C digital referral rate: 20% of net settlement), visible in the partner's `/admin` and `/dashboard` escrow ledger.
@@ -909,7 +898,7 @@ gantt
     Data Layer & Local JSON Fallback      :p1_2, after p1_1, 2d
     Streamlit playground.py Publishing Tab:p1_3, after p1_2, 3d
     section Phase 2: Storefront & UX
-    Decoupled Component Registry & Headless:p2_1, after p1_3, 2d
+    Decoupled Component Registry & Stage  :p2_1, after p1_3, 2d
     Gallery Commercial Cards & Badges     :p2_2, after p2_1, 2d
     StickyCommercialBar & Detail Stage    :p2_3, after p2_2, 3d
     section Phase 3: Checkout & Fulfillment
@@ -923,35 +912,37 @@ gantt
     End-to-End Test Suite & Verification  :p4_2, after p4_1, 2d
 ```
 
-### Phase 1: Database Schemas, Storage & Publishing Tab
-- [ ] Run SQL migrations in Supabase to create `playground_products`, `playground_orders`, and `playground_licenses` with `github_repo_source`, `showcase_projects`, `github_username`, and `referral_code` columns.
-- [ ] Enforce `UNIQUE` constraint on `order_id` in `playground_licenses` and unique index on `download_token`.
-- [ ] Create the private Supabase Storage bucket `playground-releases` with restricted service-role RLS.
-- [ ] Create `src/data/playgroundItems.json` seeded with 13 items (the 12 legacy free items + Item #13 `saas-job-hunter` Flagship Commercial Launch Title).
-- [ ] Update [src/lib/data.ts](../../src/lib/data.ts) with `getPlaygroundProducts` using `unstable_cache` tag `playground-items`.
-- [ ] Author `scripts/sync_tabs/playground.py` supporting edit/create workflows, pricing inputs, WebP image compression, chunked streaming binary package uploads, GitHub repo binding, and storage tier size checks.
-- [ ] Add `"🎮 Playground & Micro-SaaS"` to `scripts/synchronizer.py`.
+### Phase 1: Database Schemas, Storage & Publishing Tab [COMPLETE]
+- [x] Run SQL migrations in Supabase to create `playground_products`, `playground_orders`, and `playground_licenses` with `github_repo_source`, `showcase_projects`, `github_username`, and `referral_code` columns.
+- [x] Enforce `UNIQUE` constraint on `order_id` in `playground_licenses` and unique index on `download_token`.
+- [x] Create the private Supabase Storage bucket `playground-releases` with restricted service-role RLS.
+- [x] Create `src/data/playgroundItems.json` seeded with 13 authentic items (the 12 legacy free items + Item #13 `saas-job-hunter` Open-Core & Micro-SaaS Engine).
+- [x] Update `src/lib/data.ts` with `getPlaygroundProducts` using `unstable_cache` tag `playground-items`.
+- [x] Author `scripts/sync_tabs/playground.py` supporting edit/create workflows, pricing inputs, WebP image compression, chunked streaming binary package uploads, GitHub repo binding, and storage tier size checks.
+- [x] Add `"🎮 Playground & Micro-SaaS"` to `scripts/synchronizer.py`.
 
-### Phase 2: Decoupled Component Registry & Storefront UI
-- [ ] Create `src/components/playground/registry.ts` with Next.js dynamic code splitting and `PlaygroundHeadlessStage` fallback.
-- [ ] Build `PlaygroundHeadlessStage.tsx` featuring the interactive CLI Terminal Simulator, Expandable Repository Architecture Tree, System Requirement Specs, and "Built With This" Showcase.
-- [ ] Refactor [src/app/playground/[slug]/page.tsx](../../src/app/playground/%5Bslug%5D/page.tsx) to resolve interactive components via `resolvePlaygroundComponent()`.
-- [ ] Update [PlaygroundGrid.tsx](../../src/components/playground/PlaygroundGrid.tsx) and cards to render commercial badges (`₹ Price / $ Price`), dynamic filters, and currency formatting.
-- [ ] Build `StickyCommercialBar.tsx` for commercial items with tier selectors.
+### Phase 2: Decoupled Component Registry & Storefront UI [IN PROGRESS]
+- [x] Create `src/components/playground/registry.ts` with Next.js dynamic code splitting and clean `null` fallback for canvas-less code assets.
+- [x] Author `src/lib/playgroundCommerce.ts` with price resolution, timing-safe HMAC verification, atomic settlement locks, and quota checks.
+- [ ] Build authentic `PlaygroundArchitectureStage.tsx` component featuring verifiable quickstart commands (`./launch.sh`, `docker compose up -d`), repository file tree, and system specifications.
+- [ ] Refactor `src/app/playground/[slug]/page.tsx` to resolve interactive components via `resolvePlaygroundComponent()` with `PlaygroundArchitectureStage` fallback.
+- [ ] Update `PlaygroundGrid.tsx` and cards to render authentic technical badges, commercial price chips (`₹2,499 / $29`), dynamic filters, and currency formatting.
+- [ ] Build `StickyCommercialBar.tsx` for items with verified commercial releases.
 
-### Phase 3: Guest Checkout Modal & Fulfillment Engine
+### Phase 3: Guest Checkout Modal & Fulfillment Engine [BACKEND COMPLETE // UI PENDING]
+- [x] Author `src/app/api/playground/checkout/create-order/route.ts` with input validation, order logging, referral attribution, and Razorpay API order generation.
+- [x] Author `src/app/api/playground/checkout/verify/route.ts` with timing-safe HMAC signature verification, atomic order settlement lock (`claimAndSettlePlaygroundOrder`), license generation, automated GitHub repo invite trigger (`inviteCustomerToGitHubRepo`), and signed URL issuance.
+- [x] Author tokenized guest re-download endpoint `src/app/api/playground/download/route.ts` enforcing `download_token`, `download_count < max_downloads`, and generating fresh time-limited signed URLs.
+- [x] Update `src/app/api/webhooks/razorpay/route.ts` to idempotently process `playground_orders` using atomic status checks.
+- [x] Author `src/app/api/client/playground-licenses/route.ts` for session-verified license retrieval and GitHub username updates.
+- [x] Implement Resend transactional email template in `src/lib/emailNotification.ts` (`sendPlaygroundFulfillmentEmail`) with direct 24h download link, permanent magic link, GitHub invite status, and GST LUT export notice.
 - [ ] Implement `PlaygroundCheckoutModal.tsx` wrapped in `<Portal>` with `useLenis` scroll locking, `data-lenis-prevent`, dynamic INR / USD currency toggling, optional GitHub handle input, and `?ref=` partner referral tracking.
-- [ ] Author `src/app/api/playground/checkout/create-order/route.ts` with input validation, order logging, referral attribution, and Razorpay API order generation.
-- [ ] Author `src/app/api/playground/checkout/verify/route.ts` with timing-safe HMAC signature verification, atomic order settlement lock (`claimAndSettlePlaygroundOrder`), license generation, automated GitHub repo invite trigger (`inviteCustomerToGitHubRepo`), and signed URL issuance.
-- [ ] Author tokenized guest re-download endpoint `src/app/api/playground/download/route.ts` enforcing `download_token`, `download_count < max_downloads`, and generating 24h signed URLs.
-- [ ] Update `src/app/api/webhooks/razorpay/route.ts` to idempotently process `playground_orders` using atomic status checks.
-- [ ] Implement Resend transactional email template in `src/lib/emailNotification.ts` with direct 24h download link, permanent magic link, GitHub invite status, and GST LUT export notice.
 
-### Phase 4: Dashboard Integration & Quality Verification
-- [ ] Update [src/app/dashboard/page.tsx](../../src/app/dashboard/page.tsx) to fetch and display guest purchases mapped to the authenticated user's email, with GitHub handle update / re-invite retry capabilities.
+### Phase 4: Dashboard Integration & Commercial Release Activation [PENDING]
+- [x] Add comprehensive unit tests in `src/lib/__tests__/playground-commerce.test.ts` covering price calculations, HMAC verification, atomic status transitions, and license key generation (All pass cleanly).
+- [ ] Update `src/app/dashboard/page.tsx` to conditionally mount the license hub only when the authenticated user has real paid orders in `playground_orders`.
+- [ ] Stage authentic commercial digital release packages (Turnkey Boilerplates, Enterprise Source Packs) in private Supabase bucket `playground-releases` with real built binaries and verifiable SHA-256 hashes, preserving authentic open-source flagships (Job Hunter Studio) as free open-source showcases.
 - [ ] Connect Playground digital product transactions to partner escrow balances in `/admin` via `commissionConfig.json`.
-- [ ] Add unit tests in `src/lib/__tests__/playground-commerce.test.ts` covering price calculations, HMAC verification, atomic status transitions, and license key generation.
-- [ ] Verify complete build with `npx tsc --noEmit`, `npm test`, and `npm run lint`.
 
 ---
 
@@ -965,21 +956,21 @@ gantt
 | **Next.js Turbopack Build** | `npm run build` | Successful static generation of `/playground` and all dynamic `/playground/[slug]` routes. |
 | **Streamlit Synchronizer Smoke** | `python3 scripts/synchronizer.py` | UI loads cleanly, tab switches without traceback errors, and mock upload tests pass. |
 | **Portal & Scroll Section Safety** | Playwright / Manual Check | Modal renders directly into `document.body` without transform distortion; Lenis background scrolling is locked. |
+| **Production Truth Verification** | Codebase Audit | 0 simulated CLIs (`setTimeout` logs), 0 fake customer testimonials, 0 empty-string checksums. |
 
 ---
 
 ## 9. Architectural Sign-off & Invariant Matrix
 
+- [x] **Production Truth Guarantee:** Zero simulated CLI terminal buttons, zero fabricated customer testimonials, zero placeholder hashes.
 - [x] **Zero Existing Item Deletion:** 12/12 legacy toys and experiments retained with 100% functionality.
 - [x] **Guest Checkout Guarantee:** Zero mandatory OAuth barriers for purchasing digital products.
 - [x] **Dual Fulfillment Rails:** Instant private signed ZIP download + automated GitHub collaborator invite for developers wanting upstream updates.
 - [x] **No-Auth Magic Link Re-downloads:** Permanent tokenized renewal endpoint for guest buyers without Google accounts.
 - [x] **Double-Spend & Concurrency Lock:** Atomic conditional status update and unique license constraint eliminate duplicate licenses and duplicate emails.
-- [x] **Headless Code Pack Support:** Dedicated `PlaygroundHeadlessStage` (CLI terminal simulator, repo tree, specs, social proof showcase) for canvas-less code assets.
+- [x] **Verifiable Code Pack Support:** Dedicated technical blueprint and execution guide (`./launch.sh`, Docker Compose) for canvas-less code assets.
 - [x] **Ecosystem Referral Integration:** Seamless attribution to Middleman sales partners via `commissionConfig.json`.
 - [x] **Security Hardening:** No sensitive download links in client-side code; private Supabase bucket with time-limited signed URLs.
 - [x] **Design System Parity:** Dual-theme semantic CSS tokens for both Azure and Noir palettes.
-- [x] **Backward Compatibility:** All new commercial fields optional in schemas and TypeScript types.
-- [x] **Security Hardening:** No sensitive download links in client-side code; private Supabase bucket with time-limited signed URLs.
-- [x] **Design System Parity:** Dual-theme semantic CSS tokens for both Azure and Noir palettes.
+- [x] **Conditional Dashboard Tab:** Digital Goods tab only renders when authenticated user has authentic paid order records.
 - [x] **Backward Compatibility:** All new commercial fields optional in schemas and TypeScript types.

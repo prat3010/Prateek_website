@@ -120,6 +120,7 @@ ALTER TABLE projects ADD COLUMN IF NOT EXISTS "keyDeliverables" JSONB DEFAULT '[
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS "keyDeliverables_business" JSONB DEFAULT '[]';
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS "metrics" JSONB DEFAULT '[]';
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS "metrics_business" JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "sshCommand" TEXT DEFAULT '';
 
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public select projects" ON projects;
