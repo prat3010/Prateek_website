@@ -187,7 +187,7 @@
       "x": -2400,
       "y": 4100,
       "width": 1140,
-      "height": 2210,
+      "height": 1790,
       "color": "1"
     },
     {
@@ -251,31 +251,11 @@
       "color": "1"
     },
     {
-      "id": "node-ui-edgeswarmpanel",
-      "type": "file",
-      "file": "architecture_nodes/UI_EdgeSwarmPanel.md",
-      "x": -2350,
-      "y": 5450,
-      "width": 500,
-      "height": 380,
-      "color": "1"
-    },
-    {
-      "id": "node-ui-capabilitystudiopanel",
-      "type": "file",
-      "file": "architecture_nodes/UI_CapabilityStudioPanel.md",
-      "x": -1810,
-      "y": 5450,
-      "width": 500,
-      "height": 380,
-      "color": "1"
-    },
-    {
       "id": "node-tool-synchronizer",
       "type": "file",
       "file": "architecture_nodes/Tool_Synchronizer.md",
       "x": -2350,
-      "y": 5870,
+      "y": 5450,
       "width": 500,
       "height": 380,
       "color": "1"
@@ -737,7 +717,7 @@
       "x": 100,
       "y": -100,
       "width": 1140,
-      "height": 6830,
+      "height": 5570,
       "color": "4"
     },
     {
@@ -891,41 +871,11 @@
       "color": "4"
     },
     {
-      "id": "node-retriever-api-v1-multicloud",
-      "type": "file",
-      "file": "architecture_nodes/Retriever_API_v1_multicloud.md",
-      "x": 690,
-      "y": 2930,
-      "width": 500,
-      "height": 380,
-      "color": "4"
-    },
-    {
       "id": "node-retriever-api-v1-voice",
       "type": "file",
       "file": "architecture_nodes/Retriever_API_v1_voice.md",
-      "x": 150,
-      "y": 3350,
-      "width": 500,
-      "height": 380,
-      "color": "4"
-    },
-    {
-      "id": "node-retriever-api-v1-enclave",
-      "type": "file",
-      "file": "architecture_nodes/Retriever_API_v1_enclave.md",
       "x": 690,
-      "y": 3350,
-      "width": 500,
-      "height": 380,
-      "color": "4"
-    },
-    {
-      "id": "node-retriever-api-v1-scaffold",
-      "type": "file",
-      "file": "architecture_nodes/Retriever_API_v1_scaffold.md",
-      "x": 150,
-      "y": 3770,
+      "y": 2930,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -934,8 +884,8 @@
       "id": "node-retriever-api-v1-serverless-gpu",
       "type": "file",
       "file": "architecture_nodes/Retriever_API_v1_serverless_gpu.md",
-      "x": 690,
-      "y": 3770,
+      "x": 150,
+      "y": 3350,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -944,8 +894,8 @@
       "id": "node-engine-docling-layout-ocr",
       "type": "file",
       "file": "architecture_nodes/Engine_Docling_Layout_OCR.md",
-      "x": 150,
-      "y": 4190,
+      "x": 690,
+      "y": 3350,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -954,8 +904,8 @@
       "id": "node-engine-llamaguard-guardrails",
       "type": "file",
       "file": "architecture_nodes/Engine_LlamaGuard_Guardrails.md",
-      "x": 690,
-      "y": 4190,
+      "x": 150,
+      "y": 3770,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -964,8 +914,8 @@
       "id": "node-engine-multiagent-consensus",
       "type": "file",
       "file": "architecture_nodes/Engine_MultiAgent_Consensus.md",
-      "x": 150,
-      "y": 4610,
+      "x": 690,
+      "y": 3770,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -974,8 +924,8 @@
       "id": "node-engine-longllmlingua-compression",
       "type": "file",
       "file": "architecture_nodes/Engine_LongLLMLingua_Compression.md",
-      "x": 690,
-      "y": 4610,
+      "x": 150,
+      "y": 4190,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -984,8 +934,8 @@
       "id": "node-engine-rlm-python-repl",
       "type": "file",
       "file": "architecture_nodes/Engine_RLM_Python_REPL.md",
-      "x": 150,
-      "y": 5030,
+      "x": 690,
+      "y": 4190,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -994,8 +944,8 @@
       "id": "node-engine-graphrag-topology",
       "type": "file",
       "file": "architecture_nodes/Engine_GraphRAG_Topology.md",
-      "x": 690,
-      "y": 5030,
+      "x": 150,
+      "y": 4610,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -1004,18 +954,8 @@
       "id": "node-engine-sovereign-edge-sync",
       "type": "file",
       "file": "architecture_nodes/Engine_Sovereign_Edge_Sync.md",
-      "x": 150,
-      "y": 5450,
-      "width": 500,
-      "height": 380,
-      "color": "4"
-    },
-    {
-      "id": "node-engine-multicloud-replication",
-      "type": "file",
-      "file": "architecture_nodes/Engine_MultiCloud_Replication.md",
       "x": 690,
-      "y": 5450,
+      "y": 4610,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -1025,27 +965,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Sovereign_Edge_Voice.md",
       "x": 150,
-      "y": 5870,
-      "width": 500,
-      "height": 380,
-      "color": "4"
-    },
-    {
-      "id": "node-engine-autonomous-metaprogrammer",
-      "type": "file",
-      "file": "architecture_nodes/Engine_Autonomous_Metaprogrammer.md",
-      "x": 690,
-      "y": 5870,
-      "width": 500,
-      "height": 380,
-      "color": "4"
-    },
-    {
-      "id": "node-engine-confidential-micro-enclave",
-      "type": "file",
-      "file": "architecture_nodes/Engine_Confidential_Micro_Enclave.md",
-      "x": 150,
-      "y": 6290,
+      "y": 5030,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -1055,7 +975,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Serverless_GPU_vLLM_Serving.md",
       "x": 690,
-      "y": 6290,
+      "y": 5030,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -1065,7 +985,7 @@
       "type": "group",
       "label": "7. ASYNC INFRASTRUCTURE: Workers, Brokers & Encryption Envelopes",
       "x": 100,
-      "y": 6830,
+      "y": 5570,
       "width": 600,
       "height": 1370,
       "color": "3"
@@ -1075,7 +995,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Celery_RabbitMQ.md",
       "x": 150,
-      "y": 6920,
+      "y": 5660,
       "width": 500,
       "height": 380,
       "color": "3"
@@ -1085,7 +1005,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Dogfooding_Tenant_prateeq_scoping.md",
       "x": 150,
-      "y": 7340,
+      "y": 6080,
       "width": 500,
       "height": 380,
       "color": "3"
@@ -1095,7 +1015,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Envelope_Encryption.md",
       "x": 150,
-      "y": 7760,
+      "y": 6500,
       "width": 500,
       "height": 380,
       "color": "3"

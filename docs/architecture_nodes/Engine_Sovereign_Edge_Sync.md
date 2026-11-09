@@ -23,7 +23,6 @@ test_suites:
 downstream:
   - ../../../retriever/docs/api/edge
   - Retriever_API_v1_edge
-  - UI_EdgeSwarmPanel
   - ../99_DECISIONS
 ---
 
@@ -45,7 +44,6 @@ downstream:
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: REST API edge.md](../../../retriever/docs/api/edge.md)
 - [Retriever_API: v1/edge](Retriever_API_v1_edge.md)
-- [UI: EdgeSwarmPanel](UI_EdgeSwarmPanel.md)
 - [99_DECISIONS (ADR 35)](../99_DECISIONS.md#adr-35-sovereign-edge-vector-synchronization-offline-first-sqlite-crdt-swarms)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints

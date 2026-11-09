@@ -21,6 +21,7 @@ const getErrorMessage = (err: unknown): string => {
 };
 
 const CANONICAL_PROJECT_ORDER = [
+  'prateeq-tui',
   'rag-lab',
   'scoping-studio',
   'client-workspace',
@@ -38,10 +39,16 @@ export const getProjects = unstable_cache(
         .from('projects')
         .select('*');
       if (error || !data) throw error || new Error('No data');
-      const mapped = data.map((p) => ({
-        ...p,
-        id: p.slug || p.id,
-      })) as Project[];
+      const fallbackMap = new Map((projectsFallback as Project[]).map((p) => [p.id, p]));
+      const mapped = data.map((p) => {
+        const id = p.slug || p.id;
+        const fb = fallbackMap.get(id);
+        return {
+          ...p,
+          id,
+          sshCommand: p.sshCommand || fb?.sshCommand,
+        };
+      }) as Project[];
 
       return mapped.sort((a, b) => {
         const indexA = CANONICAL_PROJECT_ORDER.indexOf(a.id);

@@ -27,6 +27,7 @@ export interface Project {
   category?: 'ai' | 'scoping' | 'workspace' | 'systems' | 'fullstack' | 'mobile' | 'simulation';
   systemRole?: string;
   telemetryBadge?: string;
+  sshCommand?: string;
   architectureHighlights?: string[];
   architectureHighlights_business?: string[];
   challenges?: CaseStudyChallenge[];

@@ -23,7 +23,6 @@ test_suites:
 downstream:
   - ../../../retriever/docs/api/edge
   - Engine_Sovereign_Edge_Sync
-  - UI_EdgeSwarmPanel
 ---
 
 # Retriever API: `apps/api/src/routers/edge.py`
@@ -46,7 +45,6 @@ downstream:
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: REST API edge.md](../../../retriever/docs/api/edge.md)
 - [Engine: Sovereign Edge Sync](Engine_Sovereign_Edge_Sync.md)
-- [UI: EdgeSwarmPanel](UI_EdgeSwarmPanel.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
 > **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)

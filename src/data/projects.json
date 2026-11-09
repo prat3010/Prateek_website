@@ -1,5 +1,89 @@
 [
   {
+    "id": "prateeq-tui",
+    "slug": "prateeq-tui",
+    "title": "prateeq-tui // Sovereign Rust Terminal & Public SSH Daemon",
+    "description": "Standalone, ultra-low-latency, zero-auth public SSH terminal daemon and TUI engineered in asynchronous Rust, featuring immediate-mode rendering, AI Twin streaming, and retro arcade physics.",
+    "longDescription": "prateeq-tui is a sovereign, memory-safe Terminal User Interface and public SSH 2.0 daemon engineered entirely in pure Rust using russh, ratatui, and tokio. Visitors execute `ssh guest@rag.prateeq.in` from any terminal emulator to immediately enter an interactive 60 FPS cyberpunk workspace without installing keys or software. Built with zero shell execution (no /bin/sh child processes), sub-15ms frame latencies, an inactivity watchdog, an interactive AI Twin streaming tokens via SSE, and a retro Snake arcade game backed by Supabase PostgreSQL.",
+    "image": "/images/project-systems-terminal.webp",
+    "tags": [
+      "Rust",
+      "russh (SSH-2.0)",
+      "ratatui",
+      "tokio",
+      "Oracle Linux",
+      "systemd"
+    ],
+    "liveUrl": "ssh://guest@rag.prateeq.in",
+    "githubUrl": "https://github.com/prat3010/prateeq-tui",
+    "color": "#00FFAA",
+    "isLive": true,
+    "status": "live",
+    "category": "systems",
+    "ctaLabel": "CONNECT VIA SSH",
+    "systemRole": "SYS-00 // SOVEREIGN RUST SSH DAEMON",
+    "telemetryBadge": "ZERO SHELL EXECUTION",
+    "sshCommand": "ssh guest@rag.prateeq.in",
+    "description_business": "A high-performance sovereign SSH terminal daemon and portfolio engine proving systems-level architectural mastery, zero-privilege sandboxing, and sub-15ms response latency.",
+    "longDescription_business": "prateeq-tui demonstrates advanced systems programming and sovereign cloud infrastructure. Built without external bloated runtime dependencies or container overhead, it serves interactive terminal sessions directly over public SSH with hardened memory safety, strictly bounded resource consumption (< 20 MB RAM), and zero shell execution risk.",
+    "architectureHighlights": [
+      "Pure Rust SSH-2.0 protocol engine powered by russh and tokio, running zero POSIX shell processes and binding memory-safe virtual terminal sessions",
+      "Immediate-mode Ratatui delta rendering pipeline emitting ANSI escape sequences directly into in-memory channel buffers at 60 FPS",
+      "Hardened Linux systemd sandbox with MemoryMax=50M, AmbientCapabilities=CAP_NET_BIND_SERVICE, and strict filesystem isolation",
+      "Concurrency-governed token bucket enforcing a 50 concurrent session ceiling with automated 5-minute inactivity watchdog disconnects"
+    ],
+    "architectureHighlights_business": [
+      "Undeniable Proof of Systems Craftsmanship — instant terminal connection via `ssh guest@rag.prateeq.in` requiring zero local client software",
+      "Zero Security Attack Surface with 100% in-memory sandboxing that completely eliminates remote code execution (RCE) vectors",
+      "Extreme Resource Efficiency idling under 20 MB RSS RAM on a minimal Oracle Cloud VPS",
+      "Dual-mode unified binary compiling both as a public cloud daemon and an offline workstation CLI"
+    ],
+    "challenges": [
+      {
+        "challenge": "Rendering immediate-mode terminal UI across raw SSH streams without spawning a PTY or shell process",
+        "solution": "Implemented a custom in-memory CrosstermBackend writer coupled to russh channels that handles ANSI diffs and debounced window resize signals."
+      },
+      {
+        "challenge": "Protecting public SSH ports against brute-force DoS floods and memory exhaustion on a 1 GB VPS",
+        "solution": "Enforced atomic concurrency counters capping active sessions at 50, paired with an inactivity watchdog and systemd 50MB cgroup ceilings."
+      }
+    ],
+    "challenges_business": [
+      {
+        "challenge": "Proving deep systems engineering capability beyond standard web applications to technical executives",
+        "solution": "Built a public zero-auth SSH daemon where CTOs can immediately inspect code metrics, live architecture maps, and ADRs from their native terminal."
+      },
+      {
+        "challenge": "Ensuring public accessibility without risking server compromise or resource starvation",
+        "solution": "Hardened the daemon with zero POSIX shell invocation and memory cgroups, guaranteeing immutable server safety."
+      }
+    ],
+    "keyDeliverables": [
+      "Pure Rust Async SSH-2.0 Daemon Binary",
+      "Immediate-Mode Ratatui Virtual Workspace",
+      "Hardened Linux Systemd Security Configuration",
+      "Deterministic 60 FPS Snake Engine & Leaderboard"
+    ],
+    "keyDeliverables_business": [
+      "Instant Public SSH Gateway (`ssh guest@rag.prateeq.in`)",
+      "Interactive Architecture & System Dossier",
+      "Zero-Attack-Surface Production Sandbox",
+      "Verifiable Sub-15ms Latency Showcase"
+    ],
+    "metrics": [
+      { "label": "Memory Footprint", "value": "< 20 MB RAM" },
+      { "label": "Frame Latency", "value": "Sub-15ms" },
+      { "label": "Security Model", "value": "Zero Shell Execution" },
+      { "label": "Connection Limit", "value": "50 Concurrent Sessions" }
+    ],
+    "metrics_business": [
+      { "label": "Access Speed", "value": "< 150ms Handshake" },
+      { "label": "Client Setup", "value": "Zero Install (Native SSH)" },
+      { "label": "Server Isolation", "value": "100% Memory Safe" },
+      { "label": "Infrastructure Cost", "value": "$0 (Micro VPS)" }
+    ]
+  },
+  {
     "id": "rag-lab",
     "title": "Retriever AI (Enterprise Cognitive RAG Platform)",
     "description": "Enterprise-grade Retrieval-Augmented Generation platform featuring Hexagonal Architecture, pgvector hybrid search, local Ollama embeddings, RLM reasoning, and sub-100ms semantic response caching.",

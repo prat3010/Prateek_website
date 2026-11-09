@@ -100,6 +100,7 @@ function ProjectImage({ src, fallbackSrc, alt, fill, width, height, sizes, class
 }
 
 const CTA_LABELS: Record<string, string> = {
+  'prateeq-tui': 'CONNECT VIA SSH',
   'rag-lab': 'LAUNCH RAG STUDIO',
   'scoping-studio': 'BUILD PROJECT SCOPE',
   'client-workspace': 'ENTER CLIENT WORKSPACE',
@@ -112,18 +113,18 @@ function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [activeModalTab, setActiveModalTab] = useState<'overview' | 'architecture' | 'challenges'>('overview');
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
   const { isNoir, audience } = useTheme();
   const activeAudience = audience || 'developer';
   const lenis = useLenis();
-
 
   const getProjectCategory = (proj: Project): string => {
     if (proj.category) return proj.category;
     if (proj.id === 'rag-lab') return 'ai';
     if (proj.id === 'scoping-studio') return 'scoping';
     if (proj.id === 'client-workspace') return 'workspace';
-    if (proj.id === 'synchronizer-engine' || proj.id === 'systems-terminal' || proj.id === 'systems-console') return 'systems';
+    if (proj.id === 'prateeq-tui' || proj.id === 'synchronizer-engine' || proj.id === 'systems-terminal' || proj.id === 'systems-console') return 'systems';
     const tags = proj.tags.map((t) => t.toLowerCase());
     if (tags.some((t) => t.includes('rag') || t.includes('ai') || t.includes('ollama') || t.includes('gemini'))) return 'ai';
     return 'systems';
@@ -342,6 +343,28 @@ function Projects({ projects }: ProjectsProps) {
                   </div>
                   <div className={styles.panelOverlay}>
                     <h3 className={styles.panelTitle}>{project.title}</h3>
+                    {project.sshCommand && (
+                      <div
+                        className={styles.sshBadge}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(project.sshCommand!);
+                          }
+                          setCopiedCommand(project.id);
+                          setTimeout(() => setCopiedCommand(null), 2000);
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Copy command ${project.sshCommand}`}
+                      >
+                        <span className={styles.sshPrompt}>$</span>
+                        <code>{project.sshCommand}</code>
+                        <span className={styles.sshCopyStatus}>
+                          {copiedCommand === project.id ? '✓ COPIED' : '📋 COPY'}
+                        </span>
+                      </div>
+                    )}
                     <p className={styles.panelDesc}>
                       {activeAudience === 'business' && project.description_business
                         ? project.description_business
@@ -408,6 +431,31 @@ function Projects({ projects }: ProjectsProps) {
                     </div>
                   )}
                   <h3 className={styles.modalTitle}>{selected.title}</h3>
+                  {selected.sshCommand && (
+                    <div className={styles.modalSshContainer}>
+                      <div className={styles.modalSshHeader}>
+                        <span>SOVEREIGN PUBLIC SSH DAEMON</span>
+                        <span>PORT 2200 // ZERO-AUTH GUEST</span>
+                      </div>
+                      <div className={styles.modalSshRow}>
+                        <span className={styles.sshPrompt}>$</span>
+                        <code>{selected.sshCommand}</code>
+                        <button
+                          type="button"
+                          className={styles.modalSshCopyBtn}
+                          onClick={() => {
+                            if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                              navigator.clipboard.writeText(selected.sshCommand!);
+                            }
+                            setCopiedCommand(selected.id);
+                            setTimeout(() => setCopiedCommand(null), 2000);
+                          }}
+                        >
+                          {copiedCommand === selected.id ? '✓ COPIED' : 'COPY COMMAND'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -586,7 +634,23 @@ function Projects({ projects }: ProjectsProps) {
               })()}
 
               <div className={styles.modalActions}>
-                {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
+                {selected.liveUrl && selected.liveUrl.startsWith('ssh://') ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selected.sshCommand && typeof navigator !== 'undefined' && navigator.clipboard) {
+                        navigator.clipboard.writeText(selected.sshCommand);
+                        setCopiedCommand(selected.id);
+                        setTimeout(() => setCopiedCommand(null), 2000);
+                      }
+                      window.location.href = selected.liveUrl;
+                    }}
+                    className="comic-btn comic-btn-blue"
+                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                  >
+                    {copiedCommand === selected.id ? '✓ SSH COMMAND COPIED' : (CTA_LABELS[selected.id] || 'CONNECT VIA SSH')} <Code2 size={16} />
+                  </button>
+                ) : selected.liveUrl && selected.liveUrl.startsWith('/') ? (
                   <Link
                     href={selected.liveUrl}
                     className="comic-btn comic-btn-blue"
