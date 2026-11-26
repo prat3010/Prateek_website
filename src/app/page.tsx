@@ -50,7 +50,13 @@ async function ResumeSection() {
 
 async function BlogSectionWrapper() {
   const posts = await getAllPosts();
-  return <BlogSection posts={posts} />;
+  const summaries = posts.slice(0, 3).map(({ slug, title, date, excerpt }) => ({
+    slug,
+    title,
+    date,
+    excerpt,
+  }));
+  return <BlogSection posts={summaries} />;
 }
 
 export default function Home() {

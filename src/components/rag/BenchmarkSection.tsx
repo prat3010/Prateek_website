@@ -56,7 +56,7 @@ interface BenchmarkPayload {
 
 const data = rawBenchmarkData as unknown as BenchmarkPayload;
 
-export function BenchmarkSection() {
+export function BenchmarkSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
   const sweeps = data?.sweeps || {};
   const tiers = Object.keys(sweeps);
   const [selectedTier, setSelectedTier] = useState<string>(tiers[0] || "5");
@@ -90,7 +90,11 @@ export function BenchmarkSection() {
         <div className={styles.badge}>
           🛡️ Gate 10 Zero-Toy Static AST Verified • 100% Genuine Metrics
         </div>
-        <h2 className={styles.title}>Empirical Load & Latency Benchmarks</h2>
+        {headingLevel === "h1" ? (
+          <h1 className={styles.title}>Empirical Load &amp; Latency Benchmarks</h1>
+        ) : (
+          <h2 className={styles.title}>Empirical Load &amp; Latency Benchmarks</h2>
+        )}
         <p className={styles.subtitle}>
           Zero synthetic math, zero mocked responses. Real microsecond timings measured under concurrent load directly
           against our production Oracle Cloud VPS and PostgreSQL vector engine.

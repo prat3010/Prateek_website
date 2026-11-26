@@ -72,12 +72,12 @@ export function StepBrandKit({
                 ref={(el) => { cardRefs.current[idx] = el; }}
                 role="radio"
                 aria-checked={isSelected}
-                tabIndex={isSelected || focusedIndex === -1 ? 0 : -1}
+                tabIndex={isSelected || (focusedIndex === -1 && idx === 0) ? 0 : -1}
                 className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''} ${styles.cardSelectable}`}
                 onClick={() => onSelectBrandAsset(b)}
                 onKeyDown={(e) => {
-                  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); focusCard(idx + 1); }
-                  else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); focusCard(idx - 1); }
+                  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); focusCard((idx + 1) % brandAssets.length); }
+                  else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); focusCard((idx - 1 + brandAssets.length) % brandAssets.length); }
                   else if (e.key === 'Home') { e.preventDefault(); focusCard(0); }
                   else if (e.key === 'End') { e.preventDefault(); focusCard(brandAssets.length - 1); }
                 }}

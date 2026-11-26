@@ -3,7 +3,7 @@ title: "Unlock Your Career: AI-Powered Portfolio & Resume Automation with Struct
 date: "2026-07-08"
 excerpt: "Dive into PrateekSync AI's architecture, exploring how structured data, AI agents, and clever prompting transform your professional information into perfectly tailored resumes and portfolios."
 tags: ["Next.js", "Python", "AI"]
-coverImage: "/images/blog/default.jpg"
+coverImage: "/images/project-synchronizer.webp"
 ---
 
 Hey there, fellow developers and career enthusiasts! Ever felt overwhelmed by the sheer amount of information needed to keep your resume, portfolio, and cover letters perfectly updated and context-specific? Managing diverse professional data – projects, skills, achievements, testimonials – and then translating it into compelling, *tailored* content for every application or networking opportunity is a monumental task.

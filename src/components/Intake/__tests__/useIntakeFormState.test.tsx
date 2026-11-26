@@ -4,6 +4,12 @@ import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { useIntakeFormState } from '../useIntakeFormState';
 import type { ResumeData } from '@/data/resume';
 import type { ParseIntentResponse } from '@/lib/rag-client';
+import { signInWithGoogle } from '@/lib/auth';
+
+vi.mock('@/utils/pdfGenerator', () => ({
+  generateQuestionnairePDF: vi.fn().mockResolvedValue(undefined),
+  generateQuestionnairePDFBase64: vi.fn().mockResolvedValue({ base64: 'mock-base64-pdf' }),
+}));
 
 vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({
@@ -363,5 +369,148 @@ describe('useIntakeFormState - applyBlueprint', () => {
 
     expect(result.current.errorMsg).toContain('commercial terms');
     expect(result.current.submitting).toBe(false);
+  });
+
+  it('auto-recommends valid catalog maintenance plan IDs based on engine and features', () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    // Default first goal uses landing -> basic
+    expect(result.current.autoMaintenancePlanId).toBe('basic');
+
+    // Switching to AI strategy audit (no AI build features) -> self
+    act(() => {
+      result.current.handleGoalChange('ai_strategy_consulting');
+    });
+    expect(result.current.autoMaintenancePlanId).toBe('self');
+
+    // Switching to multipage -> standard
+    act(() => {
+      result.current.handleGoalChange('business_multipage');
+    });
+    expect(result.current.autoMaintenancePlanId).toBe('standard');
+
+    // Adding an AI feature (ai_rag) upgrades recommendation to premium
+    act(() => {
+      result.current.addFeature('ai_rag');
+    });
+    expect(result.current.autoMaintenancePlanId).toBe('premium');
+  });
+
+  it('handleFastPass validates targetAudience and routes back to Step 1 if missing', async () => {
+    vi.mocked(signInWithGoogle).mockClear();
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    act(() => {
+      result.current.setCurrentStep(4);
+      result.current.setFormData((prev) => ({
+        ...prev,
+        agreedToTerms: true,
+        targetAudience: '',
+      }));
+    });
+
+    await act(async () => {
+      await result.current.handleFastPass();
+    });
+
+    expect(result.current.currentStep).toBe(1);
+    expect(result.current.errorMsg).toContain('target audience');
+    expect(result.current.submitting).toBe(false);
+    expect(signInWithGoogle).not.toHaveBeenCalled();
+  });
+
+  it('handleFastPass proceeds to signInWithGoogle when agreedToTerms and targetAudience are valid', async () => {
+    vi.mocked(signInWithGoogle).mockClear();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    act(() => {
+      result.current.setCurrentStep(4);
+      result.current.setFormData((prev) => ({
+        ...prev,
+        agreedToTerms: true,
+        targetAudience: 'B2B SaaS Founders',
+      }));
+    });
+
+    await act(async () => {
+      await result.current.handleFastPass();
+    });
+
+    expect(result.current.errorMsg).toBe('');
+    expect(signInWithGoogle).toHaveBeenCalledTimes(1);
+  });
+
+  it('handleQuickSubmit requires valid guest contact email when unauthenticated and submits without forcing OAuth', async () => {
+    vi.mocked(signInWithGoogle).mockClear();
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+    global.fetch = fetchMock;
+
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    act(() => {
+      result.current.setServiceType('quick');
+      result.current.setSelectedQuickServices(['chatbot']);
+      result.current.setQuickFormData((prev) => ({
+        ...prev,
+        agreedToTerms: true,
+        companyName: 'Acme Corp',
+        contactEmail: 'invalid-email',
+      }));
+    });
+
+    // Invalid email blocks submission
+    await act(async () => {
+      await result.current.handleQuickSubmit();
+    });
+    expect(result.current.errorMsg.toLowerCase()).toContain('email');
+    expect(result.current.submitted).toBe(false);
+    expect(signInWithGoogle).not.toHaveBeenCalled();
+
+    // Valid guest email + phone submits lead capture & sets submitted=true without signInWithGoogle
+    act(() => {
+      result.current.setQuickFormData((prev) => ({
+        ...prev,
+        contactEmail: 'founder@acme.io',
+        contactPhone: '+1-555-0199',
+      }));
+    });
+
+    await act(async () => {
+      await result.current.handleQuickSubmit();
+    });
+
+    expect(result.current.errorMsg).toBe('');
+    expect(result.current.submitted).toBe(true);
+    expect(signInWithGoogle).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/client/intake-draft',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('"contactEmail":"founder@acme.io"'),
+      })
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/contact',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('"email":"founder@acme.io"'),
+      })
+    );
   });
 });

@@ -1,0 +1,311 @@
+.wrapper {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  padding: 5.5rem 1.5rem 6rem;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 3rem;
+  padding-bottom: 2.25rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.topNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+  padding: 0.45rem 0.9rem;
+  background: var(--surface-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-comic-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.backLink:hover {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: var(--shadow-comic);
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.8rem;
+  background: var(--badge-active-bg);
+  color: var(--badge-active-text);
+  border: 1px solid var(--badge-active-border);
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--font-headline);
+  font-size: clamp(2.1rem, 4.5vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.12rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  max-width: 780px;
+  margin-bottom: 1.75rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.section {
+  margin-bottom: 3.75rem;
+}
+
+.sectionHeader {
+  margin-bottom: 1.5rem;
+}
+
+.sectionEyebrow {
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pop-red);
+  margin-bottom: 0.35rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-headline);
+  font-size: clamp(1.5rem, 3vw, 2.15rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.sectionLead {
+  color: var(--color-text-muted);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  max-width: 740px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.4rem;
+  background: var(--surface-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-comic-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-comic);
+}
+
+.cardTop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.tierRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tierBadge {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--surface-elevated, var(--surface-card));
+  color: var(--color-text);
+}
+
+.priceTag {
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--badge-active-text);
+}
+
+.cardTitle {
+  font-family: var(--font-headline);
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.25;
+}
+
+.cardDesc {
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.techSpecs {
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  padding: 0.6rem 0.75rem;
+  background: var(--surface-secondary, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-code);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-link, var(--pop-blue));
+  text-decoration: none;
+  margin-top: 0.25rem;
+}
+
+.cardLink:hover {
+  text-decoration: underline;
+}
+
+.guaranteesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.guaranteeCard {
+  padding: 1.25rem;
+  background: var(--surface-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-comic-sm);
+}
+
+.guaranteeTitle {
+  font-family: var(--font-headline);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 0.4rem;
+}
+
+.guaranteeText {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  padding: 1.25rem 1.4rem;
+  background: var(--surface-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-comic-sm);
+}
+
+.faqQuestion {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 0.45rem;
+}
+
+.faqAnswer {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.ctaBanner {
+  padding: 2rem;
+  background: var(--surface-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-comic);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ctaBannerTitle {
+  font-family: var(--font-headline);
+  font-size: clamp(1.4rem, 2.8vw, 1.95rem);
+  font-weight: 900;
+  color: var(--color-text);
+}
+
+.ctaBannerDesc {
+  color: var(--color-text-muted);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    padding: 4.5rem 1rem 4rem;
+  }
+}

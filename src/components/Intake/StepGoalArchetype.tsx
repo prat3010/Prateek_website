@@ -19,9 +19,11 @@ import {
   Brain,
   Settings,
   Sparkles,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import type { GoalArchetype, BaseEngineItem, FeatureItem, ResumeData } from '@/data/resume';
-import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
+import { formatMoney, formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { AiScopingPromptBar } from './AiScopingPromptBar';
@@ -147,6 +149,7 @@ export function StepGoalArchetype({
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const [showAllArchetypes, setShowAllArchetypes] = React.useState(false);
 
   const filteredGoals = (selectedGoalCategory === 'all'
     ? goals
@@ -156,20 +159,33 @@ export function StepGoalArchetype({
       })
   );
 
-  const selectedArchetypeIndex = filteredGoals.findIndex((g) => formData.projectGoal === g.label);
+  const INITIAL_ALL_LIMIT = 6;
+  const canCollapseAll = selectedGoalCategory === 'all' && filteredGoals.length > INITIAL_ALL_LIMIT;
+  const visibleGoals = React.useMemo(() => {
+    if (!canCollapseAll || showAllArchetypes) return filteredGoals;
+    const topSlice = filteredGoals.slice(0, INITIAL_ALL_LIMIT);
+    const selectedOutside = filteredGoals
+      .slice(INITIAL_ALL_LIMIT)
+      .find((g) => g.label === formData.projectGoal);
+    return selectedOutside ? [...topSlice.slice(0, INITIAL_ALL_LIMIT - 1), selectedOutside] : topSlice;
+  }, [canCollapseAll, showAllArchetypes, filteredGoals, formData.projectGoal]);
+
+  const selectedArchetypeIndex = visibleGoals.findIndex((g) => formData.projectGoal === g.label);
 
   const focusArchetype = (index: number) => {
-    const clamped = Math.max(0, Math.min(index, filteredGoals.length - 1));
+    if (visibleGoals.length === 0) return;
+    const clamped = Math.max(0, Math.min(index, visibleGoals.length - 1));
     archetypeCardRefs.current[clamped]?.focus();
   };
 
   const focusCategoryTab = (index: number) => {
+    if (GOAL_CATEGORIES.length === 0) return;
     const clamped = Math.max(0, Math.min(index, GOAL_CATEGORIES.length - 1));
     categoryTabRefs.current[clamped]?.focus();
   };
 
   return (
-    <div className={styles.formStep}>
+    <div className={`${styles.formStep} ${styles.formStepCompact}`}>
       <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
         <Building2 size={18} />
         <span>STEP 1: PROJECT GOAL &amp; TARGET AUDIENCE</span>
@@ -209,27 +225,34 @@ export function StepGoalArchetype({
       {/* Low-Risk Paid Discovery Wedge */}
       {(() => {
         const auditGoal = goals.find((g) => g.id === 'ai_strategy_consulting' || g.recommendedEngineId === 'ai_strategy_audit');
-        const auditLabel = auditGoal ? auditGoal.label : '🧠 AI Strategy & Solutioning Audit';
+        const auditEngine = engines.find((e) => e.id === (auditGoal?.recommendedEngineId || 'ai_strategy_audit'));
+        const auditLabel = auditGoal ? auditGoal.label : 'AI Strategy & Solutioning Audit';
+        const auditDisplayTitle = cleanArchetypeLabel(auditGoal ? auditGoal.label : 'AI Strategy & Architecture Audit');
         const isAuditSelected = formData.projectGoal === auditLabel || formData.projectGoal === 'ai_strategy_consulting';
+        const auditPriceINR = auditEngine?.priceINR ?? 20000;
+        const auditPriceUSD = auditEngine?.priceUSD ?? 300;
         return (
           <div className={styles.discoveryWedgeBox}>
-            <div className={styles.discoveryWedgeBadge}>
-              <Sparkles size={13} />
-              <span>PAID DISCOVERY WEDGE</span>
-            </div>
             <div className={styles.discoveryWedgeContent}>
               <div className={styles.discoveryWedgeText}>
-                <h3 className={styles.discoveryWedgeTitle}>
-                  🧠 AI Strategy &amp; Architecture Audit
-                </h3>
+                <div className={styles.discoveryWedgeTitleRow}>
+                  <span className={styles.discoveryWedgeBadge}>
+                    <Sparkles size={12} aria-hidden="true" />
+                    <span>PAID DISCOVERY WEDGE</span>
+                  </span>
+                  <h3 className={styles.discoveryWedgeTitle}>
+                    <Brain size={15} className={styles.inlineIcon} aria-hidden="true" />
+                    <span>{auditDisplayTitle}</span>
+                  </h3>
+                </div>
                 <p className={styles.discoveryWedgeDescription}>
-                  Not ready for a full multi-week build? Start with a 60-minute deep-dive operational workflow audit. We analyze your tech bottlenecks, model AI ROI, and deliver an actionable 3-page custom AI Architecture Blueprint PDF.
+                  Not ready for a full build? Start with a 60-minute operational workflow audit &amp; 3-page custom AI Architecture Blueprint PDF.
                 </p>
               </div>
               <div className={styles.discoveryWedgeActions}>
                 <div className={styles.discoveryWedgePrice}>
                   <span className={styles.discoveryWedgePriceTag}>
-                    {currency === 'INR' ? '₹20,000' : '$300'}
+                    {formatMoney(currency === 'INR' ? auditPriceINR : auditPriceUSD, currency)}
                   </span>
                   <span className={styles.discoveryWedgeDuration}>/ 1-Week Sprint</span>
                 </div>
@@ -258,13 +281,13 @@ export function StepGoalArchetype({
         );
       })()}
 
-      <div className={`${styles.field} ${styles.fieldMarginSm}`}>
+      <div className={styles.field}>
         <label className={styles.label}>
           <Target size={14} className={styles.inlineIcon} />
           Or Manually Select Primary Goal Archetype
         </label>
         <p className={styles.fieldHint}>
-          Choosing an archetype automatically configures your recommended engine tier, primary business outcome, and compulsory core module dependencies.
+          Auto-configures your recommended engine tier, outcome, and compulsory dependencies.
         </p>
 
         {/* Goal Category Filter Tabs */}
@@ -284,8 +307,8 @@ export function StepGoalArchetype({
                 className={`${styles.categoryTabBtn} ${isSelected ? styles.categoryTabBtnActive : ''}`}
                 onClick={() => setSelectedGoalCategory(cat.id)}
                 onKeyDown={(e) => {
-                  if (e.key === 'ArrowRight') { e.preventDefault(); focusCategoryTab(catIdx + 1); }
-                  else if (e.key === 'ArrowLeft') { e.preventDefault(); focusCategoryTab(catIdx - 1); }
+                  if (e.key === 'ArrowRight') { e.preventDefault(); focusCategoryTab((catIdx + 1) % GOAL_CATEGORIES.length); }
+                  else if (e.key === 'ArrowLeft') { e.preventDefault(); focusCategoryTab((catIdx - 1 + GOAL_CATEGORIES.length) % GOAL_CATEGORIES.length); }
                   else if (e.key === 'Home') { e.preventDefault(); focusCategoryTab(0); }
                   else if (e.key === 'End') { e.preventDefault(); focusCategoryTab(GOAL_CATEGORIES.length - 1); }
                 }}
@@ -298,14 +321,14 @@ export function StepGoalArchetype({
         </div>
 
         <div className={styles.archetypeGrid} role="radiogroup" aria-label="Primary Project Archetype">
-          {filteredGoals.map((g, idx) => {
+          {visibleGoals.map((g, idx) => {
             const isSelected = formData.projectGoal === g.label;
             const recommendedEngine = engines.find((e) => e.id === g.recommendedEngineId);
             return (
               <TiltCard key={g.id} maxAngle={2} glare={false} className={styles.archetypeTilt}>
                 <div
                   ref={(el) => { archetypeCardRefs.current[idx] = el; }}
-                  tabIndex={isSelected || selectedArchetypeIndex === -1 ? 0 : -1}
+                  tabIndex={isSelected || (selectedArchetypeIndex === -1 && idx === 0) ? 0 : -1}
                   role="radio"
                   aria-checked={isSelected}
                   className={`${styles.archetypeCard} ${isSelected ? styles.archetypeCardSelected : ''}`}
@@ -316,16 +339,16 @@ export function StepGoalArchetype({
                       onGoalChange(g.label);
                     } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
                       e.preventDefault();
-                      focusArchetype(idx + 1);
+                      focusArchetype((idx + 1) % visibleGoals.length);
                     } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
                       e.preventDefault();
-                      focusArchetype(idx - 1);
+                      focusArchetype((idx - 1 + visibleGoals.length) % visibleGoals.length);
                     } else if (e.key === 'Home') {
                       e.preventDefault();
                       focusArchetype(0);
                     } else if (e.key === 'End') {
                       e.preventDefault();
-                      focusArchetype(filteredGoals.length - 1);
+                      focusArchetype(visibleGoals.length - 1);
                     }
                   }}
                 >
@@ -369,6 +392,29 @@ export function StepGoalArchetype({
             );
           })}
         </div>
+
+        {canCollapseAll && (
+          <div className={styles.archetypeExpandRow}>
+            <button
+              type="button"
+              className={styles.archetypeExpandBtn}
+              onClick={() => setShowAllArchetypes((prev) => !prev)}
+              aria-expanded={showAllArchetypes}
+            >
+              {showAllArchetypes ? (
+                <>
+                  <ChevronUp size={14} aria-hidden="true" />
+                  <span>Show top {INITIAL_ALL_LIMIT} archetypes</span>
+                </>
+              ) : (
+                <>
+                  <ChevronDown size={14} aria-hidden="true" />
+                  <span>Show all {filteredGoals.length} archetypes ({filteredGoals.length - visibleGoals.length} more)</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className={styles.field}>
@@ -408,11 +454,12 @@ export function StepGoalArchetype({
 
       <div className={styles.fieldGrid}>
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label className={styles.label} htmlFor="intake-company-name">
             <Building2 size={14} className={styles.inlineIcon} />
             Project / Company Name (Optional)
           </label>
           <input
+            id="intake-company-name"
             type="text"
             className={styles.input}
             aria-label="Project or Company Name"

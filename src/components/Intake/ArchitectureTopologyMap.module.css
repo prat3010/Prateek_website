@@ -1,8 +1,8 @@
 .topologyContainer {
   position: relative;
   width: 100%;
-  background: var(--surface-card, #0d0d10);
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.12));
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 12px;
   padding: 18px 20px;
   overflow: hidden;
@@ -10,9 +10,9 @@
 }
 
 :global([data-theme="azure"]) .topologyContainer {
-  background: #ffffff;
-  border-color: rgba(43, 43, 54, 0.18);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  background: var(--surface-elevated);
+  border-color: var(--surface-glass-border);
+  box-shadow: var(--shadow-glass);
 }
 
 .topBar {
@@ -21,13 +21,9 @@
   justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--surface-glass-border);
   flex-wrap: wrap;
   gap: 12px;
-}
-
-:global([data-theme="azure"]) .topBar {
-  border-bottom-color: rgba(43, 43, 54, 0.1);
 }
 
 .titleArea {
@@ -37,37 +33,37 @@
 }
 
 .titleIcon {
-  color: var(--neon-cyan, #00f0ff);
+  color: var(--neon-cyan);
 }
 
 :global([data-theme="azure"]) .titleIcon {
-  color: #3f6e91;
+  color: var(--badge-active-text);
 }
 
 .titleText {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .activeNodesPill {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.74rem;
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 9999px;
-  background: rgba(57, 255, 20, 0.12);
-  color: var(--neon-green, #39ff14);
-  border: 1px solid rgba(57, 255, 20, 0.3);
+  background: var(--badge-success-bg);
+  color: var(--neon-green);
+  border: 1px solid var(--badge-success-border);
 }
 
 :global([data-theme="azure"]) .activeNodesPill {
-  background: rgba(63, 110, 145, 0.12);
-  color: #3f6e91;
-  border-color: rgba(63, 110, 145, 0.3);
+  background: var(--badge-active-bg);
+  color: var(--badge-active-text);
+  border-color: var(--badge-active-border);
 }
 
 .controlActions {
@@ -80,10 +76,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.15));
-  color: var(--color-text-muted, #a0a0b0);
-  font-family: var(--font-mono, monospace);
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-code, monospace);
   font-size: 0.76rem;
   font-weight: 600;
   padding: 6px 12px;
@@ -93,37 +89,37 @@
 }
 
 .modeToggleBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-text, #ffffff);
+  background: var(--surface-active);
+  color: var(--color-text);
 }
 
 :global([data-theme="azure"]) .modeToggleBtn {
-  background: #f4f3ef;
-  border-color: rgba(43, 43, 54, 0.15);
-  color: #555566;
+  background: var(--surface-secondary);
+  border-color: var(--surface-glass-border);
+  color: var(--color-text-muted);
 }
 
 :global([data-theme="azure"]) .modeToggleBtn:hover {
-  background: #ebe9e3;
-  color: #2b2b36;
+  background: var(--surface-active);
+  color: var(--color-text);
 }
 
 .modeToggleBtnActive {
-  background: rgba(0, 240, 255, 0.12);
-  border-color: var(--neon-cyan, #00f0ff);
-  color: var(--neon-cyan, #00f0ff);
+  background: var(--badge-active-bg);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
 }
 
 :global([data-theme="azure"]) .modeToggleBtnActive {
-  background: rgba(63, 110, 145, 0.12);
-  border-color: #3f6e91;
-  color: #3f6e91;
+  background: var(--badge-active-bg);
+  border-color: var(--badge-active-text);
+  color: var(--badge-active-text);
 }
 
 .expandBtn {
   background: transparent;
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.15));
-  color: var(--color-text-muted, #a0a0b0);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
   padding: 6px;
   border-radius: 6px;
   cursor: pointer;
@@ -134,18 +130,8 @@
 }
 
 .expandBtn:hover {
-  color: var(--color-text, #ffffff);
-  border-color: var(--color-text, #ffffff);
-}
-
-:global([data-theme="azure"]) .expandBtn {
-  border-color: rgba(43, 43, 54, 0.15);
-  color: #555566;
-}
-
-:global([data-theme="azure"]) .expandBtn:hover {
-  color: #2b2b36;
-  border-color: #2b2b36;
+  color: var(--color-text);
+  border-color: var(--color-text);
 }
 
 /* SVG Flow Diagram */
@@ -154,13 +140,13 @@
   width: 100%;
   overflow-x: auto;
   border-radius: 8px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.06));
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
 }
 
 :global([data-theme="azure"]) .diagramWrapper {
-  background: #faf9f6;
-  border-color: rgba(43, 43, 54, 0.08);
+  background: var(--surface-primary);
+  border-color: var(--surface-glass-border);
 }
 
 .svgCanvas {
@@ -172,56 +158,48 @@
 
 /* SVG Classes */
 .tierBackground {
-  fill: var(--surface-glass-bg, rgba(255, 255, 255, 0.02));
-  stroke: var(--surface-glass-border, rgba(255, 255, 255, 0.06));
+  fill: var(--surface-glass-bg);
+  stroke: var(--surface-glass-border);
   stroke-width: 1;
   rx: 8;
 }
 
 :global([data-theme="azure"]) .tierBackground {
-  fill: rgba(43, 43, 54, 0.02);
-  stroke: rgba(43, 43, 54, 0.08);
+  fill: var(--surface-secondary);
+  stroke: var(--surface-glass-border);
 }
 
 .tierLabel {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  fill: var(--color-text-muted, #888899);
+  fill: var(--color-text-muted);
   text-transform: uppercase;
-}
-
-:global([data-theme="azure"]) .tierLabel {
-  fill: #777788;
 }
 
 .tierSubtitleText {
   font-size: 8.5px;
   font-weight: 500;
-  fill: var(--color-text-dim, #777788);
-}
-
-:global([data-theme="azure"]) .tierSubtitleText {
-  fill: #888899;
+  fill: var(--color-text-dim);
 }
 
 .connectionLine {
-  stroke: var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  stroke: var(--surface-glass-border);
   stroke-width: 1.5;
   stroke-dasharray: 4, 4;
   fill: none;
 }
 
 .connectionLineActive {
-  stroke: var(--neon-cyan, #00f0ff);
+  stroke: var(--neon-cyan);
   stroke-width: 2;
   stroke-dasharray: 6, 6;
   animation: dashPulse 20s linear infinite;
 }
 
 :global([data-theme="azure"]) .connectionLineActive {
-  stroke: #3f6e91;
+  stroke: var(--badge-active-text);
 }
 
 .nodeCard {
@@ -235,89 +213,70 @@
 }
 
 .nodeRectActive {
-  fill: var(--surface-card, #0f0f14);
-  stroke: var(--neon-cyan, #00f0ff);
+  fill: var(--surface-card);
+  stroke: var(--neon-cyan);
   stroke-width: 1.5;
-  filter: drop-shadow(0 2px 8px rgba(0, 240, 255, 0.2));
+  filter: drop-shadow(0 2px 8px var(--badge-active-bg));
 }
 
 :global([data-theme="azure"]) .nodeRectActive {
-  fill: #ffffff;
-  stroke: #3f6e91;
-  filter: drop-shadow(0 2px 6px rgba(63, 110, 145, 0.15));
+  fill: var(--surface-elevated);
+  stroke: var(--badge-active-text);
+  filter: drop-shadow(0 2px 6px var(--badge-active-bg));
 }
 
 .nodeRectDormant {
-  fill: var(--surface-glass-bg, rgba(255, 255, 255, 0.015));
-  stroke: var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  fill: var(--surface-glass-bg);
+  stroke: var(--surface-glass-border);
   stroke-width: 1;
   stroke-dasharray: 3, 3;
 }
 
-:global([data-theme="azure"]) .nodeRectDormant {
-  fill: rgba(43, 43, 54, 0.015);
-  stroke: rgba(43, 43, 54, 0.12);
-}
-
 .nodeTitle {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 11.5px;
   font-weight: 700;
-  fill: var(--color-text, #ffffff);
+  fill: var(--color-text);
 }
 
 .nodeTitleDormant {
-  fill: var(--color-text-muted, #777788);
+  fill: var(--color-text-muted);
 }
 
 .nodeSubtitle {
   font-size: 9.5px;
-  fill: var(--color-text-dim, #9999aa);
-}
-
-:global([data-theme="azure"]) .nodeSubtitle {
-  fill: #666677;
+  fill: var(--color-text-dim);
 }
 
 .nodeBadge {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 8px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .nodeBadgeActive {
-  fill: var(--neon-green, #39ff14);
+  fill: var(--neon-green);
 }
 
 :global([data-theme="azure"]) .nodeBadgeActive {
-  fill: #2d8a4e;
+  fill: var(--badge-success-text);
 }
 
 .nodeBadgeDormant {
-  fill: var(--color-text-muted, #666677);
+  fill: var(--color-text-muted);
 }
 
 .nodeBadgeBgActive {
-  fill: rgba(57, 255, 20, 0.12);
-  stroke: rgba(57, 255, 20, 0.3);
+  fill: var(--badge-success-bg);
+  stroke: var(--badge-success-border);
   stroke-width: 0.5;
-}
-
-:global([data-theme="azure"]) .nodeBadgeBgActive {
-  fill: rgba(45, 138, 78, 0.12);
-  stroke: rgba(45, 138, 78, 0.3);
 }
 
 .nodeBadgeBgDormant {
-  fill: rgba(255, 255, 255, 0.04);
-  stroke: rgba(255, 255, 255, 0.1);
+  fill: var(--surface-glass-bg);
+  stroke: var(--surface-glass-border);
   stroke-width: 0.5;
-}
-
-:global([data-theme="azure"]) .nodeBadgeBgDormant {
-  fill: rgba(43, 43, 54, 0.04);
-  stroke: rgba(43, 43, 54, 0.1);
 }
 
 /* Layered Matrix View */
@@ -328,8 +287,8 @@
 }
 
 .tierCard {
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 8px;
   padding: 14px;
   display: flex;
@@ -338,29 +297,25 @@
 }
 
 :global([data-theme="azure"]) .tierCard {
-  background: #faf9f6;
-  border-color: rgba(43, 43, 54, 0.1);
+  background: var(--surface-primary);
+  border-color: var(--surface-glass-border);
 }
 
 .tierCardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px dashed var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  border-bottom: 1px dashed var(--surface-glass-border);
   padding-bottom: 8px;
 }
 
-:global([data-theme="azure"]) .tierCardHeader {
-  border-bottom-color: rgba(43, 43, 54, 0.12);
-}
-
 .tierCardTitle {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .matrixNodeList {
@@ -375,24 +330,24 @@
   justify-content: space-between;
   padding: 8px 12px;
   border-radius: 6px;
-  background: var(--surface-card, #111116);
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
   transition: all 0.15s ease;
 }
 
 :global([data-theme="azure"]) .matrixNodeItem {
-  background: #ffffff;
-  border-color: rgba(43, 43, 54, 0.12);
+  background: var(--surface-elevated);
+  border-color: var(--surface-glass-border);
 }
 
 .matrixNodeItemActive {
-  border-color: var(--neon-cyan, #00f0ff);
-  background: rgba(0, 240, 255, 0.03);
+  border-color: var(--neon-cyan);
+  background: var(--badge-active-bg);
 }
 
 :global([data-theme="azure"]) .matrixNodeItemActive {
-  border-color: #3f6e91;
-  background: rgba(63, 110, 145, 0.04);
+  border-color: var(--badge-active-text);
+  background: var(--badge-info-bg);
 }
 
 .matrixNodeLeft {
@@ -404,12 +359,12 @@
 .matrixNodeName {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .matrixNodeSpec {
   font-size: 0.72rem;
-  color: var(--color-text-muted, #888899);
+  color: var(--color-text-muted);
 }
 
 .matrixNodeRight {
@@ -419,21 +374,21 @@
 }
 
 .activeStatusTag {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.68rem;
   font-weight: 700;
-  color: var(--neon-green, #39ff14);
+  color: var(--neon-green);
 }
 
 :global([data-theme="azure"]) .activeStatusTag {
-  color: #2d8a4e;
+  color: var(--badge-success-text);
 }
 
 .quickAddBtn {
   background: transparent;
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.2));
-  color: var(--pop-yellow, #e06d53);
-  font-family: var(--font-mono, monospace);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--pop-orange);
+  font-family: var(--font-code, monospace);
   font-size: 0.68rem;
   font-weight: 700;
   padding: 3px 8px;
@@ -443,8 +398,8 @@
 }
 
 .quickAddBtn:hover {
-  background: rgba(224, 109, 83, 0.12);
-  border-color: var(--pop-yellow, #e06d53);
+  background: var(--badge-draft-bg);
+  border-color: var(--pop-orange);
 }
 
 /* Non-Tech Blueprint Helper & Legend */
@@ -452,21 +407,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--surface-glass-bg, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  background: var(--surface-glass-bg);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 8px;
   padding: 8px 14px;
   margin-bottom: 14px;
   font-size: 0.74rem;
-  color: var(--color-text-muted, #a0a0b0);
+  color: var(--color-text-muted);
   flex-wrap: wrap;
   gap: 10px;
 }
 
 :global([data-theme="azure"]) .blueprintHelperBar {
-  background: #f7f6f2;
-  border-color: rgba(43, 43, 54, 0.1);
-  color: #666677;
+  background: var(--surface-secondary);
+  border-color: var(--surface-glass-border);
+  color: var(--color-text-muted);
 }
 
 .legendGroup {
@@ -484,37 +439,36 @@
 }
 
 .legendDotActive {
-  color: var(--neon-green, #39ff14);
+  color: var(--neon-green);
   font-size: 0.9rem;
   line-height: 1;
 }
 
 :global([data-theme="azure"]) .legendDotActive {
-  color: #2d8a4e;
+  color: var(--badge-success-text);
 }
 
 .legendDotDormant {
-  color: var(--color-text-muted, #777788);
+  color: var(--color-text-muted);
   font-size: 0.9rem;
   line-height: 1;
 }
 
 .legendIcon {
-  color: var(--neon-cyan, #00f0ff);
+  color: var(--neon-cyan);
 }
 
 :global([data-theme="azure"]) .legendIcon {
-  color: #3f6e91;
+  color: var(--badge-active-text);
 }
 
 .legendHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-style: italic;
   font-size: 0.72rem;
-  color: var(--color-text-dim, #888899);
-}
-
-:global([data-theme="azure"]) .legendHint {
-  color: #555566;
+  color: var(--color-text-dim);
 }
 
 .tierCardTitleGroup {
@@ -525,12 +479,8 @@
 
 .tierCardSubtitle {
   font-size: 0.7rem;
-  color: var(--color-text-muted, #888899);
+  color: var(--color-text-muted);
   text-transform: none;
-}
-
-:global([data-theme="azure"]) .tierCardSubtitle {
-  color: #777788;
 }
 
 .matrixNodeTitleRow {
@@ -541,18 +491,14 @@
 
 .matrixNodeSubtitle {
   font-size: 0.7rem;
-  color: var(--color-text-dim, #777788);
+  color: var(--color-text-dim);
 }
 
 .matrixNodeLayman {
   font-size: 0.74rem;
   line-height: 1.35;
-  color: var(--color-text, #dddddd);
+  color: var(--color-text);
   margin: 3px 0;
-}
-
-:global([data-theme="azure"]) .matrixNodeLayman {
-  color: #333344;
 }
 
 /* SLA Tooltip Modal Overlay */
@@ -561,22 +507,22 @@
   bottom: 16px;
   left: 20px;
   right: 20px;
-  background: var(--surface-card, #0f0f14);
-  border: 1px solid var(--neon-cyan, #00f0ff);
+  background: var(--surface-card);
+  border: 1px solid var(--neon-cyan);
   border-radius: 8px;
   padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-glass-lg);
   animation: slideUp 0.2s ease-out;
   z-index: 10;
 }
 
 :global([data-theme="azure"]) .inspectTooltip {
-  background: #ffffff;
-  border-color: #3f6e91;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background: var(--surface-elevated);
+  border-color: var(--badge-active-text);
+  box-shadow: var(--shadow-glass-lg);
 }
 
 .inspectLeft {
@@ -593,14 +539,14 @@
 }
 
 .inspectTitle {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.84rem;
   font-weight: 700;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .inspectStatusBadge {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -609,54 +555,40 @@
 }
 
 .inspectStatusActive {
-  background: rgba(57, 255, 20, 0.12);
-  color: var(--neon-green, #39ff14);
-  border: 1px solid rgba(57, 255, 20, 0.25);
+  background: var(--badge-success-bg);
+  color: var(--neon-green);
+  border: 1px solid var(--badge-success-border);
 }
 
 :global([data-theme="azure"]) .inspectStatusActive {
-  background: rgba(45, 138, 78, 0.12);
-  color: #2d8a4e;
-  border-color: rgba(45, 138, 78, 0.25);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
+  border-color: var(--badge-success-border);
 }
 
 .inspectStatusDormant {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-text-muted, #888899);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-:global([data-theme="azure"]) .inspectStatusDormant {
-  background: rgba(43, 43, 54, 0.05);
-  color: #666677;
-  border-color: rgba(43, 43, 54, 0.12);
+  background: var(--surface-glass-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--surface-glass-border);
 }
 
 .inspectLayman {
   font-size: 0.78rem;
   line-height: 1.4;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
   margin: 2px 0;
-}
-
-:global([data-theme="azure"]) .inspectLayman {
-  color: #2b2b36;
 }
 
 .inspectHowItFits {
   font-size: 0.74rem;
   line-height: 1.35;
-  color: var(--color-text-dim, #9999aa);
+  color: var(--color-text-dim);
   margin: 2px 0 4px 0;
-}
-
-:global([data-theme="azure"]) .inspectHowItFits {
-  color: #555566;
 }
 
 .inspectSla {
   font-size: 0.72rem;
-  color: var(--color-text-muted, #a0a0b0);
+  color: var(--color-text-muted);
 }
 
 .inspectRight {
@@ -666,27 +598,27 @@
 }
 
 .activeCheckBadge {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--neon-green, #39ff14);
-  background: rgba(57, 255, 20, 0.1);
-  border: 1px solid rgba(57, 255, 20, 0.25);
+  color: var(--neon-green);
+  background: var(--badge-success-bg);
+  border: 1px solid var(--badge-success-border);
   border-radius: 4px;
   padding: 4px 8px;
   white-space: nowrap;
 }
 
 :global([data-theme="azure"]) .activeCheckBadge {
-  color: #2d8a4e;
-  background: rgba(45, 138, 78, 0.1);
-  border-color: rgba(45, 138, 78, 0.25);
+  color: var(--badge-success-text);
+  background: var(--badge-success-bg);
+  border-color: var(--badge-success-border);
 }
 
 .closeInspectBtn {
   background: transparent;
   border: none;
-  color: var(--color-text-muted, #a0a0b0);
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: 4px;
 }
@@ -695,7 +627,7 @@
 .fullscreenOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(8, 8, 10, 0.94);
+  background: var(--color-bg);
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -703,30 +635,26 @@
   animation: fadeIn 0.2s ease-out;
 }
 
-:global([data-theme="azure"]) .fullscreenOverlay {
-  background: rgba(250, 249, 246, 0.98);
-}
-
 .fullscreenHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px;
-  background: var(--surface-card, #0d0d10);
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
 :global([data-theme="azure"]) .fullscreenHeader {
-  background: #ffffff;
-  border-color: rgba(43, 43, 54, 0.15);
+  background: var(--surface-elevated);
+  border-color: var(--surface-glass-border);
 }
 
 .fullscreenBody {
   flex: 1;
-  background: var(--surface-card, #0d0d10);
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 8px;
   overflow: auto;
   padding: 20px;
@@ -736,8 +664,8 @@
 }
 
 :global([data-theme="azure"]) .fullscreenBody {
-  background: #ffffff;
-  border-color: rgba(43, 43, 54, 0.15);
+  background: var(--surface-elevated);
+  border-color: var(--surface-glass-border);
 }
 
 @keyframes dashPulse {

@@ -11,6 +11,7 @@ import {
   Plus,
   X,
   CheckCircle2,
+  Lightbulb,
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import type { BaseEngineItem, FeatureItem } from '@/data/resume';
@@ -761,7 +762,7 @@ export function ArchitectureTopologyMap({
           </span>
         </div>
         <span className={styles.legendHint}>
-          💡 Click any component to inspect what it delivers for your business
+          <Lightbulb size={12} className={styles.legendIcon} aria-hidden="true" /> Click any component to inspect what it delivers for your business
         </span>
       </div>
 
@@ -787,8 +788,18 @@ export function ArchitectureTopologyMap({
                     return (
                       <div
                         key={node.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${node.title} (${active ? 'Active' : 'Dormant'})`}
                         className={`${styles.matrixNodeItem} ${active ? styles.matrixNodeItemActive : ''}`}
                         onClick={() => setInspectedNode(node)}
+                        onKeyDown={(e) => {
+                          if ((e.target as HTMLElement).closest('button')) return;
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setInspectedNode(node);
+                          }
+                        }}
                       >
                         <div className={styles.matrixNodeLeft}>
                           <div className={styles.matrixNodeTitleRow}>

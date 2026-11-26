@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+vi.mock('@/components/ui/Portal', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 import { StepTechnicalScope } from '../StepTechnicalScope';
 import type { BaseEngineItem, FeatureItem, GoalArchetype } from '@/data/resume';
 
@@ -199,5 +204,168 @@ describe('StepTechnicalScope Component', () => {
 
     fireEvent.click(bannerBtn);
     expect(onOpenCopilot).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides hideFromFullProject engines from the base engine override list', () => {
+    const hiddenEngine: BaseEngineItem = {
+      id: 'ai_strategy_audit',
+      title: 'AI Strategy & Architecture Audit',
+      tier: 'Sprint Tier',
+      priceINR: 20000,
+      priceUSD: 300,
+      laymanDescription: 'Audit sprint',
+      techSpecs: 'Audit specs',
+      hideFromFullProject: true,
+    };
+
+    render(
+      <StepTechnicalScope
+        engines={[mockEngine, hiddenEngine]}
+        features={mockFeatures}
+        currentArchetype={mockArchetype}
+        selectedEngine={mockEngine}
+        formData={{
+          selectedBaseEngineId: 'saas',
+          selectedFeatures: ['auth'],
+          projectStartType: 'greenfield',
+        }}
+        showEngineOverride={true}
+        setShowEngineOverride={vi.fn()}
+        activePopoverId={null}
+        setActivePopoverId={vi.fn()}
+        popoverAnchor={null}
+        setPopoverAnchor={vi.fn()}
+        lockedHintId={null}
+        currency="INR"
+        priceInCurrency={(inr, usd) => `₹${inr.toLocaleString()} / $${usd}`}
+        onEngineSelect={vi.fn()}
+        onFeatureToggle={vi.fn()}
+        onApplySmartPreset={vi.fn()}
+        togglePopover={vi.fn()}
+        dependsOnMap={{}}
+      />
+    );
+
+    expect(screen.getAllByText(/Full-Stack SaaS Core/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText(/AI Strategy & Architecture Audit/i)).toBeNull();
+  });
+
+  it('supports roving arrow/Home/End focus across base engine override radio cards', () => {
+    const secondEngine: BaseEngineItem = {
+      id: 'multipage',
+      title: 'Multi-Page Business Engine',
+      tier: 'Standard Tier',
+      priceINR: 55000,
+      priceUSD: 700,
+      laymanDescription: 'Multi-page site',
+      techSpecs: 'Next.js 16',
+    };
+
+    render(
+      <StepTechnicalScope
+        engines={[mockEngine, secondEngine]}
+        features={mockFeatures}
+        currentArchetype={mockArchetype}
+        selectedEngine={mockEngine}
+        formData={{
+          selectedBaseEngineId: 'saas',
+          selectedFeatures: ['auth'],
+          projectStartType: 'greenfield',
+        }}
+        showEngineOverride={true}
+        setShowEngineOverride={vi.fn()}
+        activePopoverId={null}
+        setActivePopoverId={vi.fn()}
+        popoverAnchor={null}
+        setPopoverAnchor={vi.fn()}
+        lockedHintId={null}
+        currency="INR"
+        priceInCurrency={(inr, usd) => `₹${inr.toLocaleString()} / $${usd}`}
+        onEngineSelect={vi.fn()}
+        onFeatureToggle={vi.fn()}
+        onApplySmartPreset={vi.fn()}
+        togglePopover={vi.fn()}
+        dependsOnMap={{}}
+      />
+    );
+
+    const radios = screen.getAllByRole('radio');
+    expect(radios.length).toBe(2);
+    radios[0].focus();
+    expect(document.activeElement).toBe(radios[0]);
+
+    fireEvent.keyDown(radios[0], { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(radios[1]);
+
+    fireEvent.keyDown(radios[1], { key: 'Home' });
+    expect(document.activeElement).toBe(radios[0]);
+
+    fireEvent.keyDown(radios[0], { key: 'End' });
+    expect(document.activeElement).toBe(radios[1]);
+  });
+
+  it('renders technical spec popover as an accessible dialog and returns focus to trigger on close', () => {
+    const rafOriginal = window.requestAnimationFrame;
+    window.requestAnimationFrame = (cb) => {
+      cb(0);
+      return 0;
+    };
+
+    function Harness() {
+      const [activeId, setActiveId] = React.useState<string | null>(null);
+      const [anchor, setAnchor] = React.useState<{ x: number; y: number } | null>(null);
+      return (
+        <StepTechnicalScope
+          engines={[mockEngine]}
+          features={mockFeatures}
+          currentArchetype={mockArchetype}
+          selectedEngine={mockEngine}
+          formData={{
+            selectedBaseEngineId: 'saas',
+            selectedFeatures: ['auth'],
+            projectStartType: 'greenfield',
+          }}
+          showEngineOverride={false}
+          setShowEngineOverride={vi.fn()}
+          activePopoverId={activeId}
+          setActivePopoverId={setActiveId}
+          popoverAnchor={anchor}
+          setPopoverAnchor={setAnchor}
+          lockedHintId={null}
+          currency="INR"
+          priceInCurrency={(inr, usd) => `₹${inr.toLocaleString()} / $${usd}`}
+          onEngineSelect={vi.fn()}
+          onFeatureToggle={vi.fn()}
+          onApplySmartPreset={vi.fn()}
+          togglePopover={(_e, id) => {
+            setActiveId(id);
+            setAnchor({ x: 50, y: 100 });
+          }}
+          dependsOnMap={{}}
+        />
+      );
+    }
+
+    try {
+      render(<Harness />);
+      const infoBtn = screen.getByRole('button', {
+        name: /View Technical Engineering Specs for User Authentication & RBAC/i,
+      });
+      infoBtn.focus();
+      fireEvent.click(infoBtn);
+
+      const dialog = screen.getByRole('dialog', {
+        name: /User Authentication & RBAC Technical Specifications/i,
+      });
+      expect(dialog).toBeDefined();
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(
+        screen.queryByRole('dialog', { name: /User Authentication & RBAC Technical Specifications/i })
+      ).toBeNull();
+      expect(document.activeElement).toBe(infoBtn);
+    } finally {
+      window.requestAnimationFrame = rafOriginal;
+    }
   });
 });

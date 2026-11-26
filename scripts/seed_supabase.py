@@ -270,6 +270,7 @@ if os.path.exists(posts_dir):
                 title = slug
                 date = ""
                 excerpt = ""
+                cover_image = ""
                 tags = []
                 content_body = file_content
                 
@@ -286,6 +287,8 @@ if os.path.exists(posts_dir):
                                 date = line.split("date:", 1)[1].strip().strip('"').strip("'")
                             elif line.startswith("excerpt:"):
                                 excerpt = line.split("excerpt:", 1)[1].strip().strip('"').strip("'")
+                            elif line.startswith("coverImage:"):
+                                cover_image = line.split("coverImage:", 1)[1].strip().strip('"').strip("'")
                             elif line.startswith("tags:"):
                                 tags_str = line.split("tags:", 1)[1].strip()
                                 try:
@@ -300,7 +303,7 @@ if os.path.exists(posts_dir):
                     'date': date,
                     'excerpt': excerpt,
                     'tags': tags,
-                    'coverImage': '/images/blog/default.jpg',
+                    'coverImage': cover_image,
                     'content': content_body
                 })
             except Exception as e:

@@ -18,10 +18,10 @@
   position: relative;
   width: 100%;
   max-width: 520px;
-  background: var(--surface-card, #0d0d10);
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.12));
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 12px;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-glass-lg);
   overflow: hidden;
   animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
@@ -29,9 +29,9 @@
 }
 
 :global([data-theme="azure"]) .modalContainer {
-  background: #ffffff;
-  border-color: rgba(43, 43, 54, 0.18);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  background: var(--surface-elevated);
+  border-color: var(--border-muted);
+  box-shadow: var(--shadow-glass-lg);
 }
 
 .header {
@@ -39,13 +39,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.04));
-  border-bottom: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--surface-glass-border);
 }
 
 :global([data-theme="azure"]) .header {
-  background: #f4f3ef;
-  border-bottom-color: rgba(43, 43, 54, 0.1);
+  background: var(--surface-secondary);
+  border-bottom-color: var(--surface-glass-border);
 }
 
 .headerLeft {
@@ -61,25 +61,25 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgba(224, 109, 83, 0.15);
-  color: var(--pop-yellow, #e06d53);
-  border: 1px solid rgba(224, 109, 83, 0.35);
+  background: var(--badge-danger-bg);
+  color: var(--badge-danger-text);
+  border: 1px solid var(--badge-danger-border);
   animation: pulseAmber 2s infinite ease-in-out;
 }
 
 .title {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .closeBtn {
   background: transparent;
   border: none;
-  color: var(--color-text-muted, #a0a0b0);
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -90,13 +90,8 @@
 }
 
 .closeBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-text, #ffffff);
-}
-
-:global([data-theme="azure"]) .closeBtn:hover {
-  background: rgba(43, 43, 54, 0.08);
-  color: #2b2b36;
+  background: var(--surface-active);
+  color: var(--color-text);
 }
 
 .body {
@@ -111,13 +106,13 @@
 .description {
   font-size: 0.92rem;
   line-height: 1.5;
-  color: var(--color-text, #e2e2e8);
+  color: var(--color-text);
   margin: 0;
 }
 
 .targetHighlight {
   font-weight: 700;
-  color: var(--pop-yellow, #e06d53);
+  color: var(--badge-danger-text);
 }
 
 .dependentsList {
@@ -132,13 +127,13 @@
   justify-content: space-between;
   padding: 10px 14px;
   border-radius: 8px;
-  background: var(--surface-glass-bg, rgba(255, 255, 255, 0.03));
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  background: var(--surface-glass-bg);
+  border: 1px solid var(--surface-glass-border);
 }
 
 :global([data-theme="azure"]) .dependentItem {
-  background: #faf9f6;
-  border-color: rgba(43, 43, 54, 0.1);
+  background: var(--surface-primary);
+  border-color: var(--surface-glass-border);
 }
 
 .dependentLeft {
@@ -148,20 +143,20 @@
 }
 
 .dependentIcon {
-  color: var(--pop-blue, #3f6e91);
+  color: var(--badge-active-text);
 }
 
 .dependentLabel {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .dependentPrice {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--pop-yellow, #e06d53);
+  color: var(--badge-danger-text);
 }
 
 .savingsBox {
@@ -169,14 +164,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: rgba(57, 255, 20, 0.08);
-  border: 1px solid rgba(57, 255, 20, 0.25);
+  background: var(--badge-success-bg);
+  border: 1px solid var(--badge-success-border);
   border-radius: 8px;
 }
 
 :global([data-theme="azure"]) .savingsBox {
-  background: rgba(63, 110, 145, 0.08);
-  border-color: rgba(63, 110, 145, 0.25);
+  background: var(--badge-info-bg);
+  border-color: var(--badge-info-border);
 }
 
 .savingsLabel {
@@ -184,18 +179,18 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--neon-green, #39ff14);
+  color: var(--badge-success-text);
 }
 
 :global([data-theme="azure"]) .savingsLabel {
-  color: #3f6e91;
+  color: var(--badge-active-text);
 }
 
 .savingsAmount {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--color-text, #ffffff);
+  color: var(--color-text);
 }
 
 .footer {
@@ -204,22 +199,22 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 20px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.02));
-  border-top: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  background: var(--surface-elevated);
+  border-top: 1px solid var(--surface-glass-border);
 }
 
 :global([data-theme="azure"]) .footer {
-  background: #f4f3ef;
-  border-top-color: rgba(43, 43, 54, 0.1);
+  background: var(--surface-secondary);
+  border-top-color: var(--surface-glass-border);
 }
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.2));
-  color: var(--color-text, #ffffff);
+  border: 1px solid var(--border-muted);
+  color: var(--color-text);
   padding: 10px 18px;
   border-radius: 8px;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
@@ -227,41 +222,31 @@
 }
 
 .cancelBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--color-text, #ffffff);
-}
-
-:global([data-theme="azure"]) .cancelBtn {
-  border-color: rgba(43, 43, 54, 0.25);
-  color: #2b2b36;
-}
-
-:global([data-theme="azure"]) .cancelBtn:hover {
-  background: rgba(43, 43, 54, 0.08);
-  border-color: #2b2b36;
+  background: var(--surface-active);
+  border-color: var(--color-border);
 }
 
 .removeAllBtn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #e06d53;
+  background: var(--badge-danger-text);
   border: none;
-  color: #ffffff;
+  color: var(--app-btn-primary-text);
   padding: 10px 20px;
   border-radius: 8px;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-code, monospace);
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(224, 109, 83, 0.35);
+  box-shadow: var(--shadow-glass);
   transition: all 0.15s ease;
 }
 
 .removeAllBtn:hover {
-  background: #c85b42;
+  filter: brightness(1.08);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(224, 109, 83, 0.45);
+  box-shadow: var(--shadow-glass-lg);
 }
 
 @keyframes fadeIn {

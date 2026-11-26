@@ -162,6 +162,9 @@
 }
 
 .pillBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   background: var(--surface-card);
   border: 1px solid var(--border-muted);
   color: var(--color-text-muted);
@@ -307,6 +310,9 @@
 }
 
 .engineTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-code);
   font-size: 0.72rem;
   font-weight: 600;
@@ -397,15 +403,15 @@
 
 :global([data-theme='noir']) .reviewBlueprintBtn {
   background: var(--neon-cyan);
-  color: #050505;
+  color: var(--color-selection-text);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+  box-shadow: var(--app-btn-primary-shadow);
 }
 
 :global([data-theme='noir']) .reviewBlueprintBtn:hover {
-  background: #ffffff;
-  color: #000000;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+  background: var(--pop-black);
+  color: var(--color-selection-text);
+  box-shadow: var(--shadow-glass-lg);
 }
 
 @media (max-width: 640px) {

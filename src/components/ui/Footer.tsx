@@ -83,13 +83,14 @@ export default function Footer({ socials, profile, className }: FooterProps) {
 
   const navItems = useMemo(() => [
     { label: 'Home', href: '/#home' },
-    { label: 'About', href: '/#about' },
-    { label: 'Capabilities', href: '/#capabilities' },
+    { label: 'Services', href: '/services' },
+    { label: 'Scoping Lab', href: '/scoping' },
+    { label: 'Retriever AI', href: '/rag' },
     { label: 'Deployments', href: '/#deployments' },
     { label: audience === 'business' ? 'Quotation' : 'Resume', href: '/#resume' },
     { label: 'Playground', href: '/playground' },
-    { label: 'Contact', href: '/#contact' },
     { label: 'Blog', href: '/blog' },
+    { label: 'Contact', href: '/#contact' },
   ], [audience]);
 
   const isVisibleRef = useRef(true);

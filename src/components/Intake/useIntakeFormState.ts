@@ -94,9 +94,9 @@ export const FEATURE_CATEGORIES = [
 
 export const QUICK_CATEGORIES: { id: string; label: string; categories: readonly string[] }[] = [
   { id: 'all', label: 'All Services', categories: [] },
-  { id: 'ai', label: 'AI & Chatbots', categories: ['AI & Intelligence'] },
-  { id: 'integration', label: 'Integrations & Payments', categories: ['Integrations & Payments'] },
-  { id: 'performance', label: 'Speed & SEO', categories: ['Optimization & Growth', 'Security & Infrastructure'] },
+  { id: 'ai', label: 'AI & Chatbots', categories: ['ai', 'AI & Intelligence'] },
+  { id: 'integration', label: 'Integrations & Payments', categories: ['integration', 'email', 'Integrations & Payments'] },
+  { id: 'performance', label: 'Speed & SEO', categories: ['performance', 'Optimization & Growth', 'Security & Infrastructure'] },
 ];
 
 export function useIntakeFormState(
@@ -184,7 +184,14 @@ export function useIntakeFormState(
     initialPreset?.quickServiceId ? [initialPreset.quickServiceId] : []
   );
   const [quickStep, setQuickStep] = useState(initialPreset?.quickServiceId ? 2 : 1);
-  const [quickFormData, setQuickFormData] = useState({ companyName: '', siteUrl: '', additionalNotes: '', agreedToTerms: false });
+  const [quickFormData, setQuickFormData] = useState({
+    companyName: '',
+    contactEmail: user?.email || '',
+    contactPhone: '',
+    siteUrl: '',
+    additionalNotes: '',
+    agreedToTerms: false,
+  });
   const [selectedGoalCategory, setSelectedGoalCategory] = useState<'all' | 'websites' | 'saas' | 'ai_widgets'>('all');
   const [selectedQuickCategory, setSelectedQuickCategory] = useState<'all' | 'ai' | 'integration' | 'performance'>('all');
   const [showEngineOverride, setShowEngineOverride] = useState(false);
@@ -233,7 +240,7 @@ export function useIntakeFormState(
     let restoredBaseEngineId = initialEngineObj.id;
     let restoredFeatures = initialFeatureIds;
     let restoredBrandId = initialPreset?.brandId || brandAssets[0]?.id || 'ready';
-    let restoredMaintenanceId = initialPreset?.careId || maintenancePlans[0]?.id || 'growth';
+    let restoredMaintenanceId = initialPreset?.careId || '';
     let restoredCompany = user?.user_metadata?.full_name || '';
     let restoredGoal = initialArchetype.label;
     let restoredKpi = initialArchetype.primaryOutcome || initialArchetype.description;
@@ -341,10 +348,44 @@ export function useIntakeFormState(
   }, [currentArchetype]);
 
   const autoMaintenancePlanId = useMemo(() => {
-    if (selectedEngine.id === 'engine_saas' || selectedEngine.id === 'engine_ai_saas') return 'scale';
-    if (selectedEngine.id === 'engine_multipage' || selectedEngine.id === 'engine_ecommerce') return 'growth';
-    return 'essential';
-  }, [selectedEngine]);
+    const pickPlan = (...candidates: string[]) =>
+      candidates.find((id) => maintenancePlans.some((p: MaintenancePlanOption) => p.id === id)) ||
+      candidates[0];
+
+    const selectedFeatureObjs = features.filter((f: FeatureItem) =>
+      formData.selectedFeatures.includes(f.id)
+    );
+    const hasPremiumFeature = selectedFeatureObjs.some(
+      (f: FeatureItem) => f.recommendedMaintenanceId === 'premium'
+    );
+    const hasStandardFeature = selectedFeatureObjs.some(
+      (f: FeatureItem) => f.recommendedMaintenanceId === 'standard'
+    );
+
+    if (
+      hasPremiumFeature ||
+      selectedEngine.id === 'saas' ||
+      selectedEngine.id === 'engine_saas' ||
+      selectedEngine.id === 'engine_ai_saas'
+    ) {
+      return pickPlan('premium', 'scale');
+    }
+    if (
+      hasStandardFeature ||
+      selectedEngine.id === 'multipage' ||
+      selectedEngine.id === 'engine_multipage' ||
+      selectedEngine.id === 'engine_ecommerce'
+    ) {
+      return pickPlan('standard', 'growth');
+    }
+    if (
+      selectedEngine.id === 'ai_strategy_audit' ||
+      selectedEngine.id === 'standalone_embed'
+    ) {
+      return pickPlan('self', 'basic', 'essential');
+    }
+    return pickPlan('basic', 'essential');
+  }, [selectedEngine, features, formData.selectedFeatures, maintenancePlans]);
 
   const activeMaintenancePlan = useMemo(() => {
     const targetId = formData.selectedMaintenanceId || autoMaintenancePlanId;
@@ -564,10 +605,12 @@ export function useIntakeFormState(
     const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
     const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
     const engineTitle = `Quick Service: ${serviceLabels.join(', ') || 'Custom Tasks'}`;
+    const effectiveEmail = quickFormData.contactEmail.trim() || user?.email || '';
+    const effectivePhone = quickFormData.contactPhone.trim();
     return {
       companyName: quickFormData.companyName.trim() || 'Quick Service Order',
-      contactEmail: user?.email || '',
-      contactPhone: '',
+      contactEmail: effectiveEmail,
+      contactPhone: effectivePhone,
       projectGoal: 'Quick Service Integration',
       businessKPI: 'Fast-Track Engineering Turnaround',
       targetAudience: quickFormData.siteUrl ? `Existing Property (${quickFormData.siteUrl})` : 'Existing Web Property',
@@ -593,6 +636,8 @@ export function useIntakeFormState(
       totalCostUSD: quote.totalUSD,
       timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
       additionalNotes: [
+        effectiveEmail ? `[Contact Email: ${effectiveEmail}]` : '',
+        effectivePhone ? `[Contact Phone: ${effectivePhone}]` : '',
         quickFormData.siteUrl ? `[Site URL: ${quickFormData.siteUrl}]` : '',
         quickFormData.additionalNotes,
       ].filter(Boolean).join(' | '),
@@ -832,16 +877,46 @@ export function useIntakeFormState(
     return `/dashboard?${params.toString()}`;
   }, []);
 
+  const buildQuickScopePayload = useCallback(() => {
+    const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
+    const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
+    const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
+    const effectiveEmail = quickFormData.contactEmail.trim() || user?.email || '';
+    const effectivePhone = quickFormData.contactPhone.trim();
+
+    return {
+      scopeCode: generatedScopeCode,
+      companyName: quickFormData.companyName.trim() || 'Quick Service Order',
+      contactEmail: effectiveEmail,
+      contactPhone: effectivePhone,
+      clientPhone: effectivePhone,
+      projectGoal: 'Quick Service Integration',
+      baseEngineId: 'quick_service',
+      baseEngineTitle: `Quick Service: ${serviceLabels.join(', ')}`,
+      selectedFeatures: serviceLabels,
+      brandAssetOption: 'Not Applicable (Existing Site)',
+      maintenancePlan: 'Self-Managed (30-Day Warranty)',
+      totalCostINR: quote.totalINR,
+      totalCostUSD: quote.totalUSD,
+      currency,
+      timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
+      businessKPI: 'Quick Service Integration',
+      paymentStructure: '50/50',
+      inspirationLinks: quickFormData.siteUrl || '',
+      additionalNotes: quickFormData.additionalNotes || '',
+    };
+  }, [quickServices, selectedQuickServices, currency, generatedScopeCode, quickFormData, user]);
+
   const handleProceedToDashboard = useCallback(() => {
     cancelAutoRedirect();
-    const scopePayload = buildScopePayload();
+    const scopePayload = serviceType === 'quick' ? buildQuickScopePayload() : buildScopePayload();
     const redirectUrl = getDashboardRedirectUrl(scopePayload);
     if (user?.email) {
       window.location.href = redirectUrl;
     } else {
       window.location.href = `/login?redirect_to=${encodeURIComponent(redirectUrl)}`;
     }
-  }, [cancelAutoRedirect, buildScopePayload, getDashboardRedirectUrl, user]);
+  }, [cancelAutoRedirect, serviceType, buildQuickScopePayload, buildScopePayload, getDashboardRedirectUrl, user]);
 
   const handleQuickFastPass = useCallback(async () => {
     if (selectedQuickServices.length === 0) return;
@@ -850,29 +925,10 @@ export function useIntakeFormState(
       toast.error('Please accept the standard commercial terms before using Fast-Pass.');
       return;
     }
+    setErrorMsg('');
     setSubmitting(true);
     try {
-      const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
-      const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
-      const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
-
-      const quickScopePayload = {
-        scopeCode: generatedScopeCode,
-        companyName: quickFormData.companyName.trim() || 'Quick Service Order',
-        clientPhone: '',
-        baseEngineTitle: `Quick Service: ${serviceLabels.join(', ')}`,
-        selectedFeatures: serviceLabels,
-        brandAssetOption: 'Not Applicable (Existing Site)',
-        maintenancePlan: 'Self-Managed (30-Day Warranty)',
-        totalCostINR: quote.totalINR,
-        totalCostUSD: quote.totalUSD,
-        currency,
-        timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
-        businessKPI: '⚡ Quick Service Integration',
-        paymentStructure: '50/50',
-        inspirationLinks: quickFormData.siteUrl || '',
-        additionalNotes: quickFormData.additionalNotes || '',
-      };
+      const quickScopePayload = buildQuickScopePayload();
 
       if (typeof window !== 'undefined') {
         try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(quickScopePayload)); } catch {}
@@ -895,7 +951,7 @@ export function useIntakeFormState(
       console.error('Quick fast-pass error:', err);
       setSubmitting(false);
     }
-  }, [selectedQuickServices, quickServices, currency, generatedScopeCode, quickFormData, getDashboardRedirectUrl]);
+  }, [selectedQuickServices.length, quickFormData.agreedToTerms, buildQuickScopePayload, getDashboardRedirectUrl]);
 
   const handleFastPass = useCallback(async () => {
     if (!formData.agreedToTerms) {
@@ -903,6 +959,21 @@ export function useIntakeFormState(
       toast.error('Please accept the standard commercial terms before using Fast-Pass.');
       return;
     }
+    if (!formData.targetAudience || formData.targetAudience.trim().length < 2) {
+      const msg = 'Please specify a target audience persona or industry in Step 1 before submitting.';
+      setErrorMsg(msg);
+      toast.error(msg);
+      setCurrentStep(1);
+      if (typeof document !== 'undefined') {
+        requestAnimationFrame(() => {
+          const input = document.getElementById('intake-target-audience');
+          input?.focus();
+          input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+      return;
+    }
+    setErrorMsg('');
     setSubmitting(true);
     try {
       const scopePayload = buildScopePayload();
@@ -927,7 +998,7 @@ export function useIntakeFormState(
       console.error('Fast-pass error:', err);
       setSubmitting(false);
     }
-  }, [formData.agreedToTerms, buildScopePayload, getDashboardRedirectUrl]);
+  }, [formData.agreedToTerms, formData.targetAudience, buildScopePayload, getDashboardRedirectUrl]);
 
   const validateStep1 = useCallback((): boolean => {
     if (!formData.targetAudience || formData.targetAudience.trim().length < 2) {
@@ -948,6 +1019,14 @@ export function useIntakeFormState(
 
     if (!formData.targetAudience || formData.targetAudience.trim().length < 2) {
       setErrorMsg('Please specify a target audience persona or industry in Step 1 before submitting.');
+      setCurrentStep(1);
+      if (typeof document !== 'undefined') {
+        requestAnimationFrame(() => {
+          const input = document.getElementById('intake-target-audience');
+          input?.focus();
+          input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
       return;
     }
 
@@ -1060,30 +1139,30 @@ export function useIntakeFormState(
   }, [formData, user, generatedScopeCode, currency, recaptchaUnavailable, resumeData, buildQuestionnaireData, isNoir, getAccessToken, buildScopePayload, getDashboardRedirectUrl]);
 
   const handleQuickSubmit = useCallback(async () => {
-    if (!quickFormData.agreedToTerms || selectedQuickServices.length === 0) return;
+    if (selectedQuickServices.length === 0) return;
+    if (!quickFormData.agreedToTerms) {
+      setErrorMsg('Please accept the standard commercial terms before submitting.');
+      return;
+    }
+
+    const effectiveEmail = (user?.email || quickFormData.contactEmail).trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!user && (!effectiveEmail || !emailRegex.test(effectiveEmail))) {
+      setErrorMsg('Please enter a valid contact email address (e.g., founder@company.com) or use 1-Click Google Fast-Pass.');
+      if (typeof document !== 'undefined') {
+        requestAnimationFrame(() => {
+          const input = document.getElementById('quick-contact-email');
+          input?.focus();
+          input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+      return;
+    }
+
+    setErrorMsg('');
     setSubmitting(true);
     try {
-      const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
-      const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
-      const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
-
-      const quickScopePayload = {
-        scopeCode: generatedScopeCode,
-        companyName: quickFormData.companyName.trim() || 'Quick Service Order',
-        clientPhone: '',
-        baseEngineTitle: `Quick Service: ${serviceLabels.join(', ')}`,
-        selectedFeatures: serviceLabels,
-        brandAssetOption: 'Not Applicable (Existing Site)',
-        maintenancePlan: 'Self-Managed (30-Day Warranty)',
-        totalCostINR: quote.totalINR,
-        totalCostUSD: quote.totalUSD,
-        currency,
-        timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
-        businessKPI: '⚡ Quick Service Integration',
-        paymentStructure: '50/50',
-        inspirationLinks: quickFormData.siteUrl || '',
-        additionalNotes: quickFormData.additionalNotes || '',
-      };
+      const quickScopePayload = buildQuickScopePayload();
 
       if (typeof window !== 'undefined') {
         try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(quickScopePayload)); } catch {}
@@ -1100,11 +1179,51 @@ export function useIntakeFormState(
         console.warn('Quick service intake draft API warning:', draftErr);
       }
 
+      let recaptchaToken: string | undefined;
+      if (SITE_KEY && typeof window !== 'undefined' && window.grecaptcha && !recaptchaUnavailable) {
+        try {
+          recaptchaToken = await new Promise<string>((resolve) => {
+            window.grecaptcha!.ready(() => {
+              window.grecaptcha!.execute(SITE_KEY, { action: 'submit_quick_scope' })
+                .then((token) => resolve(token))
+                .catch(() => resolve(''));
+            });
+          });
+        } catch (rcErr) {
+          console.warn('reCAPTCHA execution warning:', rcErr);
+        }
+      }
+
+      const pdfBase64 = await generateQuestionnairePDFBase64(
+        resumeData,
+        buildQuickServiceData(),
+        isNoir,
+        currency
+      ).then((res) => res.base64).catch(() => undefined);
+
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: quickFormData.companyName.trim() || user?.user_metadata?.full_name || 'Quick Service Client',
+          email: effectiveEmail || 'lead@unauthenticated.client',
+          message: `[Quick Service Scoping Brief Created — ${generatedScopeCode}]`,
+          recaptchaToken,
+          pdfAttachment: pdfBase64
+            ? { content: pdfBase64, filename: `${generatedScopeCode}-Quick-Service-Brief.pdf` }
+            : undefined,
+          attachmentBase64: pdfBase64,
+          attachmentFileName: `${generatedScopeCode}-Quick-Service-Brief.pdf`,
+        }),
+      }).catch((err) => console.warn('Quick service contact notify warning:', err));
+
       try {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
       } catch {}
       toast.success('Quick Service Scope Saved!', {
-        description: 'Preparing your client workspace environment...',
+        description: user?.email
+          ? 'Preparing your client workspace environment...'
+          : 'Your quick service brief has been captured and sent.',
       });
 
       if (user?.email) {
@@ -1130,15 +1249,14 @@ export function useIntakeFormState(
         return;
       }
 
-      const redirectUrl = getDashboardRedirectUrl(quickScopePayload);
-      await signInWithGoogle(redirectUrl);
+      setSubmitted(true);
     } catch (err: unknown) {
       console.error('Quick service submit error:', err);
       setErrorMsg('Something went wrong during submission. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  }, [quickFormData, selectedQuickServices, quickServices, currency, generatedScopeCode, user, getAccessToken, getDashboardRedirectUrl]);
+  }, [quickFormData, selectedQuickServices.length, currency, generatedScopeCode, user, recaptchaUnavailable, resumeData, buildQuickServiceData, buildQuickScopePayload, isNoir, getAccessToken, getDashboardRedirectUrl]);
 
   return {
     goals,

@@ -594,7 +594,7 @@
 }
 
 :global([data-theme='noir']) .mathTotalRow {
-  color: var(--neon-green, #39ff14);
+  color: var(--neon-green);
   text-shadow: none;
 }
 
@@ -845,13 +845,13 @@
 }
 
 .sprintRiskIcon {
-  color: var(--pop-terracotta, #e06d53);
+  color: var(--pop-orange);
   flex-shrink: 0;
   margin-top: 1px;
 }
 
 :global([data-theme='noir']) .sprintRiskIcon {
-  color: var(--neon-pink, #ff2a55);
+  color: var(--neon-pink);
 }
 
 /* Focus-visible accessibility outlines (Azure & Noir design system) */

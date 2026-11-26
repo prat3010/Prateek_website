@@ -1,0 +1,19 @@
+# Prateeq Sharma (Prateeq Studio)
+
+> Forward Deployed AI Engineer & Solutions Architect building custom RAG knowledge systems, Next.js 16 SaaS MVPs, Voice AI agents, and fixed-scope web applications. Based in India, working remotely worldwide.
+
+## Primary Commercial Pages
+- [Services & Fixed-Scope Pricing](https://prateeq.in/services): Full catalog of core web engines, AI solution blueprints, and 2–7 day quick sprints with transparent INR and USD pricing.
+- [Project Scoping Lab & Instant Quote](https://prateeq.in/scoping): Interactive CPQ configurator that resolves transitive module dependencies and exports an itemized PDF Statement of Work.
+- [Retriever AI — Enterprise Hybrid RAG Platform](https://prateeq.in/rag): Multi-tenant PostgreSQL + pgvector HNSW + BM25 hybrid RAG platform with $0 local Ollama embeddings, CRAG anti-hallucination guardrails, and a 1-line embeddable website chatbot script.
+- [Retriever Production Load Benchmarks](https://prateeq.in/rag/benchmarks): Empirical concurrent load testing results (5–20 VUs) against production Oracle Cloud VPS and pgvector.
+
+## Technical Case Studies & Demos
+- [Engineering Blog](https://prateeq.in/blog): Deep dives on hybrid cloud RAG architecture, SaaS MVP cost breakdowns, pgvector vs Pinecone, and zero-hallucination AI chatbots.
+- [Interactive Playground](https://prateeq.in/playground): Live demos of Micro-SaaS builds, Retriever cognitive tools, and interactive labs.
+- [Diagnostics Terminal](https://prateeq.in/terminal): Interactive web CLI and system telemetry.
+
+## Engagement & Contact
+- Direct Email: prateeqsharma@gmail.com
+- Commercial Terms: 50/50 milestone escrow split, 100% IP transfer upon final settlement, 30-day post-launch warranty.
+- Privacy Architecture: https://prateeq.in/privacy

@@ -92,9 +92,20 @@ export default function Navbar({ items, className }: NavbarProps) {
         { label: 'Pricing', href: '/rag#pricing' },
       ];
     }
+    if (pathname?.startsWith('/services')) {
+      return [
+        { label: 'Home', href: '/' },
+        { label: 'Services', href: '/services' },
+        { label: 'Scoping Lab', href: '/scoping' },
+        { label: 'Retriever AI', href: '/rag' },
+        { label: 'Blog', href: '/blog' },
+        { label: 'Contact', href: '/#contact' },
+      ];
+    }
     if (pathname?.startsWith('/scoping')) {
       return [
         { label: 'Home', href: '/' },
+        { label: 'Services', href: '/services' },
         { label: 'Playground', href: '/#playground' },
         { label: 'Retriever AI', href: '/rag' },
         { label: 'Terminal', href: '/terminal' },
@@ -104,6 +115,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (pathname?.startsWith('/terminal')) {
       return [
         { label: 'Home', href: '/' },
+        { label: 'Services', href: '/services' },
         { label: 'Playground', href: '/#playground' },
         { label: 'Scoping Lab', href: '/scoping' },
         { label: 'Retriever AI', href: '/rag' },
@@ -113,6 +125,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (pathname?.startsWith('/analytics')) {
       return [
         { label: 'Home', href: '/' },
+        { label: 'Services', href: '/services' },
         { label: 'Terminal', href: '/terminal' },
         { label: 'Scoping Lab', href: '/scoping' },
         { label: 'Retriever AI', href: '/rag' },
@@ -122,6 +135,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (pathname === '/login') {
       return [
         { label: 'Home', href: '/' },
+        { label: 'Services', href: '/services' },
         { label: 'Scoping Lab', href: '/scoping' },
         { label: 'Retriever AI', href: '/rag' },
         { label: 'Contact', href: '/#contact' },
@@ -130,6 +144,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (pathname?.startsWith('/playground')) {
       return [
         { label: 'Home', href: '/' },
+        { label: 'Services', href: '/services' },
         { label: 'Playground', href: '/#playground' },
         { label: 'Scoping Lab', href: '/scoping' },
         { label: 'Terminal', href: '/terminal' },

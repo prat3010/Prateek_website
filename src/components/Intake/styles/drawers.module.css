@@ -1,35 +1,35 @@
 
 :global([data-theme='noir']) .btnSecondary:hover {
-  border-color: var(--neon-cyan, #00f0ff);
-  color: #FFFFFF;
-  background: #121216;
+  border-color: var(--neon-cyan);
+  color: var(--color-border);
+  background: var(--surface-glass-bg);
   text-shadow: none;
   transform: translate(0, 0);
   box-shadow: none;
 }
 
 :global([data-theme='noir']) .stickyBar {
-  background: rgba(3, 3, 4, 0.95);
-  border: 1px solid #2F2F3D;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+  background: var(--surface-hardware-recessed);
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--surface-hardware-shadow);
 }
 
 :global([data-theme='noir']) .stickyTitle {
-  color: #8a8a93;
+  color: var(--color-text-muted);
 }
 
 :global([data-theme='noir']) .mobileFormulaToggle {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e0e0e3;
+  background: var(--surface-hardware-keycap);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
 }
 
 :global([data-theme='noir']) .stickyBreakdown {
-  color: #e0e0e3;
+  color: var(--color-text);
 }
 
 :global([data-theme='noir']) .stickyTotal {
-  color: var(--neon-green, #39ff14);
+  color: var(--neon-green);
   text-shadow: none;
 }
 
@@ -40,66 +40,66 @@
 }
 
 :global([data-theme='noir']) .careCard {
-  background: #0d0d10;
-  border: 1px solid #2F2F3D;
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--border-accent);
 }
 
 :global([data-theme='noir']) .careCardSelected {
-  border-color: var(--neon-cyan, #00f0ff);
-  background: #08080a;
-  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15);
+  border-color: var(--neon-cyan);
+  background: var(--badge-active-bg);
+  box-shadow: var(--shadow-glass);
 }
 
 :global([data-theme='noir']) .careCardBadge {
-  color: var(--neon-cyan, #00f0ff);
-  background: #08080a;
-  border: 1px solid #2F2F3D;
+  color: var(--neon-cyan);
+  background: var(--color-bg);
+  border: 1px solid var(--border-accent);
 }
 
 :global([data-theme='noir']) .careCardTitle {
-  color: #FAFAFA;
+  color: var(--color-border);
 }
 
 :global([data-theme='noir']) .careCardPrice {
-  color: var(--neon-green, #39ff14);
+  color: var(--neon-green);
   text-shadow: none;
 }
 
 :global([data-theme='noir']) .careCardList {
-  color: #8a8a93;
+  color: var(--color-text-muted);
 }
 
 :global([data-theme='noir']) .infoBtn {
-  background: #0d0d10;
-  border: 1px solid #2F2F3D;
-  color: var(--neon-cyan, #00f0ff);
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--border-accent);
+  color: var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .infoBtn:hover,
 :global([data-theme='noir']) .infoBtnActive {
-  background: var(--neon-cyan, #00f0ff);
-  color: #08080a;
-  border-color: var(--neon-cyan, #00f0ff);
+  background: var(--neon-cyan);
+  color: var(--color-selection-text);
+  border-color: var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .popoverBox {
-  background: #030304;
-  border: 1px solid var(--neon-pink, #ff2a55);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 42, 85, 0.15);
+  background: var(--surface-hardware-recessed);
+  border: 1px solid var(--neon-pink);
+  box-shadow: var(--shadow-glass-lg);
 }
 
 :global([data-theme='noir']) .popoverHeader {
-  color: var(--neon-cyan, #00f0ff);
-  border-bottom: 1px solid #2F2F3D;
+  color: var(--neon-cyan);
+  border-bottom: 1px solid var(--border-accent);
 }
 
 :global([data-theme='noir']) .popoverTechText {
-  color: #e0e0e3;
+  color: var(--color-text);
 }
 
 :global([data-theme='noir']) .successIcon {
-  background: rgba(57, 255, 20, 0.1);
-  color: var(--neon-green, #39ff14);
+  background: var(--badge-success-bg);
+  color: var(--neon-green);
 }
 
 /* ── Disabled Button Styling ── */
@@ -116,8 +116,8 @@
 .termsCheckboxBox {
   margin-top: 14px;
   padding: 12px 14px;
-  background: rgba(2, 132, 199, 0.08);
-  border: 1px solid rgba(2, 132, 199, 0.3);
+  background: var(--badge-info-bg);
+  border: 1px solid var(--badge-info-border);
   border-radius: 6px;
   transition: border-color 0.2s ease;
 }
@@ -136,21 +136,21 @@
   margin-top: 2px;
   width: 16px;
   height: 16px;
-  accent-color: #0284c7;
+  accent-color: var(--intake-accent);
   cursor: pointer;
 }
 
 /* ── Terms Content Box ── */
 
 .termsContentBox {
-  background: #FFFFFF;
-  border: 1.5px solid #2B2B36;
+  background: var(--intake-card-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
   padding: 12px 16px;
   max-height: 120px;
   overflow-y: auto;
   font-size: 12px;
-  color: #475569;
+  color: var(--color-text-muted);
   line-height: 1.5;
   touch-action: pan-y;
   overscroll-behavior: contain;
@@ -161,43 +161,37 @@
 }
 
 :global([data-theme='noir']) .termsContentBox {
-  background: #030304;
-  border-color: #2F2F3D;
+  background: var(--surface-hardware-recessed);
+  border-color: var(--border-accent);
   color: var(--color-text-muted);
 }
 
 :global([data-theme='noir']) .chipCard {
-  background: #0d0d10;
-  border: 1px solid #2F2F3D;
-  color: #e0e0e3;
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--border-accent);
+  color: var(--color-text);
 }
 
 :global([data-theme='noir']) .chipCard:hover {
-  border-color: var(--neon-cyan, #00f0ff);
+  border-color: var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .chipCardActive {
-  background: var(--neon-cyan, #00f0ff);
-  color: #08080a;
-  border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: var(--neon-cyan);
+  color: var(--color-selection-text);
+  border-color: var(--neon-cyan);
+  box-shadow: var(--shadow-glass);
 }
 
 .recaptchaWarning {
   margin-top: 12px;
   font-size: 12px;
   line-height: 1.5;
-  color: #b45309;
-  background: #fffbeb;
-  border: 1.5px solid #f59e0b;
+  color: var(--badge-draft-text);
+  background: var(--badge-draft-bg);
+  border: 1.5px solid var(--badge-draft-border);
   border-radius: 8px;
   padding: 10px 14px;
-}
-
-:global([data-theme='noir']) .recaptchaWarning {
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.4);
 }
 
 /* ── Step 0: Service Type Gate ── */
@@ -304,7 +298,7 @@
 
 .quoteSummary {
   margin-top: 16px;
-  background: #F7F2E8;
+  background: var(--surface-secondary);
   border: 1.5px solid var(--color-border);
   border-radius: var(--border-radius-sm, 6px);
   padding: 16px;
@@ -324,8 +318,8 @@
 }
 
 :global([data-theme='noir']) .quoteSummary {
-  background: rgba(30, 30, 40, 0.8);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--surface-card);
+  border-color: var(--surface-glass-border);
 }
 
 .quoteTitle {
@@ -334,15 +328,10 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--pop-black);
+  color: var(--color-text);
   margin: 0 0 12px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-:global([data-theme='noir']) .quoteTitle {
-  color: var(--pop-cream, #f7f2e8);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-muted);
 }
 
 .quoteRow {
@@ -351,31 +340,19 @@
   align-items: center;
   padding: 6px 0;
   font-size: 12px;
-  color: var(--pop-black);
-}
-
-:global([data-theme='noir']) .quoteRow {
-  color: rgba(247, 242, 232, 0.8);
+  color: var(--color-text);
 }
 
 .quoteRowTotal {
   margin-top: 8px;
   padding-top: 10px;
-  border-top: 1.5px solid var(--pop-blue);
+  border-top: 1.5px solid var(--intake-accent);
   font-size: 14px;
 }
 
-:global([data-theme='noir']) .quoteRowTotal {
-  border-color: var(--neon-cyan, #00f0ff);
-}
-
 .totalPrice {
-  color: var(--pop-blue);
+  color: var(--intake-accent-text);
   font-size: 16px;
-}
-
-:global([data-theme='noir']) .totalPrice {
-  color: var(--neon-cyan, #00f0ff);
 }
 
 /* ── Quick Service Compact Summary (inline total bar) ── */
@@ -385,18 +362,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background: rgba(90, 142, 182, 0.08);
-  border: 1.5px solid var(--pop-blue);
+  background: var(--badge-active-bg);
+  border: 1.5px solid var(--intake-accent);
   border-radius: var(--border-radius-sm, 6px);
   font-family: var(--font-code);
   font-size: 13px;
-  color: var(--pop-black);
-}
-
-:global([data-theme='noir']) .quoteSummaryCompact {
-  background: rgba(0, 240, 255, 0.06);
-  border-color: var(--neon-cyan, #00f0ff);
-  color: var(--pop-cream, #f7f2e8);
+  color: var(--color-text);
 }
 
 /* ── Step 0 Card Content Layout ── */
@@ -442,7 +413,7 @@
 /* ── Error Message ── */
 
 .formError {
-  color: #dc2626;
+  color: var(--badge-danger-text);
   font-size: 13px;
   margin-top: 12px;
 }
@@ -857,9 +828,13 @@
 .intentBarContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   width: 100%;
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
+}
+
+.intentBarContainer > div {
+  margin-bottom: 0;
 }
 
 .copilotTriggerRow {
@@ -872,54 +847,58 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--badge-active-bg, rgba(90, 142, 182, 0.18));
-  border: 1.5px solid var(--badge-active-border, rgba(44, 89, 125, 0.3));
-  color: var(--badge-active-text, #2c597d);
+  background: var(--badge-active-bg);
+  border: 1.5px solid var(--badge-active-border);
+  color: var(--badge-active-text);
   font-family: var(--font-code, monospace);
   font-size: 0.76rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 5px 12px;
   border-radius: var(--border-radius-md, 8px);
   cursor: pointer;
-  box-shadow: var(--shadow-comic-sm, 1.5px 1.5px 0px rgba(43, 43, 54, 0.12));
+  box-shadow: var(--shadow-comic-sm);
   transition: all 0.15s ease;
 }
 
 .copilotTriggerBtn:hover {
-  background: var(--pop-yellow, #F4DC95);
-  color: var(--pop-black, #2B2B36);
-  border-color: var(--color-border, #2B2B36);
+  background: var(--pop-yellow);
+  color: var(--pop-black);
+  border-color: var(--color-border);
   transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-comic, 3px 3px 0px rgba(43, 43, 54, 0.18));
+  box-shadow: var(--shadow-comic);
 }
 
 :global([data-theme='noir']) .copilotTriggerBtn {
-  background: rgba(0, 240, 255, 0.1);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  color: var(--neon-cyan, #00f0ff);
+  background: var(--badge-active-bg);
+  border: 1px solid var(--badge-active-border);
+  color: var(--neon-cyan);
   box-shadow: none;
 }
 
 :global([data-theme='noir']) .copilotTriggerBtn:hover {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  background: var(--badge-info-bg);
+  border-color: var(--neon-cyan);
+  box-shadow: var(--shadow-glass);
   transform: translateY(-1px);
 }
 
 .discoveryWedgeBox {
-  margin: 1.25rem 0 1.75rem;
-  border-radius: 12px;
-  border: 1.5px solid var(--accent-color);
-  background: linear-gradient(135deg, rgba(90, 142, 182, 0.08) 0%, rgba(90, 142, 182, 0.02) 100%);
-  padding: 1rem 1.25rem;
+  margin: 0;
+  border-radius: 10px;
+  border: 1.5px solid var(--intake-accent);
+  background: var(--badge-info-bg);
+  padding: 0.75rem 1rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-glass);
 }
 
-:global([data-theme='noir']) .discoveryWedgeBox {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(0, 240, 255, 0.02) 100%);
+.discoveryWedgeTitleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .discoveryWedgeBadge {
@@ -927,15 +906,14 @@
   align-items: center;
   gap: 0.35rem;
   font-family: var(--font-code);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: var(--accent-color);
-  color: var(--surface-secondary);
-  padding: 0.2rem 0.5rem;
+  background: var(--intake-accent);
+  color: var(--intake-on-accent);
+  padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  margin-bottom: 0.75rem;
 }
 
 .discoveryWedgeContent {
@@ -943,34 +921,37 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 .discoveryWedgeText {
   flex: 1;
-  min-width: 280px;
+  min-width: 240px;
 }
 
 .discoveryWedgeTitle {
   font-family: var(--font-headline);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--color-text);
-  margin: 0 0 0.4rem 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .discoveryWedgeDescription {
-  font-size: 0.86rem;
-  line-height: 1.45;
-  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
 .discoveryWedgeActions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
   flex-wrap: wrap;
 }
 
@@ -982,24 +963,24 @@
 
 .discoveryWedgePriceTag {
   font-family: var(--font-code);
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: var(--pop-yellow, #facc15);
+  color: var(--intake-accent-text);
 }
 
 .discoveryWedgeDuration {
   font-size: 0.72rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--color-text-muted);
 }
 
 .discoveryWedgeBtn {
-  background: var(--app-btn-primary-bg, #38bdf8);
-  color: var(--app-btn-primary-text, #0b0f19);
+  background: var(--app-btn-primary-bg);
+  color: var(--app-btn-primary-text);
   border: 1px solid transparent;
   border-radius: 8px;
-  padding: 0.55rem 1rem;
+  padding: 0.5rem 0.9rem;
   font-family: var(--font-headline);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -1014,9 +995,9 @@
 }
 
 .discoveryWedgeBtnActive {
-  background: var(--badge-success-bg, rgba(34, 197, 94, 0.2));
-  color: var(--badge-success-text, #4ade80);
-  border-color: var(--badge-success-border, rgba(34, 197, 94, 0.5));
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
+  border-color: var(--badge-success-border);
 }
 
 

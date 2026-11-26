@@ -8,6 +8,11 @@ import {
   Activity,
   CheckCircle2,
   ArrowRight,
+  Building2,
+  Mic,
+  ShoppingBag,
+  BarChart3,
+  GraduationCap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Currency } from '@/lib/pricing';
@@ -62,11 +67,11 @@ function formatEngineLabel(id: string): string {
 }
 
 const QUICK_SUGGESTIONS = [
-  { label: '🚀 Real Estate RAG Portal', prompt: 'Build a real estate portal with private AI knowledge base for property documents, client portal, and lead capture.' },
-  { label: '🤖 Healthcare Voice Bot', prompt: 'Create a HIPAA-ready healthcare platform with conversational voice AI agent, appointment booking, and SMS workflows.' },
-  { label: '🛍️ Headless E-Commerce', prompt: 'Modern direct-to-consumer e-commerce brand store with product catalog, cart drawer, Razorpay checkout, and analytics.' },
-  { label: '📊 SaaS MVP with Billing', prompt: 'Full-stack B2B SaaS platform with user authentication, Stripe subscriptions, role-based admin center, and email alerts.' },
-  { label: '🎓 Course LMS Portal', prompt: 'Online learning course academy with student accounts, video lesson player, payment gating, and completion certificates.' },
+  { icon: Building2, label: 'Real Estate RAG Portal', prompt: 'Build a real estate portal with private AI knowledge base for property documents, client portal, and lead capture.' },
+  { icon: Mic, label: 'Healthcare Voice Bot', prompt: 'Create a HIPAA-ready healthcare platform with conversational voice AI agent, appointment booking, and SMS workflows.' },
+  { icon: ShoppingBag, label: 'Headless E-Commerce', prompt: 'Modern direct-to-consumer e-commerce brand store with product catalog, cart drawer, Razorpay checkout, and analytics.' },
+  { icon: BarChart3, label: 'SaaS MVP with Billing', prompt: 'Full-stack B2B SaaS platform with user authentication, Stripe subscriptions, role-based admin center, and email alerts.' },
+  { icon: GraduationCap, label: 'Course LMS Portal', prompt: 'Online learning course academy with student accounts, video lesson player, payment gating, and completion certificates.' },
 ];
 
 export function AiScopingPromptBar({
@@ -113,7 +118,7 @@ export function AiScopingPromptBar({
       setMatchedBlueprint(data);
       onApplyBlueprint(data);
       toast.success(
-        `🎯 ${Math.round(data.confidenceScore * 100)}% Match: ${data.summaryRationale}`,
+        `${Math.round(data.confidenceScore * 100)}% Match: ${data.summaryRationale}`,
         {
           action: onNavigateStep
             ? {
@@ -144,7 +149,7 @@ export function AiScopingPromptBar({
     setMatchedBlueprint(blueprint);
     onApplyBlueprint(blueprint);
     toast.success(
-      `📄 RFP Parsed (${Math.round(blueprint.confidenceScore * 100)}% Confidence): ${blueprint.summaryRationale}`,
+      `RFP Parsed (${Math.round(blueprint.confidenceScore * 100)}% Confidence): ${blueprint.summaryRationale}`,
       {
         action: onNavigateStep
           ? {
@@ -234,7 +239,10 @@ export function AiScopingPromptBar({
               <span>Blueprint Matched ({Math.round(matchedBlueprint.confidenceScore * 100)}% Confidence)</span>
             </div>
             {matchedBlueprint.retrieverEngineRecommended && (
-              <span className={styles.engineTag}>⚡ Retriever Recommended</span>
+              <span className={styles.engineTag}>
+                <Zap size={12} aria-hidden="true" />
+                <span>Retriever Recommended</span>
+              </span>
             )}
           </div>
 
@@ -288,34 +296,38 @@ export function AiScopingPromptBar({
 
       <div className={styles.suggestionsRow}>
         <span className={styles.suggestionLabel}>Quick Blueprints:</span>
-        {QUICK_SUGGESTIONS.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            className={styles.pillBtn}
-            onClick={() => handleSuggestionClick(item.prompt)}
-            disabled={isLoading}
-          >
-            {item.label}
-          </button>
-        ))}
+        {QUICK_SUGGESTIONS.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.label}
+              type="button"
+              className={styles.pillBtn}
+              onClick={() => handleSuggestionClick(item.prompt)}
+              disabled={isLoading}
+            >
+              <Icon size={12} aria-hidden="true" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {telemetry && (
         <div className={styles.telemetryRow}>
           <div className={styles.telemetryBadge}>
-            <Activity size={13} />
+            <Activity size={13} aria-hidden="true" />
             <span>
               {telemetry.fallbackMode
-                ? '⚙️ Catalog Rule-Based Matcher (Offline Fallback)'
-                : `⚡ Powered by Retriever (${telemetry.modelUsed || 'Live Engine'})`}
+                ? 'Catalog Rule-Based Matcher (Offline Fallback)'
+                : `Powered by Retriever (${telemetry.modelUsed || 'Live Engine'})`}
             </span>
           </div>
           <div className={styles.telemetryDetails}>
             <span>Latency: {telemetry.latencyMs}ms</span>
             {!telemetry.fallbackMode && (
               <span>
-                • ⚡ Semantic Cache:{' '}
+                • Semantic Cache:{' '}
                 {telemetry.semanticCacheHit ? 'Active (HNSW pgvector)' : 'Warm'}
               </span>
             )}

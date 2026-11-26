@@ -82,7 +82,7 @@ export const getAllPosts = unstable_cache(
         .not('slug', 'like', 'draft-%')
         .order('date', { ascending: false });
       if (error || !data) throw error || new Error('No data');
-      return data.map((p) => ({
+      const dbPosts = data.map((p) => ({
         slug: p.slug,
         title: p.title,
         date: p.date,
@@ -91,6 +91,9 @@ export const getAllPosts = unstable_cache(
         coverImage: p.coverImage || '',
         content: p.content,
       })) as BlogPost[];
+      const seenSlugs = new Set(dbPosts.map((p) => p.slug));
+      const localExtras = getLocalAllPosts().filter((p) => !seenSlugs.has(p.slug));
+      return [...dbPosts, ...localExtras].sort((a, b) => (a.date < b.date ? 1 : -1));
     } catch (err) {
       console.error('Failed to fetch posts from Supabase, falling back to local files:', err);
       return getLocalAllPosts();
@@ -110,8 +113,11 @@ export const getPostBySlug = (slug: string) => unstable_cache(
         .from('posts')
         .select('*')
         .eq('slug', slug)
-        .single();
-      if (error || !data) throw error || new Error('No data');
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        return getLocalPostBySlug(slug);
+      }
       return {
         slug: data.slug,
         title: data.title,

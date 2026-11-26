@@ -163,8 +163,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     generatedScopeCode,
   ]);
 
-  const handleValidateAndNavigate = React.useCallback((targetStep: number) => {
-    if (currentStep === 1 && targetStep > 1) {
+  const handleValidateAndNavigate = React.useCallback((targetStep: number, options?: { skipStep1Validation?: boolean }) => {
+    if (currentStep === 1 && targetStep > 1 && !options?.skipStep1Validation) {
       if (!validateStep1()) {
         setIsCartOpen(false);
         setIsCopilotDrawerOpen(false);
@@ -178,6 +178,10 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     const finalStep = targetStep === 3 && shouldSkipBrandStep ? 4 : targetStep;
     setCurrentStep(finalStep);
   }, [currentStep, shouldSkipBrandStep, validateStep1, setErrorMsg, setCurrentStep, setIsCartOpen, setIsCopilotDrawerOpen]);
+
+  const handleAiNavigateStep = React.useCallback((targetStep: number) => {
+    handleValidateAndNavigate(targetStep, { skipStep1Validation: targetStep === 2 });
+  }, [handleValidateAndNavigate]);
 
   const handleNextStep = React.useCallback(() => {
     if (currentStep === 1) {
@@ -342,6 +346,10 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   // Reset form data cleanly when changing service type (Issue 4.8)
   const resetServiceType = () => {
     setSelectedQuickServices([]);
+    setQuickStep(1);
+    setErrorMsg('');
+    setActivePopoverId(null);
+    setPopoverAnchor(null);
     setServiceType(null);
   };
 
@@ -396,7 +404,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
               <div className={styles.submittedActions}>
                 <button
                   type="button"
-                  onClick={handleDownloadPDF}
+                  onClick={serviceType === 'quick' ? handleDownloadQuickPDF : handleDownloadPDF}
                   disabled={generatingPdf}
                   className={`${styles.btn} ${styles.btnSecondary} ${generatingPdf ? styles.btnDisabled : ''}`}
                 >
@@ -441,6 +449,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
               onQuickSubmit={handleQuickSubmit}
               onQuickFastPass={handleQuickFastPass}
               onDownloadPDF={handleDownloadQuickPDF}
+              onClearError={() => setErrorMsg('')}
               togglePopover={togglePopover}
             />
           ) : (
@@ -511,7 +520,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                       }
                     }}
                     onApplyBlueprint={applyBlueprint}
-                    onNavigateStep={handleValidateAndNavigate}
+                    onNavigateStep={handleAiNavigateStep}
                     isNoir={isNoir}
                     stepHeadingRef={stepHeadingRef}
                     chatSessionId={chatSessionId}
@@ -666,16 +675,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                   </div>
 
                   <div className={styles.submitWrapper}>
-                    {currentStep < 4 ? (
-                      <button
-                        type="button"
-                        onClick={handleNextStep}
-                        className={`${styles.btn} ${styles.btnPrimary}`}
-                      >
-                        <span>NEXT STEP</span>
-                        <ArrowRight size={16} />
-                      </button>
-                    ) : (
+                    {currentStep === 4 && (
                       <>
                         {!user && !authLoading && (
                           <button
@@ -745,7 +745,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         allFeatures={features}
         onRemoveFeature={requestRemoveFeature}
         onAddFeature={addFeature}
-        onSwitchEngine={() => handleValidateAndNavigate(2)}
+        onSwitchEngine={() => handleAiNavigateStep(2)}
         promoCode={appliedPromo}
         onApplyPromo={applyPromoCode}
         onRemovePromo={removePromoCode}
@@ -762,7 +762,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         currency={currency}
         isNoir={isNoir}
         onApplyBlueprint={applyBlueprint}
-        onNavigateStep={handleValidateAndNavigate}
+        onNavigateStep={handleAiNavigateStep}
         chatSessionId={chatSessionId}
         setChatSessionId={setChatSessionId}
         chatTranscript={chatTranscript}

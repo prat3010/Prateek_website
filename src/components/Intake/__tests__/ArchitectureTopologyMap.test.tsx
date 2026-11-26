@@ -299,4 +299,24 @@ describe('ArchitectureTopologyMap Component', () => {
 
     expect(onAdd).toHaveBeenCalledWith('commerce');
   });
+
+  it('supports keyboard activation on matrix view node cards', () => {
+    render(
+      <ArchitectureTopologyMap
+        selectedEngineId="landing"
+        selectedFeatureIds={[]}
+        allEngines={engines}
+        allFeatures={features}
+        currency="INR"
+        onAddFeature={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Matrix View/i }));
+
+    const matrixNodeBtn = screen.getByRole('button', { name: /Storefront & Cart \(Dormant\)/i });
+    fireEvent.keyDown(matrixNodeBtn, { key: 'Enter' });
+
+    expect(screen.getByText(/What it delivers:/i)).toBeInTheDocument();
+  });
 });

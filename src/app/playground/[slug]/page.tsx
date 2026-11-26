@@ -1,5 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -43,6 +45,15 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
+function resolvePlaygroundPreviewImage(previewImage?: string): string | undefined {
+  if (!previewImage) return undefined;
+  if (previewImage.startsWith('http://') || previewImage.startsWith('https://')) {
+    return previewImage;
+  }
+  const cleanRel = previewImage.replace(/^\/+/, '');
+  return existsSync(join(process.cwd(), 'public', cleanRel)) ? previewImage : undefined;
+}
+
 export async function generateMetadata({ params }: PlaygroundSlugPageProps): Promise<Metadata> {
   const { slug } = await params;
   const item = getPlaygroundItemBySlug(slug);
@@ -53,9 +64,12 @@ export async function generateMetadata({ params }: PlaygroundSlugPageProps): Pro
     };
   }
 
+  const validImage = resolvePlaygroundPreviewImage(item.previewImage);
+
   return {
     title: `${item.title} // The Playground | Prateeq Sharma`,
     description: item.tagline,
+    keywords: item.tags,
     alternates: {
       canonical: `/playground/${slug}`,
     },
@@ -63,7 +77,14 @@ export async function generateMetadata({ params }: PlaygroundSlugPageProps): Pro
       title: `${item.title} // The Playground`,
       description: item.tagline,
       url: `https://prateeq.in/playground/${slug}`,
-      images: item.previewImage ? [{ url: item.previewImage }] : undefined,
+      type: 'website',
+      ...(validImage ? { images: [{ url: validImage, alt: item.title }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${item.title} // The Playground`,
+      description: item.tagline,
+      ...(validImage ? { images: [validImage] } : {}),
     },
   };
 }
@@ -76,11 +97,55 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
     notFound();
   }
 
+  const validImage = resolvePlaygroundPreviewImage(item.previewImage);
+  const resolvedJsonLdImage = validImage
+    ? validImage.startsWith('http')
+      ? validImage
+      : `https://prateeq.in${validImage}`
+    : `https://prateeq.in/playground/${slug}/opengraph-image`;
+  const itemJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': item.kind === 'saas' || item.kind === 'cognitive-tool' ? 'SoftwareApplication' : 'CreativeWork',
+        name: item.title,
+        description: item.description || item.tagline,
+        url: `https://prateeq.in/playground/${slug}`,
+        ...(item.kind === 'saas' || item.kind === 'cognitive-tool'
+          ? { applicationCategory: 'WebApplication', operatingSystem: 'Web' }
+          : {}),
+        image: resolvedJsonLdImage,
+        creator: {
+          '@type': 'Person',
+          name: 'Prateeq Sharma',
+          url: 'https://prateeq.in',
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://prateeq.in' },
+          { '@type': 'ListItem', position: 2, name: 'Playground', item: 'https://prateeq.in/playground' },
+          { '@type': 'ListItem', position: 3, name: item.title, item: `https://prateeq.in/playground/${slug}` },
+        ],
+      },
+    ],
+  };
+
+  const jsonLdScript = (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(itemJsonLd) }}
+    />
+  );
+
   // ─── 🎮 1. INTERACTIVE TOYS & ARCADE GAMES ───
   if (item.kind === 'interactive-toy') {
     const toy = item as InteractiveToyPlaygroundItem;
     return (
-      <ArcadeCabinetShell item={toy}>
+      <>
+        {jsonLdScript}
+        <ArcadeCabinetShell item={toy}>
         {toy.renderMode === 'iframe' && toy.iframeUrl ? (
           <div className={styles.iframeContainer}>
             <iframe
@@ -93,7 +158,8 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
         ) : (
           <PlaygroundStageRenderer componentName={toy.componentName} item={toy} />
         )}
-      </ArcadeCabinetShell>
+        </ArcadeCabinetShell>
+      </>
     );
   }
 
@@ -102,6 +168,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
     const cog = item as CognitiveToolPlaygroundItem;
     return (
       <div className={styles.container}>
+        {jsonLdScript}
         <Link href="/playground" className={styles.backNav}>
           <ArrowLeft size={16} />
           <span>Back to Playground</span>
@@ -145,6 +212,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
     const media = item as GenerativeMediaPlaygroundItem;
     return (
       <div className={styles.container}>
+        {jsonLdScript}
         <Link href="/playground" className={styles.backNav}>
           <ArrowLeft size={16} />
           <span>Back to Playground</span>
@@ -247,6 +315,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
     const saas = item as SaasPlaygroundItem;
     return (
       <div className={styles.container}>
+        {jsonLdScript}
         <Link href="/playground" className={styles.backNav}>
           <ArrowLeft size={16} />
           <span>Back to Playground</span>
@@ -407,6 +476,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
   const exp = item as ExperimentPlaygroundItem;
   return (
     <div className={styles.container}>
+      {jsonLdScript}
       <Link href="/playground" className={styles.backNav}>
         <ArrowLeft size={16} />
         <span>Back to Playground</span>

@@ -3,7 +3,7 @@ title: "Building a Web-Based CLI: How to Create an Interactive Terminal in Your 
 date: "2026-07-08"
 excerpt: "Ever wanted a command-line interface directly within your web application? This post dives into the technical details and architectural choices behind crafting an engaging, functional terminal experience in a Next.js app, from command parsing to API integration."
 tags: ["Next.js", "Python", "AI"]
-coverImage: "/images/blog/default.jpg"
+coverImage: "/images/project-systems-terminal.webp"
 ---
 
 You know that feeling when you land on a portfolio or a cool tech demo site, and suddenly, there's a fully functional command-line interface staring back at you? It's instant immersion, a nod to developers, and frankly, just plain cool. We're going to pull back the curtain on how to build one of these — specifically, the `/terminal` route in my own Next.js app, which brings a CLI experience directly to the browser.

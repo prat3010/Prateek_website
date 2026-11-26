@@ -845,6 +845,15 @@ describe('Navbar Component Navigation', () => {
       });
     });
 
+    it('renders tailored ecosystem navigation on /services', () => {
+      mockPathname = '/services';
+      render(<Navbar />);
+
+      expect(screen.getAllByRole('link', { name: /^services$/i })[0].getAttribute('href')).toBe('/services');
+      expect(screen.getAllByRole('link', { name: /scoping lab/i })[0].getAttribute('href')).toBe('/scoping');
+      expect(screen.getAllByRole('link', { name: /retriever ai/i })[0].getAttribute('href')).toBe('/rag');
+    });
+
     it('renders tailored ecosystem navigation on /scoping', () => {
       mockPathname = '/scoping';
       render(<Navbar />);

@@ -6,7 +6,6 @@ import { isAdminEmail } from '@/lib/auth';
 export async function POST(req: NextRequest) {
   try {
     const apiKey = process.env.RESEND_API_KEY || '';
-    const contactEmailTo = process.env.CONTACT_EMAIL_TO || '3010prateeksharma@gmail.com';
     const userEmail = await getVerifiedSessionEmail(req);
     if (!userEmail) {
       return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
@@ -37,12 +36,33 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'reject') {
-      await supabase
+      const { error: updateErr } = await supabase
         .from('outreach_leads')
         .update({ status: 'rejected', updated_at: new Date().toISOString() })
         .eq('id', leadId);
 
+      if (updateErr) {
+        return NextResponse.json({ error: updateErr.message }, { status: 500 });
+      }
+
       return NextResponse.json({ success: true, message: 'Lead pitch dismissed' });
+    }
+
+    if (action === 'mark_sent') {
+      const { error: updateErr } = await supabase
+        .from('outreach_leads')
+        .update({ status: 'sent', updated_at: new Date().toISOString() })
+        .eq('id', leadId);
+
+      if (updateErr) {
+        return NextResponse.json({ error: updateErr.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        status: 'sent',
+        message: `Marked ${lead.company} as manually applied`,
+      });
     }
 
     if (action === 'approve') {
@@ -61,8 +81,12 @@ export async function POST(req: NextRequest) {
         // Fallback to pitchToSend as raw text
       }
 
-      // Dispatch Email via Resend API if key is present
-      if (apiKey) {
+      const rawEmail = typeof lead.email === 'string' ? lead.email.trim() : '';
+      const recipientEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail) ? rawEmail : '';
+      let emailSent = false;
+
+      // Dispatch Email via Resend API only if the lead has a real verified email address
+      if (apiKey && recipientEmail) {
         try {
           const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -72,7 +96,7 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
               from: 'Prateek Sharma <notifications@prateeq.in>',
-              to: [lead.email || contactEmailTo],
+              to: [recipientEmail],
               subject: `Partnership & Software Architecture for ${lead.company}`,
               text: emailText,
             }),
@@ -85,6 +109,7 @@ export async function POST(req: NextRequest) {
               { status: 502 }
             );
           }
+          emailSent = true;
         } catch (emailErr) {
           console.error('Resend email dispatch exception:', emailErr);
           return NextResponse.json(
@@ -94,18 +119,30 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      await supabase
+      const nextStatus = emailSent ? 'sent' : 'approved';
+      const { error: updateErr } = await supabase
         .from('outreach_leads')
         .update({
-          status: 'sent',
+          status: nextStatus,
           ai_generated_pitch: pitchToSend,
           updated_at: new Date().toISOString(),
         })
         .eq('id', leadId);
 
+      if (updateErr) {
+        return NextResponse.json({ error: updateErr.message }, { status: 500 });
+      }
+
+      const message = emailSent
+        ? `Approved & dispatched email to ${lead.lead_name || lead.company} (${recipientEmail})`
+        : recipientEmail
+          ? `Approved ${lead.company} (email not dispatched — RESEND_API_KEY is not configured).`
+          : `Approved ${lead.company} for manual application (no direct email on posting — use source link).`;
+
       return NextResponse.json({
         success: true,
-        message: `Approved & dispatched email to ${lead.lead_name || lead.company} (${lead.email || contactEmailTo})`,
+        status: nextStatus,
+        message,
       });
     }
 

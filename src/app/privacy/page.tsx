@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'PrivacyPolicy',
+    '@type': 'WebPage',
     name: 'Prateeq Sharma Privacy & Telemetry Architecture',
     url: 'https://prateeq.in/privacy',
     description:
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
     inLanguage: 'en-US',
     publisher: {
       '@type': 'Person',
-      name: 'Prateek Sharma',
+      name: 'Prateeq Sharma',
       jobTitle: 'Forward Deployed AI Engineer & Solutions Architect',
       url: 'https://prateeq.in',
       email: 'prateeqsharma@gmail.com',

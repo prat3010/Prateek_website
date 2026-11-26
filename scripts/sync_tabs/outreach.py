@@ -446,14 +446,11 @@ def extract_contact_info(text, company=""):
 
     email_match = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', text)
     valid_emails = [
-        e for e in email_match 
-        if not any(b in e.lower() for b in ['example.com', 'domain.com', 'ycombinator.com', 'sentry.io', 'github.com'])
+        e for e in email_match
+        if not e.lower().startswith(('noreply@', 'no-reply@'))
+        and not any(b in e.lower() for b in ['example.com', 'domain.com', 'ycombinator.com', 'sentry.io', 'github.com', 'remoteok.com', 'w3.org'])
     ]
     direct_email = valid_emails[0] if valid_emails else None
-
-    if not direct_email:
-        domain_clean = re.sub(r'[^a-zA-Z0-9]', '', company.lower()) + ".com"
-        direct_email = f"contact@{domain_clean}"
 
     return direct_email, ats_link
 
@@ -1644,7 +1641,7 @@ def render_outreach_tab():
 
                 with st.container(border=True):
                     st.markdown(f"### {lead.get('company')} — {lead.get('role')}")
-                    st.caption(f"Match Score: `{lead.get('quality_score')}/100` | Target Email: `{lead.get('email')}` | Source: `{lead.get('intent_source')}`{comp_text}")
+                    st.caption(f"Match Score: `{lead.get('quality_score')}/100` | Target Email: `{lead.get('email') or 'ATS / Link only'}` | Source: `{lead.get('intent_source')}`{comp_text}")
 
                     src_url = lead.get("source_url", "")
                     if src_url:
@@ -1714,7 +1711,7 @@ def render_outreach_tab():
             for lead in sent_leads:
                 with st.container(border=True):
                     st.markdown(f"**{lead.get('company')}** — {lead.get('role')}")
-                    st.caption(f"Archived at: `{lead.get('updated_at', lead.get('created_at'))}` | Target Email: `{lead.get('email')}`")
+                    st.caption(f"Archived at: `{lead.get('updated_at', lead.get('created_at'))}` | Target Email: `{lead.get('email') or 'ATS / Link only'}`")
                     raw_p = lead.get("ai_generated_pitch", "")
                     try:
                         p_dict = json.loads(raw_p) if raw_p and raw_p.startswith("{") else {"email": raw_p}

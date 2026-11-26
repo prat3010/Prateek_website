@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import {
   ShieldCheck,
   Info,
@@ -93,21 +93,46 @@ export function StepCommercials({
   user,
 }: StepCommercialsProps) {
   const popoverCloseRef = useRef<HTMLButtonElement>(null);
+  const popoverTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const careCardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [isFullTermsOpen, setIsFullTermsOpen] = useState(false);
+
+  const selectedCareId = formData.selectedMaintenanceId || autoMaintenancePlanId;
+  const selectedCareIdx = maintenancePlans.findIndex((p) => p.id === selectedCareId);
+
+  const focusCareCard = (index: number) => {
+    if (maintenancePlans.length === 0) return;
+    const clamped = Math.max(0, Math.min(index, maintenancePlans.length - 1));
+    careCardRefs.current[clamped]?.focus();
+  };
+
+  const closePopover = useCallback(
+    (restoreFocus = true) => {
+      setActivePopoverId(null);
+      setPopoverAnchor(null);
+      if (restoreFocus) {
+        const trigger = popoverTriggerRef.current;
+        if (trigger && trigger.isConnected) {
+          requestAnimationFrame(() => trigger.focus());
+        }
+      }
+    },
+    [setActivePopoverId, setPopoverAnchor]
+  );
 
   useEffect(() => {
     if (activePopoverId && popoverAnchor) {
       popoverCloseRef.current?.focus();
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          setActivePopoverId(null);
-          setPopoverAnchor(null);
+          e.preventDefault();
+          closePopover(true);
         }
       };
       document.addEventListener('keydown', handleEscape);
       return () => document.removeEventListener('keydown', handleEscape);
     }
-  }, [activePopoverId, popoverAnchor, setActivePopoverId, setPopoverAnchor]);
+  }, [activePopoverId, popoverAnchor, closePopover]);
 
   const depositINR = totalCost.depositINR ?? Math.round(totalCost.totalINR * 0.5);
   const depositUSD = totalCost.depositUSD ?? Math.round(totalCost.totalUSD * 0.5);
@@ -218,31 +243,38 @@ export function StepCommercials({
         </label>
         <div className={styles.careGrid} role="radiogroup" aria-label="Maintenance Care Plan">
           {maintenancePlans.map((p, pIdx) => {
-            const isSelected = (formData.selectedMaintenanceId || autoMaintenancePlanId) === p.id;
+            const isSelected = selectedCareId === p.id;
             const isAutoRecommended = autoMaintenancePlanId === p.id;
             const isPopoverOpen = activePopoverId === p.id;
             return (
               <div
                 key={p.id}
+                ref={(el) => { careCardRefs.current[pIdx] = el; }}
                 role="radio"
                 aria-checked={isSelected}
-                tabIndex={isSelected ? 0 : -1}
+                tabIndex={isSelected || (selectedCareIdx === -1 && pIdx === 0) ? 0 : -1}
                 className={`${styles.careCard} ${isSelected ? styles.careCardSelected : ''}`}
-                onClick={() => onChangeField('selectedMaintenanceId', p.id)}
+                onClick={(ev) => {
+                  if ((ev.target as HTMLElement).closest('button')) return;
+                  onChangeField('selectedMaintenanceId', p.id);
+                }}
                 onKeyDown={(ev) => {
+                  if ((ev.target as HTMLElement).closest('button')) return;
                   if (ev.key === 'Enter' || ev.key === ' ') {
                     ev.preventDefault();
                     onChangeField('selectedMaintenanceId', p.id);
                   } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') {
                     ev.preventDefault();
-                    const next = (pIdx + 1) % maintenancePlans.length;
-                    const card = (ev.currentTarget.parentElement?.children[next] as HTMLElement);
-                    card?.focus();
+                    focusCareCard((pIdx + 1) % maintenancePlans.length);
                   } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') {
                     ev.preventDefault();
-                    const prev = (pIdx - 1 + maintenancePlans.length) % maintenancePlans.length;
-                    const card = (ev.currentTarget.parentElement?.children[prev] as HTMLElement);
-                    card?.focus();
+                    focusCareCard((pIdx - 1 + maintenancePlans.length) % maintenancePlans.length);
+                  } else if (ev.key === 'Home') {
+                    ev.preventDefault();
+                    focusCareCard(0);
+                  } else if (ev.key === 'End') {
+                    ev.preventDefault();
+                    focusCareCard(maintenancePlans.length - 1);
                   }
                 }}
               >
@@ -260,10 +292,15 @@ export function StepCommercials({
                     {p.priceINR > 0 && <span className={styles.carePeriod}>{p.period}</span>}
                     <button
                       type="button"
-                      onClick={(ev) => togglePopover(ev, p.id)}
+                      onClick={(ev) => {
+                        popoverTriggerRef.current = ev.currentTarget;
+                        togglePopover(ev, p.id);
+                      }}
                       className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
                       title="Click to view SLA Coverage & Technical Deliverables"
-                      aria-label="View SLA Coverage & Technical Deliverables"
+                      aria-label={`View SLA Coverage & Technical Deliverables for ${p.name}`}
+                      aria-haspopup="dialog"
+                      aria-expanded={isPopoverOpen}
                     >
                       <Info size={12} />
                     </button>
@@ -277,9 +314,9 @@ export function StepCommercials({
                     <>
                       <div
                         className={styles.popoverOverlay}
-                        onClick={() => {
-                          setActivePopoverId(null);
-                          setPopoverAnchor(null);
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          closePopover(true);
                         }}
                       />
                       <div
@@ -287,7 +324,11 @@ export function StepCommercials({
                         style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
                         onClick={(ev) => ev.stopPropagation()}
                       >
-                        <div className={`${styles.popoverBox} ${styles.popoverStatic}`}>
+                        <div
+                          role="dialog"
+                          aria-label={`${p.name} SLA Coverage`}
+                          className={`${styles.popoverBox} ${styles.popoverStatic}`}
+                        >
                           <div className={styles.popoverHeader}>
                             <span>
                               <Wrench size={12} className={styles.inlineIcon} />
@@ -296,10 +337,7 @@ export function StepCommercials({
                             <button
                               ref={popoverCloseRef}
                               type="button"
-                              onClick={() => {
-                                setActivePopoverId(null);
-                                setPopoverAnchor(null);
-                              }}
+                              onClick={() => closePopover(true)}
                               className={styles.popoverCloseBtn}
                               aria-label="Close details"
                             >
@@ -329,11 +367,12 @@ export function StepCommercials({
 
       <div className={styles.fieldGrid}>
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label className={styles.label} htmlFor="intake-timeline">
             <Clock size={14} className={styles.inlineIcon} />
             Target Delivery Timeline
           </label>
           <select
+            id="intake-timeline"
             className={styles.select}
             value={formData.timeline}
             aria-label="Target Delivery Timeline"
@@ -348,11 +387,12 @@ export function StepCommercials({
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label className={styles.label} htmlFor="intake-additional-notes">
             <FileText size={14} className={styles.inlineIcon} />
             Specific Project Context &amp; Integrations
           </label>
           <input
+            id="intake-additional-notes"
             type="text"
             className={styles.input}
             aria-label="Specific Project Context & Integrations"
@@ -440,11 +480,12 @@ export function StepCommercials({
         </p>
         <div className={styles.fieldGrid}>
           <div className={styles.field}>
-            <label className={styles.label}>
+            <label className={styles.label} htmlFor="intake-contact-email">
               <Mail size={14} className={styles.inlineIcon} />
               Contact Email {!user && '(Required to save proposal)'}
             </label>
             <input
+              id="intake-contact-email"
               type="email"
               inputMode="email"
               className={styles.input}
@@ -456,11 +497,12 @@ export function StepCommercials({
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>
+            <label className={styles.label} htmlFor="intake-contact-phone">
               <Phone size={14} className={styles.inlineIcon} />
               Contact Phone / WhatsApp (Optional)
             </label>
             <input
+              id="intake-contact-phone"
               type="tel"
               inputMode="tel"
               className={styles.input}

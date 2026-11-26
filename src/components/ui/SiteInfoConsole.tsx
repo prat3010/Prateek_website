@@ -242,13 +242,13 @@ export default function SiteInfoConsole() {
                   aria-label={isAiChatActive ? 'Disconnect AI Twin' : 'Connect to Live AI Twin'}
                 />
               </div>
-              <h2 className={styles.titleText}>
+              <h1 className={styles.titleText}>
                 {isAiChatActive
                   ? 'PRATEEQ.AI TWIN CONSOLE // ACTIVE NEURAL LINK'
                   : isNoir
                     ? 'SYSTEM DIAGNOSTICS & LOGS (v2.5)'
                     : 'COBALT TERMINAL CORE // SITE SCHEMATICS'}
-              </h2>
+              </h1>
             </div>
             <div className={styles.titleBarActions}>
               <button

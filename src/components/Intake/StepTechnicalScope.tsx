@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { SlidersHorizontal, Layers, Info, X, Boxes, Settings, Zap, Sparkles, Rocket, Bot, Lock, Link, Wrench } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
@@ -60,6 +60,35 @@ export function StepTechnicalScope({
   onOpenCopilot,
 }: StepTechnicalScopeProps) {
   const popoverCloseRef = useRef<HTMLButtonElement>(null);
+  const popoverTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const engineCardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const visibleEngines = React.useMemo(
+    () => engines.filter((e) => !e.hideFromFullProject || e.id === selectedEngine.id),
+    [engines, selectedEngine.id]
+  );
+
+  const selectedEngineIdx = visibleEngines.findIndex((e) => e.id === formData.selectedBaseEngineId);
+
+  const focusEngineCard = (index: number) => {
+    if (visibleEngines.length === 0) return;
+    const clamped = Math.max(0, Math.min(index, visibleEngines.length - 1));
+    engineCardRefs.current[clamped]?.focus();
+  };
+
+  const closePopover = useCallback(
+    (restoreFocus = true) => {
+      setActivePopoverId(null);
+      setPopoverAnchor(null);
+      if (restoreFocus) {
+        const trigger = popoverTriggerRef.current;
+        if (trigger && trigger.isConnected) {
+          requestAnimationFrame(() => trigger.focus());
+        }
+      }
+    },
+    [setActivePopoverId, setPopoverAnchor]
+  );
 
   const hasAiPresetFeatures = React.useMemo(() => {
     return ['ai_rag', 'ai_agents', 'ai_voice_agent'].some((id) =>
@@ -96,14 +125,14 @@ export function StepTechnicalScope({
       popoverCloseRef.current?.focus();
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          setActivePopoverId(null);
-          setPopoverAnchor(null);
+          e.preventDefault();
+          closePopover(true);
         }
       };
       document.addEventListener('keydown', handleEscape);
       return () => document.removeEventListener('keydown', handleEscape);
     }
-  }, [activePopoverId, popoverAnchor, setActivePopoverId, setPopoverAnchor]);
+  }, [activePopoverId, popoverAnchor, closePopover]);
   return (
     <div className={styles.formStep}>
       <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
@@ -168,31 +197,38 @@ export function StepTechnicalScope({
               </button>
             </div>
             <div className={styles.checkboxGrid} role="radiogroup" aria-label="Base Platform Engine">
-              {engines.map((e, eIdx) => {
+              {visibleEngines.map((e, eIdx) => {
                 const isSelected = formData.selectedBaseEngineId === e.id;
                 const isPopoverOpen = activePopoverId === e.id;
                 return (
                   <TiltCard key={e.id} maxAngle={2} glare={false} className={styles.engineTilt}>
                     <div
+                      ref={(el) => { engineCardRefs.current[eIdx] = el; }}
                       role="radio"
                       aria-checked={isSelected}
-                      tabIndex={isSelected ? 0 : -1}
+                      tabIndex={isSelected || (selectedEngineIdx === -1 && eIdx === 0) ? 0 : -1}
                       className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
-                      onClick={() => onEngineSelect(e.id)}
+                      onClick={(ev) => {
+                        if ((ev.target as HTMLElement).closest('button')) return;
+                        onEngineSelect(e.id);
+                      }}
                       onKeyDown={(ev) => {
+                        if ((ev.target as HTMLElement).closest('button')) return;
                         if (ev.key === 'Enter' || ev.key === ' ') {
                           ev.preventDefault();
                           onEngineSelect(e.id);
                         } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') {
                           ev.preventDefault();
-                          const next = (eIdx + 1) % engines.length;
-                          const card = (ev.currentTarget.parentElement?.parentElement?.children[next]?.firstElementChild as HTMLElement);
-                          card?.focus();
+                          focusEngineCard((eIdx + 1) % visibleEngines.length);
                         } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') {
                           ev.preventDefault();
-                          const prev = (eIdx - 1 + engines.length) % engines.length;
-                          const card = (ev.currentTarget.parentElement?.parentElement?.children[prev]?.firstElementChild as HTMLElement);
-                          card?.focus();
+                          focusEngineCard((eIdx - 1 + visibleEngines.length) % visibleEngines.length);
+                        } else if (ev.key === 'Home') {
+                          ev.preventDefault();
+                          focusEngineCard(0);
+                        } else if (ev.key === 'End') {
+                          ev.preventDefault();
+                          focusEngineCard(visibleEngines.length - 1);
                         }
                       }}
                       style={{ cursor: 'pointer' }}
@@ -202,6 +238,7 @@ export function StepTechnicalScope({
                         name="baseEngine"
                         checked={isSelected}
                         tabIndex={-1}
+                        aria-hidden="true"
                         onChange={() => onEngineSelect(e.id)}
                       />
                       <div className={styles.engineCardInner}>
@@ -211,10 +248,15 @@ export function StepTechnicalScope({
                               {`${e.title} (${e.tier})`}
                               <button
                                 type="button"
-                                onClick={(ev) => togglePopover(ev, e.id)}
+                                onClick={(ev) => {
+                                  popoverTriggerRef.current = ev.currentTarget;
+                                  togglePopover(ev, e.id);
+                                }}
                                 className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
                                 title="Click to view Technical Engineering Specs"
-                                aria-label="View Technical Engineering Specs"
+                                aria-label={`View Technical Engineering Specs for ${e.title}`}
+                                aria-haspopup="dialog"
+                                aria-expanded={isPopoverOpen}
                               >
                                 <Info size={11} />
                               </button>
@@ -233,9 +275,9 @@ export function StepTechnicalScope({
                             <>
                               <div
                                 className={styles.popoverOverlay}
-                                onClick={() => {
-                                  setActivePopoverId(null);
-                                  setPopoverAnchor(null);
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  closePopover(true);
                                 }}
                               />
                               <div
@@ -243,7 +285,11 @@ export function StepTechnicalScope({
                                 style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
                                 onClick={(ev) => ev.stopPropagation()}
                               >
-                                <div className={`${styles.popoverBox} ${styles.popoverStatic}`}>
+                                <div
+                                  role="dialog"
+                                  aria-label={`${e.title} Technical Specifications`}
+                                  className={`${styles.popoverBox} ${styles.popoverStatic}`}
+                                >
                                   <div className={styles.popoverHeader}>
                                     <span>
                                       <Wrench size={12} className={styles.inlineIcon} />
@@ -254,10 +300,7 @@ export function StepTechnicalScope({
                                       ref={popoverCloseRef}
                                       className={styles.popoverCloseBtn}
                                       aria-label="Close"
-                                      onClick={() => {
-                                        setActivePopoverId(null);
-                                        setPopoverAnchor(null);
-                                      }}
+                                      onClick={() => closePopover(true)}
                                     >
                                       <X size={12} />
                                     </button>
@@ -391,19 +434,24 @@ export function StepTechnicalScope({
                   const isLocked = isCompulsory || isRequiredDependency || isLegacyRequired;
                   const isPopoverOpen = activePopoverId === m.id;
                   return (
-                    <label
+                    <div
                       key={m.id}
                       className={`${styles.checkboxCard} ${isLocked ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
                       style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
                       onClick={(e) => {
-                        if (isLocked) {
-                          e.preventDefault();
-                          onFeatureToggle(m.id);
+                        if ((e.target as HTMLElement).closest('button, input')) {
+                          if (isLocked && (e.target as HTMLElement).closest('input')) {
+                            e.preventDefault();
+                            onFeatureToggle(m.id);
+                          }
+                          return;
                         }
+                        onFeatureToggle(m.id);
                       }}
                     >
                       <input
                         type="checkbox"
+                        aria-label={m.label}
                         checked={isChecked}
                         disabled={isLocked}
                         onChange={() => onFeatureToggle(m.id)}
@@ -415,10 +463,15 @@ export function StepTechnicalScope({
                               {m.label}
                               <button
                                 type="button"
-                                onClick={(ev) => togglePopover(ev, m.id)}
+                                onClick={(ev) => {
+                                  popoverTriggerRef.current = ev.currentTarget;
+                                  togglePopover(ev, m.id);
+                                }}
                                 className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
                                 title="Click to view Technical Engineering Specs"
-                                aria-label="View Technical Engineering Specs"
+                                aria-label={`View Technical Engineering Specs for ${m.label}`}
+                                aria-haspopup="dialog"
+                                aria-expanded={isPopoverOpen}
                               >
                                 <Info size={11} />
                               </button>
@@ -483,9 +536,9 @@ export function StepTechnicalScope({
                             <>
                               <div
                                 className={styles.popoverOverlay}
-                                onClick={() => {
-                                  setActivePopoverId(null);
-                                  setPopoverAnchor(null);
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  closePopover(true);
                                 }}
                               />
                               <div
@@ -493,20 +546,22 @@ export function StepTechnicalScope({
                                 style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
                                 onClick={(ev) => ev.stopPropagation()}
                               >
-                                <div className={`${styles.popoverBox} ${styles.popoverStatic}`}>
+                                <div
+                                  role="dialog"
+                                  aria-label={`${m.label} Technical Specifications`}
+                                  className={`${styles.popoverBox} ${styles.popoverStatic}`}
+                                >
                                   <div className={styles.popoverHeader}>
                                     <span>
                                       <Wrench size={12} className={styles.inlineIcon} />
                                       TECHNICAL ARCHITECTURE SPECS
                                     </span>
-                                   <button
+                                    <button
+                                      ref={popoverCloseRef}
                                       type="button"
                                       className={styles.popoverCloseBtn}
                                       aria-label="Close"
-                                      onClick={() => {
-                                        setActivePopoverId(null);
-                                        setPopoverAnchor(null);
-                                      }}
+                                      onClick={() => closePopover(true)}
                                     >
                                       <X size={12} />
                                     </button>
@@ -518,7 +573,7 @@ export function StepTechnicalScope({
                           </Portal>
                         )}
                       </div>
-                    </label>
+                    </div>
                   );
                 })}
               </div>

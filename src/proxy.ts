@@ -15,8 +15,14 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     regionCookie = (country === 'IN' || country === 'Local/Unknown') ? 'india' : 'global';
   }
   
-  // Parse User Agent via Next.js helper
+  // Parse User Agent via Next.js helper + AI/SEO/social crawler patterns
   const { device, browser, os, isBot } = userAgent(request);
+  const rawUa = request.headers.get('user-agent') || '';
+  const isKnownCrawler =
+    isBot ||
+    /GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-Web|PerplexityBot|Google-InspectionTool|GoogleOther|Storebot-Google|Applebot|bingbot|msnbot|AhrefsBot|SemrushBot|LinkedInBot|WhatsApp|Discordbot|TelegramBot|Slackbot|Twitterbot|facebookexternalhit|Chrome-Lighthouse|Lighthouse/i.test(
+      rawUa
+    );
 
   // Check for presence of active auth user or Supabase session tokens
   const hasUserCookie = Boolean(
@@ -30,7 +36,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   requestHeaders.set('x-theme', themeCookie);
   requestHeaders.set('x-region', regionCookie);
   requestHeaders.set('x-user-authenticated', hasUserCookie ? 'true' : 'false');
-  if (isBot) {
+  if (isKnownCrawler) {
     requestHeaders.set('x-audience', 'developer');
   } else if (audienceCookie) {
     requestHeaders.set('x-audience', audienceCookie);
@@ -86,7 +92,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   }
 
   // Bypass database writes for search engine crawlers and automated bots
-  if (isBot) {
+  if (isKnownCrawler) {
     return nextResponse();
   }
 
@@ -131,6 +137,6 @@ export const config = {
      * - images (static theme assets)
      * - playground/assets (game and media assets)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sitemap.xml|images/|playground/assets/).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sitemap.xml|llms.txt|fonts/|images/|playground/assets/|.*opengraph-image.*|.*twitter-image.*).*)',
   ],
 };

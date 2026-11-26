@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, Rocket, Sparkles } from 'lucide-react';
+import { Layers, Rocket, Sparkles, Clock, Zap } from 'lucide-react';
 import TiltCard from '@/components/ui/TiltCard';
 import styles from './intakeStyles';
 
@@ -46,7 +46,10 @@ export function ServiceTypeGate({ onSelectType }: ServiceTypeGateProps) {
                 <Rocket size={22} />
                 <span className={styles.step0CardTitle}>Full Project Build</span>
               </div>
-              <span className={styles.turnaroundBadge}>⏱ 2–4 Week Turnaround</span>
+              <span className={styles.turnaroundBadge}>
+                <Clock size={12} aria-hidden="true" />
+                <span>2–4 Week Turnaround</span>
+              </span>
             </div>
             <p className={styles.step0CardDesc}>
               New website, web app, or SaaS platform from scratch with full scoping wizard.
@@ -74,7 +77,10 @@ export function ServiceTypeGate({ onSelectType }: ServiceTypeGateProps) {
                 <Sparkles size={22} />
                 <span className={styles.step0CardTitle}>Quick Service</span>
               </div>
-              <span className={styles.turnaroundBadge}>⚡ 48-Hour Turnaround</span>
+              <span className={styles.turnaroundBadge}>
+                <Zap size={12} aria-hidden="true" />
+                <span>48-Hour Turnaround</span>
+              </span>
             </div>
             <p className={styles.step0CardDesc}>
               Add a feature to your existing site — chatbot, SEO, speed fix, payments, and more.

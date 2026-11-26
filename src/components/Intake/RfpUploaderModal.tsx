@@ -166,7 +166,7 @@ export function RfpUploaderModal({
       const confidence = blueprint.confidenceScore ? `${Math.round(blueprint.confidenceScore * 100)}% Match` : 'Parsed';
 
       toast.success(
-        `🎯 ${confidence} via ${modelName}${latency}: ${blueprint.summaryRationale}`,
+        `${confidence} via ${modelName}${latency}: ${blueprint.summaryRationale}`,
         { duration: 7000 }
       );
 

@@ -204,10 +204,10 @@ export function ArchitectureCartDrawer({
   } else if (featureCount < 6) {
     progressWidth = 50 + ((featureCount - 3) / 3) * 50;
     const needed = 6 - featureCount;
-    meterHint = `🎉 5% Growth Stack active! Add ${needed} more for 10% Full Suite discount.`;
+    meterHint = `5% Growth Stack active! Add ${needed} more for 10% Full Suite discount.`;
   } else {
     progressWidth = 100;
-    meterHint = '🔥 Maximum 10% Full Suite volume discount unlocked!';
+    meterHint = 'Maximum 10% Full Suite volume discount unlocked!';
   }
 
   // GraphRAG Frequently Built Together Intelligent Upsells

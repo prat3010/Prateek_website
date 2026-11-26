@@ -44,10 +44,13 @@ export const metadata: Metadata = {
   description:
     "Forward Deployed AI Engineer & Solutions Architect. Direct technical partnership building custom RAG systems, Next.js web applications, and high-ROI software.",
   keywords: [
-    "Forward Deployed Engineer",
+    "Forward Deployed AI Engineer",
     "AI Solution Architect",
-    "RAG Systems Engineer",
-    "Full-Stack Developer",
+    "Custom RAG Systems Engineer",
+    "Next.js SaaS MVP Developer",
+    "Hire AI Engineer",
+    "Enterprise RAG Chatbot",
+    "Retriever AI",
     "Prateeq Sharma",
     "Prateeq",
     "Next.js",
@@ -149,6 +152,23 @@ export default async function RootLayout({
           "@id": "https://prateeq.in/#person"
         },
         "inLanguage": "en-US"
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://prateeq.in/#service",
+        "name": "Prateeq Studio — Forward Deployed AI & Next.js Engineering",
+        "url": "https://prateeq.in/services",
+        "description": "Direct engineering partnership building custom RAG knowledge systems, Next.js SaaS MVPs, voice AI agents, and high-conversion web applications with transparent fixed-scope pricing.",
+        "provider": {
+          "@id": "https://prateeq.in/#person"
+        },
+        "areaServed": "Worldwide",
+        "serviceType": [
+          "Custom RAG & AI Knowledge Base Engineering",
+          "Full-Stack Next.js SaaS MVP Development",
+          "AI Agents & Voice Automation",
+          "Technical SEO & Core Web Vitals Optimization"
+        ]
       }
     ]
   };

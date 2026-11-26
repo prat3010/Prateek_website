@@ -22,13 +22,13 @@
   width: 100%;
   max-width: 540px;
   height: 100%;
-  background: var(--surface-primary, #FAF9F6);
-  color: var(--color-text, #2B2B36);
-  border-left: 1.5px solid var(--border-muted, rgba(43, 43, 54, 0.35));
-  box-shadow: -10px 0 36px rgba(43, 43, 54, 0.12), -2px 0 8px rgba(43, 43, 54, 0.05);
+  background: var(--surface-primary);
+  color: var(--color-text);
+  border-left: 1.5px solid var(--border-muted);
+  box-shadow: var(--shadow-glass-lg);
   display: flex;
   flex-direction: column;
-  font-family: var(--font-body, serif);
+  font-family: var(--font-body);
   animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   position: relative;
@@ -36,11 +36,11 @@
 
 .drawerNoir,
 :global([data-theme='noir']) .drawer {
-  background: var(--surface-primary, #121214);
-  color: var(--color-text, #e0e0e3);
-  border-left: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.12));
-  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.85), inset 1px 0 0 rgba(255, 255, 255, 0.05);
-  font-family: var(--font-code, monospace);
+  background: var(--surface-primary);
+  color: var(--color-text);
+  border-left: 1px solid var(--surface-glass-border);
+  box-shadow: var(--shadow-glass-lg);
+  font-family: var(--font-code);
 }
 
 /* Top decorative accent wire */
@@ -49,9 +49,9 @@
   width: 100%;
   background: linear-gradient(
     90deg,
-    var(--pop-blue, #5A8EB6) 0%,
-    var(--pop-yellow, #F4DC95) 50%,
-    var(--pop-red, #D95D67) 100%
+    var(--pop-blue) 0%,
+    var(--pop-yellow) 50%,
+    var(--pop-red) 100%
   );
   flex-shrink: 0;
 }
@@ -60,11 +60,11 @@
 :global([data-theme='noir']) .topAccentLine {
   background: linear-gradient(
     90deg,
-    var(--neon-cyan, #00f0ff) 0%,
-    var(--neon-pink, #ff2a55) 50%,
-    var(--neon-green, #39ff14) 100%
+    var(--neon-cyan) 0%,
+    var(--neon-pink) 50%,
+    var(--neon-green) 100%
   );
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  box-shadow: var(--shadow-glass);
 }
 
 @keyframes fadeIn {
@@ -81,18 +81,18 @@
 .header {
   flex-shrink: 0;
   padding: 1.15rem 1.5rem;
-  border-bottom: 1.5px solid var(--border-muted, rgba(43, 43, 54, 0.25));
+  border-bottom: 1.5px solid var(--border-muted);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--surface-primary, #FAF9F6);
+  background: var(--surface-primary);
   position: relative;
 }
 
 .drawerNoir .header,
 :global([data-theme='noir']) .header {
-  background: var(--surface-glass-header, #121216);
-  border-bottom: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  background: var(--surface-glass-header);
+  border-bottom: 1px solid var(--surface-glass-border);
 }
 
 .titleArea {
@@ -105,47 +105,47 @@
   width: 38px;
   height: 38px;
   border-radius: var(--border-radius-md, 8px);
-  background: rgba(90, 142, 182, 0.14);
-  border: 1.5px solid rgba(90, 142, 182, 0.35);
+  background: var(--badge-active-bg);
+  border: 1.5px solid var(--badge-active-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--pop-blue, #5A8EB6);
+  color: var(--pop-blue);
   flex-shrink: 0;
-  box-shadow: var(--shadow-comic-sm, 1.5px 1.5px 0px rgba(43, 43, 54, 0.14));
+  box-shadow: var(--shadow-comic-sm);
   transition: all 0.2s ease;
 }
 
 .drawerNoir .copilotIconBox,
 :global([data-theme='noir']) .copilotIconBox {
-  background: rgba(0, 240, 255, 0.1);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+  background: var(--badge-active-bg);
+  border: 1px solid var(--badge-active-border);
+  color: var(--neon-cyan);
+  box-shadow: var(--shadow-glass);
 }
 
 .titleText {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--color-text, #2B2B36);
-  font-family: var(--font-headline, serif);
+  color: var(--color-text);
+  font-family: var(--font-headline);
   letter-spacing: 0.02em;
   line-height: 1.25;
 }
 
 .drawerNoir .titleText,
 :global([data-theme='noir']) .titleText {
-  font-family: var(--font-code, monospace);
-  color: #ffffff;
+  font-family: var(--font-code);
+  color: var(--color-border);
   letter-spacing: -0.01em;
 }
 
 .subtitleText {
   margin: 2px 0 0 0;
   font-size: 0.74rem;
-  color: var(--color-text-muted, #525060);
-  font-family: var(--font-code, monospace);
+  color: var(--color-text-muted);
+  font-family: var(--font-code);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -154,22 +154,22 @@
 
 .drawerNoir .subtitleText,
 :global([data-theme='noir']) .subtitleText {
-  color: var(--color-text-muted, #8a8a93);
+  color: var(--color-text-muted);
 }
 
 .liveDot {
   width: 7px;
   height: 7px;
-  background-color: var(--pop-green, #79B48B);
+  background-color: var(--pop-green);
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(121, 180, 139, 0.85);
+  box-shadow: 0 0 6px var(--pop-green);
   animation: pulseDot 2s infinite ease-in-out;
 }
 
 .drawerNoir .liveDot,
 :global([data-theme='noir']) .liveDot {
-  background-color: var(--neon-green, #39ff14);
-  box-shadow: 0 0 8px rgba(57, 255, 20, 0.85);
+  background-color: var(--neon-green);
+  box-shadow: 0 0 8px var(--neon-green);
 }
 
 @keyframes pulseDot {
@@ -184,9 +184,9 @@
 }
 
 .closeBtn {
-  background: var(--surface-card, #FAF9F6);
-  border: 1.5px solid var(--border-muted, rgba(43, 43, 54, 0.35));
-  color: var(--color-text-muted, #525060);
+  background: var(--surface-card);
+  border: 1.5px solid var(--border-muted);
+  color: var(--color-text-muted);
   width: 34px;
   height: 34px;
   border-radius: var(--border-radius-md, 8px);
@@ -194,16 +194,16 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow-comic-sm, 1.5px 1.5px 0px rgba(43, 43, 54, 0.14));
+  box-shadow: var(--shadow-comic-sm);
   transition: all 0.15s ease;
 }
 
 .closeBtn:hover {
-  background: var(--pop-yellow, #F4DC95);
-  color: var(--pop-black, #2B2B36);
-  border-color: var(--color-border, #2B2B36);
+  background: var(--pop-yellow);
+  color: var(--pop-black);
+  border-color: var(--color-border);
   transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-comic, 3px 3px 0px rgba(43, 43, 54, 0.18));
+  box-shadow: var(--shadow-comic);
 }
 
 .closeBtn:active {
@@ -213,18 +213,18 @@
 
 .drawerNoir .closeBtn,
 :global([data-theme='noir']) .closeBtn {
-  background: var(--surface-card, #1e1e24);
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.12));
-  color: var(--color-text-muted, #8a8a93);
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
   box-shadow: none;
 }
 
 .drawerNoir .closeBtn:hover,
 :global([data-theme='noir']) .closeBtn:hover {
-  background: var(--surface-card, #1e1e24);
-  color: var(--neon-pink, #ff2a55);
-  border-color: var(--neon-pink, #ff2a55);
-  box-shadow: 0 0 10px rgba(255, 42, 85, 0.4);
+  background: var(--surface-card);
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: var(--shadow-glass);
   transform: translateY(-1px);
 }
 

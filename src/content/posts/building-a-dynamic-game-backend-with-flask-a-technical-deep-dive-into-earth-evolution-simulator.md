@@ -3,10 +3,8 @@ title: "Building a Dynamic Game Backend with Flask: A Technical Deep Dive into E
 date: "2026-07-08"
 excerpt: "This post explores the architectural and technical journey of developing 'Earth Evolution Simulator' using Flask, detailing scenario-driven progression, dynamic event systems, state management for emergent gameplay, and resilience calculation, all powered by a robust Flask backend."
 tags: ["Flask", "Python"]
-coverImage: "/images/blog/default.jpg"
+coverImage: "/images/project-earth-simulator.webp"
 ---
-
-# Building a Dynamic Game Backend with Flask: A Technical Deep Dive into Earth Evolution Simulator
 
 This post provides a comprehensive technical overview of the development of 'Earth Evolution Simulator', a complex scenario-driven game built upon a Flask backend. We'll delve into the core architectural decisions that enable its narrative progression, dynamic event systems, and the intricate mechanics of emergent gameplay, demonstrating how Flask facilitates a robust and engaging game experience.
 

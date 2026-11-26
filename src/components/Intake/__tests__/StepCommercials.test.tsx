@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+vi.mock('@/components/ui/Portal', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 import { StepCommercials } from '../StepCommercials';
 import type { BaseEngineItem, MaintenancePlanOption } from '@/data/resume';
 
@@ -284,5 +289,101 @@ describe('StepCommercials Component', () => {
     expect(phoneInput).toBeDefined();
     fireEvent.change(phoneInput, { target: { value: '+91 99999 88888' } });
     expect(onChange).toHaveBeenCalledWith('contactPhone', '+91 99999 88888');
+  });
+
+  it('supports roving focus across maintenance plans and popover dialog focus return', () => {
+    const rafOriginal = window.requestAnimationFrame;
+    window.requestAnimationFrame = (cb) => {
+      cb(0);
+      return 0;
+    };
+
+    const plans: MaintenancePlanOption[] = [
+      ...mockMaintenance,
+      {
+        id: 'premium',
+        name: 'Scale & AI Ops',
+        priceINR: 30000,
+        priceUSD: 400,
+        period: '/ month',
+        badge: 'Scale',
+        laymanDescription: 'Priority 4h SLA.',
+        techSpecs: '24/7 telemetry & vector monitoring',
+        includes: ['4h SLA'],
+      },
+    ];
+
+    function Harness() {
+      const [activeId, setActiveId] = React.useState<string | null>(null);
+      const [anchor, setAnchor] = React.useState<{ x: number; y: number } | null>(null);
+      return (
+        <StepCommercials
+          selectedEngine={mockEngine}
+          totalCost={{
+            totalINR: 200000,
+            totalUSD: 2500,
+            featuresINR: 80000,
+            featuresUSD: 1000,
+            brandOpt: { label: 'Included', priceINR: 0, priceUSD: 0 },
+          }}
+          maintenancePlans={plans}
+          formData={{
+            selectedFeatures: ['auth'],
+            selectedMaintenanceId: 'essential',
+            timeline: 'Standard (3–4 weeks)',
+            additionalNotes: '',
+            hostingOwnership: 'client_owned',
+            taxInvoicingPreference: 'standard',
+            agreedToTerms: false,
+          }}
+          autoMaintenancePlanId="essential"
+          activePopoverId={activeId}
+          setActivePopoverId={setActiveId}
+          popoverAnchor={anchor}
+          setPopoverAnchor={setAnchor}
+          currency="INR"
+          priceInCurrency={(inr, usd) => `₹${inr.toLocaleString()} / $${usd}`}
+          timelineOptions={['Standard (3–4 weeks)']}
+          termsList={mockTerms}
+          togglePopover={(_e, id) => {
+            setActiveId(id);
+            setAnchor({ x: 50, y: 100 });
+          }}
+          onChangeField={vi.fn()}
+        />
+      );
+    }
+
+    try {
+      render(<Harness />);
+      const careRadiogroup = screen.getByRole('radiogroup', { name: /Maintenance Care Plan/i });
+      const careRadios = Array.from(careRadiogroup.querySelectorAll('[role="radio"]')) as HTMLElement[];
+      expect(careRadios.length).toBe(2);
+
+      careRadios[0].focus();
+      fireEvent.keyDown(careRadios[0], { key: 'ArrowRight' });
+      expect(document.activeElement).toBe(careRadios[1]);
+
+      fireEvent.keyDown(careRadios[1], { key: 'Home' });
+      expect(document.activeElement).toBe(careRadios[0]);
+
+      fireEvent.keyDown(careRadios[0], { key: 'End' });
+      expect(document.activeElement).toBe(careRadios[1]);
+
+      const infoBtn = screen.getByRole('button', {
+        name: /View SLA Coverage & Technical Deliverables for Essential Care Plan/i,
+      });
+      infoBtn.focus();
+      fireEvent.click(infoBtn);
+
+      expect(
+        screen.getByRole('dialog', { name: /Essential Care Plan SLA Coverage/i })
+      ).toBeDefined();
+
+      fireEvent.click(screen.getByRole('button', { name: /Close details/i }));
+      expect(document.activeElement).toBe(infoBtn);
+    } finally {
+      window.requestAnimationFrame = rafOriginal;
+    }
   });
 });

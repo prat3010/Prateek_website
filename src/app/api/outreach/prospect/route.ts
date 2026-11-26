@@ -3,82 +3,22 @@ import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { isAdminEmail } from '@/lib/auth';
 import outreachDefaults from '@/data/outreach_defaults.json';
+import {
+  fetchHnWhosHiring,
+  fetchHnFreelance,
+  fetchRemoteOk,
+  type RawLeadCandidate,
+} from '@/lib/outreachProspecting';
 
 export const maxDuration = 60;
 
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const MODEL_NAME = outreachDefaults.activeModel || 'gemini-3.6-flash';
-
-interface WebSearchResult {
-  title: string;
-  link: string;
-  snippet: string;
-}
+const MODEL_NAME = outreachDefaults.activeModel || 'gemini-2.5-flash';
 
 interface LeadEvaluation {
   is_valid_lead: boolean;
   quality_score: number;
   source_type: string;
   reason: string;
-}
-
-async function searchLiveWeb(query: string): Promise<WebSearchResult[]> {
-  try {
-    const encoded = encodeURIComponent(query);
-    const res = await fetch(`https://html.duckduckgo.com/html/?q=${encoded}`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      },
-    });
-
-    if (!res.ok) return [];
-    const html = await res.text();
-    const results: WebSearchResult[] = [];
-
-    const linkRegex = /<a class="result__url" href="([^"]+)".*?>\s*(.*?)\s*<\/a>/gi;
-    const snippetRegex = /<a class="result__snippet".*?>\s*(.*?)\s*<\/a>/gi;
-
-    let match;
-    const links: string[] = [];
-    while ((match = linkRegex.exec(html)) !== null && links.length < 6) {
-      let rawUrl = match[1];
-      if (rawUrl.includes('uddg=')) {
-        const parts = rawUrl.split('uddg=');
-        if (parts[1]) rawUrl = decodeURIComponent(parts[1].split('&')[0]);
-      }
-      if (rawUrl.startsWith('http')) {
-        links.push(rawUrl);
-      }
-    }
-
-    const snippets: string[] = [];
-    while ((match = snippetRegex.exec(html)) !== null && snippets.length < links.length) {
-      snippets.push(match[1].replace(/<[^>]+>/g, '').trim());
-    }
-
-    const bannedList: string[] = ['duckduckgo', 'wikipedia', 'readycontacts', 'datacaptive'];
-
-    for (let i = 0; i < links.length; i++) {
-      try {
-        const urlObj = new URL(links[i]);
-        const domain = urlObj.hostname.replace('www.', '');
-        const isBanned = bannedList.some((b: string) => domain.includes(b));
-        if (domain && !isBanned) {
-          results.push({
-            title: domain.split('.')[0].toUpperCase() + ' Corp',
-            link: links[i],
-            snippet: snippets[i] || `B2B software operations on ${domain}`,
-          });
-        }
-      } catch {}
-    }
-
-    return results;
-  } catch (err) {
-    console.warn('Live web search fetch failed, using fallback:', err);
-    return [];
-  }
 }
 
 async function queryRetrieverForProof(queryText: string): Promise<string> {
@@ -90,7 +30,7 @@ async function queryRetrieverForProof(queryText: string): Promise<string> {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const res = await fetch(`${apiUrl.replace(/\/$/, '')}/v1/tenants/${tenantId}/search`, {
       method: 'POST',
@@ -131,17 +71,18 @@ async function queryRetrieverForProof(queryText: string): Promise<string> {
 }
 
 async function callGeminiWithFallback(prompt: string): Promise<string | null> {
-  if (!GEMINI_API_KEY) return null;
-  const models = [MODEL_NAME, 'gemini-2.5-flash', 'gemini-3.6-flash'];
+  const geminiApiKey = process.env.GEMINI_API_KEY || '';
+  if (!geminiApiKey) return null;
+  const models = [MODEL_NAME, 'gemini-2.5-flash', 'gemini-2.0-flash'];
   const uniqueModels = Array.from(new Set(models));
 
   for (const model of uniqueModels) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -162,64 +103,67 @@ async function callGeminiWithFallback(prompt: string): Promise<string | null> {
   return null;
 }
 
-async function evaluateLeadWithGemini(companyName: string, domain: string, snippet: string): Promise<LeadEvaluation> {
-  const fallbackResult: LeadEvaluation = {
-    is_valid_lead: true,
-    quality_score: 80,
-    source_type: 'b2b_agency',
-    reason: 'Standard search lead',
+async function evaluateLeadWithGemini(candidate: RawLeadCandidate): Promise<LeadEvaluation> {
+  const localThreshold = Math.min(outreachDefaults.minQualityScore || 75, 55);
+  const localFallback: LeadEvaluation = {
+    is_valid_lead: candidate.local_score >= localThreshold,
+    quality_score: candidate.local_score,
+    source_type: candidate.intent_source,
+    reason: candidate.local_reason,
   };
 
-  if (!GEMINI_API_KEY) return fallbackResult;
+  if (!process.env.GEMINI_API_KEY) return localFallback;
 
   try {
-    const promptText = `Analyze this web snippet/search result for a potential software development lead. Determine if this is an active company, startup, or hiring job post that needs custom web/AI software development (Next.js, Python, RAG AI). Filter out contact directories, database sellers, spam lists, and irrelevant blogs. Context: Company=${companyName}, Domain=${domain}, Snippet=${snippet}. Return valid JSON ONLY with schema: {"is_valid_lead": boolean, "quality_score": number, "source_type": "hn_whoishiring" | "weworkremotely" | "remoteok" | "b2b_startup" | "directory_spam", "reason": "brief 1-sentence reason"}`;
-    
+    const promptText = `Analyze this active tech hiring/project post for a potential software engineering or AI architecture lead (Next.js, Python, FastAPI, RAG AI, Supabase). Filter out spam, irrelevant stacks (C++, iOS/Android native, PHP/WordPress), and US-only/clearance-only roles.
+Context: Company=${candidate.company}, Role=${candidate.role}, Source=${candidate.intent_source}, Snippet=${candidate.snippet}.
+Return valid JSON ONLY: {"is_valid_lead": boolean, "quality_score": number (0-100), "source_type": "${candidate.intent_source}", "reason": "brief 1-sentence reason"}`;
+
     const text = await callGeminiWithFallback(promptText);
-    if (!text) return fallbackResult;
+    if (!text) return localFallback;
 
     const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
 
     return {
-      is_valid_lead: parsed.is_valid_lead ?? true,
-      quality_score: typeof parsed.quality_score === 'number' ? parsed.quality_score : 80,
-      source_type: parsed.source_type || 'b2b_agency',
-      reason: parsed.reason || 'Verified by Gemini AI',
+      is_valid_lead: Boolean(parsed.is_valid_lead),
+      quality_score: typeof parsed.quality_score === 'number' ? parsed.quality_score : candidate.local_score,
+      source_type: parsed.source_type || candidate.intent_source,
+      reason: parsed.reason || candidate.local_reason,
     };
   } catch {
-    return fallbackResult;
+    return localFallback;
   }
 }
 
-async function generateGeminiPitch(companyName: string, domain: string, snippet: string): Promise<string> {
-  const lowSnip = snippet.toLowerCase();
+async function generateGeminiPitch(candidate: RawLeadCandidate): Promise<string> {
+  const lowSnip = `${candidate.role} ${candidate.snippet}`.toLowerCase();
   const ctaLink = lowSnip.includes('agent') || lowSnip.includes('workflow') || lowSnip.includes('tool')
     ? 'https://prateeq.in/scoping?engine=saas&goal=autonomous_agents'
     : lowSnip.includes('rag') || lowSnip.includes('vector') || lowSnip.includes('embedding')
       ? 'https://prateeq.in/scoping?engine=saas&goal=ai_rag_app'
       : 'https://prateeq.in/scoping?engine=saas&goal=saas_app';
 
-  const fallbackPitch = `Hi ${companyName} Team,\n\nI saw your post for software engineering capabilities (${snippet.slice(0, 100)}...).\n\nAs a Forward Deployed Engineer & AI Solutions Architect, I specialize in building custom AI agents, vector search, and full-stack software assets.\n\nI put together an interactive scoping spec for your stack: ${ctaLink}\n\nBest,\nPrateek Sharma`;
+  const fallbackPitch = `Hi ${candidate.company} Team,\n\nI saw your post for ${candidate.role} (${candidate.snippet.slice(0, 100)}...).\n\nAs a Forward Deployed Engineer & AI Solutions Architect, I specialize in building custom AI agents, pgvector RAG systems, and Next.js/FastAPI production software.\n\nI put together an interactive scoping spec for your stack: ${ctaLink}\n\nBest,\nPrateek Sharma`;
 
-  if (!GEMINI_API_KEY) return fallbackPitch;
+  if (!process.env.GEMINI_API_KEY) return fallbackPitch;
 
   try {
-    const retrieverEvidence = await queryRetrieverForProof(`${companyName} software requirements: ${snippet}`);
+    const retrieverEvidence = await queryRetrieverForProof(`${candidate.company} ${candidate.role}: ${candidate.snippet}`);
     const promptText = `You are writing a B2B outreach pitch as Prateek Sharma (Forward Deployed Engineer & AI Solutions Architect).
 Prateek's Production Background:
-- Retriever AI SaaS: Multi-tenant hybrid search & pgvector RAG platform on Next.js 16 and Supabase with presigned citation downloads and 1-line script embeds.
-- Synchronizer Control Deck: Streamlit management dashboard integrated with Gemini 2.5 Flash for automated skills scanning, certificate analysis, and real-time database sync.
+- Retriever AI SaaS: Multi-tenant hybrid search & pgvector RAG platform on Next.js 16, FastAPI, and Supabase with presigned citation downloads and 1-line script embeds.
+- Synchronizer Control Deck: Streamlit management dashboard integrated with Gemini for automated skills scanning, certificate analysis, and real-time database sync.
 - Client Workspace Dashboard: Google OAuth 2.0 workspace with interactive milestone tracking, Razorpay payment processing, and dynamic commercial PDF proposal exports.
 - Portfolio & Telemetry Engine: Next.js 16 edge proxy architecture with sub-100ms SQL telemetry aggregations.
 ${retrieverEvidence}
 
 Client Information:
-Company=${companyName}, Domain=${domain}, Snippet=${snippet}.
+Company=${candidate.company}, Role=${candidate.role}, Compensation=${candidate.compensation || 'Not specified'}, Snippet=${candidate.snippet}.
 
 Rules:
-1. Write a 3-sentence, hyper-personalized pitch connecting their hiring needs to Prateek's real production builds. If verified architectural proof from Retriever is present above, explicitly reference relevant systems proof (e.g. ColBERT token MaxSim, pgvector HNSW, DeBERTa NLI judge, zero-downtime blue/green OCI deployment, sub-300ms latency).
-2. Position Prateek as a Forward Deployed Engineer who builds custom AI solutions and full-stack software.
+1. Write a 3-sentence, hyper-personalized pitch connecting their exact needs to Prateek's real production builds. If verified architectural proof from Retriever is present above, reference relevant systems proof (e.g. ColBERT token MaxSim, pgvector HNSW, DeBERTa NLI judge, zero-downtime deployment).
+2. Position Prateek as a Forward Deployed Engineer who ships custom AI solutions and full-stack software.
 3. Include the CTA deep link: ${ctaLink}
 4. Sign off from Prateek Sharma.
 Return raw plain text ONLY, no markdown formatting or subject lines.`;
@@ -241,76 +185,76 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
 
-    if (!supabase || !SUPABASE_SERVICE_KEY) {
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    if (!supabase || !supabaseServiceKey) {
       return NextResponse.json({ error: 'Supabase configuration missing' }, { status: 500 });
     }
 
-    const targetQueries = (outreachDefaults as Record<string, unknown>).targetQueries as string[] | undefined || [
-      'remote "Forward Deployed Engineer" OR "Agentic AI" developer hiring',
-      'remote Next.js Supabase AI engineer hiring',
-      'b2b software agency founders contact us',
+    // Fetch known source URLs to avoid re-inserting duplicate leads
+    const { data: existingRows } = await supabase
+      .from('outreach_leads')
+      .select('source_url');
+    const knownUrls = new Set<string>(
+      (existingRows || [])
+        .map((r: { source_url?: string | null }) => r.source_url)
+        .filter((u): u is string => Boolean(u))
+    );
+
+    // Fetch real, high-intent leads concurrently from HN Who's Hiring, HN Freelance, and RemoteOK
+    const [hnHiringRes, hnFreelanceRes, remoteOkRes] = await Promise.allSettled([
+      fetchHnWhosHiring(knownUrls),
+      fetchHnFreelance(knownUrls),
+      fetchRemoteOk(knownUrls),
+    ]);
+
+    const rawCandidates: RawLeadCandidate[] = [
+      ...(hnHiringRes.status === 'fulfilled' ? hnHiringRes.value : []),
+      ...(hnFreelanceRes.status === 'fulfilled' ? hnFreelanceRes.value : []),
+      ...(remoteOkRes.status === 'fulfilled' ? remoteOkRes.value : []),
     ];
-    const selectedQuery = targetQueries[Math.floor(Math.random() * targetQueries.length)];
-    const liveResults = await searchLiveWeb(selectedQuery);
+
+    // Deduplicate within this batch by source_url and sort by local relevance score
+    const seenBatchUrls = new Set<string>();
+    const uniqueCandidates = rawCandidates
+      .filter((c) => {
+        if (!c.source_url || seenBatchUrls.has(c.source_url)) return false;
+        seenBatchUrls.add(c.source_url);
+        return true;
+      })
+      .sort((a, b) => b.local_score - a.local_score);
+
+    const minQualityScore = outreachDefaults.minQualityScore || 75;
+    const effectiveMinScore = process.env.GEMINI_API_KEY ? minQualityScore : Math.min(minQualityScore, 55);
+    const maxLeadsPerRun = Math.min(outreachDefaults.maxLeadsPerRun || 8, 8);
 
     const prospectsToInsert = [];
-
-    if (liveResults.length > 0) {
-      for (const res of liveResults.slice(0, 8)) {
-        try {
-          const domain = new URL(res.link).hostname.replace('www.', '');
-          const companyName = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
-
-          // Step 1: AI Lead Quality Evaluation
-          const evaluation = await evaluateLeadWithGemini(companyName, domain, res.snippet);
-
-          if (!evaluation.is_valid_lead || evaluation.quality_score < (outreachDefaults.minQualityScore || 75)) {
-            console.log(`Skipping low quality / directory lead: ${domain} (Score: ${evaluation.quality_score}, Reason: ${evaluation.reason})`);
-            continue;
-          }
-
-          // Step 2: AI Pitch Generation
-          const customPitch = await generateGeminiPitch(companyName, domain, res.snippet);
-
-          prospectsToInsert.push({
-            lead_name: `Founder / CTO`,
-            company: `${companyName} (${domain})`,
-            role: 'Managing Director & Tech Lead',
-            email: `contact@${domain}`,
-            source_url: res.link,
-            ai_generated_pitch: customPitch,
-            quality_score: evaluation.quality_score,
-            intent_source: evaluation.source_type,
-            verification_reason: evaluation.reason,
-            snippet: res.snippet || '',
-            lead_type: 'client',
-            compensation: null,
-          });
-
-          if (prospectsToInsert.length >= (outreachDefaults.maxLeadsPerRun || 5)) break;
-        } catch {}
+    for (const candidate of uniqueCandidates.slice(0, 12)) {
+      const evaluation = await evaluateLeadWithGemini(candidate);
+      if (!evaluation.is_valid_lead || evaluation.quality_score < effectiveMinScore) {
+        continue;
       }
-    }
 
-    // Fallback if web search returns zero verified leads
-    if (prospectsToInsert.length === 0) {
+      const customPitch = await generateGeminiPitch(candidate);
       prospectsToInsert.push({
-        lead_name: 'David Miller',
-        company: 'Apex Digital Solutions',
-        role: 'Founder & Managing Partner',
-        email: 'david@apexdigital.io',
-        source_url: 'https://apexdigital.io',
-        ai_generated_pitch: `Hi David,\n\nI noticed Apex Digital Solutions is expanding custom software services. We recently built a multi-tenant hybrid search & RAG platform ("Retriever") on Next.js 16 and PostgreSQL pgvector.\n\nI created a custom interactive scoping spec for your stack: https://prateeq.in/scoping?engine=landing&goal=ai_rag_app\n\nBest,\nPrateek Sharma`,
-        quality_score: 90,
-        intent_source: 'b2b_agency',
-        verification_reason: 'Verified fallback lead',
-        snippet: 'Custom digital software & AI development',
-        lead_type: 'client',
-        compensation: null,
+        lead_name: candidate.lead_name,
+        company: candidate.company,
+        role: candidate.role,
+        email: candidate.email,
+        source_url: candidate.source_url,
+        ai_generated_pitch: customPitch,
+        quality_score: evaluation.quality_score,
+        intent_source: evaluation.source_type,
+        verification_reason: evaluation.reason,
+        snippet: candidate.snippet,
+        lead_type: candidate.lead_type,
+        compensation: candidate.compensation,
       });
+
+      if (prospectsToInsert.length >= maxLeadsPerRun) break;
     }
 
     const insertedLeads = [];
+    const insertErrors: string[] = [];
     for (const lead of prospectsToInsert) {
       const { data, error } = await supabase
         .from('outreach_leads')
@@ -325,22 +269,37 @@ export async function POST(req: NextRequest) {
           intent_source: lead.intent_source,
           verification_reason: lead.verification_reason,
           snippet: lead.snippet || '',
-          lead_type: lead.lead_type || 'client',
+          lead_type: lead.lead_type || 'job',
           compensation: lead.compensation || null,
           status: 'pending',
         })
         .select('*')
         .maybeSingle();
 
-      if (!error && data) {
+      if (error) {
+        console.error('Failed to insert outreach lead:', error);
+        insertErrors.push(error.message);
+      } else if (data) {
         insertedLeads.push(data);
       }
     }
 
+    if (prospectsToInsert.length > 0 && insertedLeads.length === 0 && insertErrors.length > 0) {
+      return NextResponse.json(
+        { error: `Failed to save discovered leads: ${insertErrors[0]}` },
+        { status: 500 }
+      );
+    }
+
+    const message =
+      insertedLeads.length > 0
+        ? `Discovered & staged ${insertedLeads.length} verified high-intent leads from HN & RemoteOK!`
+        : 'No new verified high-intent leads matched your criteria in this run.';
+
     return NextResponse.json({
       success: true,
-      query_used: selectedQuery,
-      message: `Discovered & generated ${insertedLeads.length} verified high-quality leads!`,
+      candidates_scanned: uniqueCandidates.length,
+      message,
       leads: insertedLeads,
     });
   } catch (error) {

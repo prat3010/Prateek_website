@@ -13,6 +13,17 @@ import {
   FileDown,
   X,
   Sparkles,
+  Shield,
+  TrendingDown,
+  Clock,
+  Lightbulb,
+  Puzzle,
+  Gamepad2,
+  Mic,
+  Building2,
+  Rocket,
+  User,
+  Map as MapIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import NumberFlow from '@number-flow/react';
@@ -101,37 +112,37 @@ export interface InlineScopingChatCardProps {
 
 const STEP_2_QUICK_PROMPTS = [
   {
-    icon: '🛡️',
+    icon: Shield,
     label: 'Run Architecture Tier Audit',
     query:
       'Run a comprehensive architecture audit on my active tier modules across the 5 tiers (Visitor, Security, Commerce, AI, Data). Are there any missing security, caching, or SLA safeguards?',
   },
   {
-    icon: '📉',
+    icon: TrendingDown,
     label: 'Cut $1,000 / ₹75k (Prune to MVP)',
     query:
       'How can I cut ~$1,000 / ₹75,000 from this scope without losing core user experience?',
   },
   {
-    icon: '⚡',
+    icon: Zap,
     label: 'Optimize Latency & Scale',
     query:
       'How can I optimize the latency and edge performance of this selected architecture with caching and security layers?',
   },
   {
-    icon: '⏱️',
+    icon: Clock,
     label: 'Delivery Timeline',
     query:
       'What is the estimated delivery timeline and sprint milestone breakdown for these exact active modules?',
   },
   {
-    icon: '💡',
+    icon: Lightbulb,
     label: 'Suggest Lean Phase 1 MVP',
     query:
       'Suggest an optimal Phase 1 Lean MVP split for this selection so I can launch fast and defer scale add-ons.',
   },
   {
-    icon: '🧩',
+    icon: Puzzle,
     label: 'Architecture Dependencies',
     query:
       'Can you explain the technical dependencies between my selected modules and why they are required?',
@@ -140,31 +151,31 @@ const STEP_2_QUICK_PROMPTS = [
 
 const QUICK_PROMPTS = [
   {
-    icon: '💡',
+    icon: Lightbulb,
     label: 'Sculpt Lean MVP (< $3,000 / ₹2.5L)',
     query:
       'Can we sculpt a lean Phase 1 MVP under $3,000 / ₹2,50,000? What features can we de-scope or defer to v1.1?',
   },
   {
-    icon: '🎮',
+    icon: Gamepad2,
     label: 'Gaming YouTuber Merch & VIP',
     query:
       'I am a gaming YouTuber looking to sell custom merchandise and build a VIP vault for behind-the-scenes videos. What stack and features do I need, and how much will it cost?',
   },
   {
-    icon: '🎙️',
+    icon: Mic,
     label: 'Podcaster Audio & Transcripts',
     query:
       'I host a podcast and need a platform with private audio hosting, AI transcript search over past episodes, newsletter capture, and premium subscriptions.',
   },
   {
-    icon: '🏢',
+    icon: Building2,
     label: 'Real Estate AI Search',
     query:
       'We are a real estate agency needing an interactive portal with AI search over property documents and contracts, client accounts, and tour booking.',
   },
   {
-    icon: '🚀',
+    icon: Rocket,
     label: 'SaaS MVP with Billing',
     query:
       'I want to launch a B2B SaaS MVP with team organization accounts, Stripe/Razorpay subscription tiers, role-based access control, and usage analytics.',
@@ -355,7 +366,7 @@ export function InlineScopingChatCard({
   const handleRfpBlueprintExtracted = (blueprint: ParseIntentResponse) => {
     onApplyBlueprint(blueprint);
     toast.success(
-      `📄 RFP Parsed (${Math.round(blueprint.confidenceScore * 100)}% Confidence): ${blueprint.summaryRationale}`,
+      `RFP Parsed (${Math.round(blueprint.confidenceScore * 100)}% Confidence): ${blueprint.summaryRationale}`,
       {
         action: onNavigateStep
           ? {
@@ -554,7 +565,7 @@ export function InlineScopingChatCard({
           totalUSD: quote.netTotalUSD,
         };
 
-        fallbackContent = `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.\n\n<blueprint_action>\n${JSON.stringify(offlineBlueprint, null, 2)}\n</blueprint_action>`;
+        fallbackContent = `Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.\n\n<blueprint_action>\n${JSON.stringify(offlineBlueprint, null, 2)}\n</blueprint_action>`;
       }
 
       setChatTranscript([
@@ -648,7 +659,7 @@ export function InlineScopingChatCard({
 
       const activeResume = (resumeData || defaultResume) as unknown as ResumeData;
       await generateExecutiveBriefPDF(activeResume, briefData, isNoir, currency);
-      toast.success('📄 Executive Scoping Memo generated successfully!');
+      toast.success('Executive Scoping Memo generated successfully!');
     } catch (err) {
       console.error('Failed to generate Executive Scoping Memo PDF:', err);
       toast.error('Unable to generate PDF memo. Please try again.');
@@ -678,7 +689,8 @@ export function InlineScopingChatCard({
             <span>Conversational Scoping Copilot</span>
           </div>
           <span className={styles.modelBadge}>
-            ⚡ Retriever • Gemini 3.8 Flash
+            <Zap size={12} aria-hidden="true" />
+            <span>Retriever • Gemini 3.8 Flash</span>
           </span>
         </div>
 
@@ -731,7 +743,7 @@ export function InlineScopingChatCard({
         <div className={styles.scopeSyncBanner}>
           <span className={styles.livePulseDot} />
           <span className={styles.scopeSyncText}>
-            🟢 Live Scope Sync: <strong>{currentScope.baseEngineId.toUpperCase()}</strong> •{' '}
+            Live Scope Sync: <strong>{currentScope.baseEngineId.toUpperCase()}</strong> •{' '}
             {currentScope.selectedFeatures.length} Modules Active ({formatPricePair(currentScope.totalINR, currentScope.totalUSD, currency)})
           </span>
         </div>
@@ -745,18 +757,21 @@ export function InlineScopingChatCard({
 
       {/* Quick Prompt Pills */}
       <div className={styles.pillGrid} role="group" aria-label="Quick Scoping Suggestions">
-        {activeQuickPrompts.map((pill, i) => (
-          <button
-            key={i}
-            type="button"
-            disabled={isStreaming}
-            className={styles.pillBtn}
-            onClick={() => handleSendMessage(pill.query)}
-          >
-            <span>{pill.icon}</span>
-            <span>{pill.label}</span>
-          </button>
-        ))}
+        {activeQuickPrompts.map((pill, i) => {
+          const PillIcon = pill.icon;
+          return (
+            <button
+              key={i}
+              type="button"
+              disabled={isStreaming}
+              className={styles.pillBtn}
+              onClick={() => handleSendMessage(pill.query)}
+            >
+              <PillIcon size={13} aria-hidden="true" />
+              <span>{pill.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Messages Viewport */}
@@ -772,7 +787,7 @@ export function InlineScopingChatCard({
       >
         {chatTranscript.length === 0 ? (
           <div className={styles.welcomeIntro}>
-            <Bot size={22} style={{ flexShrink: 0, color: 'var(--color-primary, #3b82f6)' }} />
+            <Bot size={22} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
             <div>
               <strong>Lead Solutions Architect:</strong>
               <div style={{ marginTop: '2px', opacity: 0.9 }}>
@@ -794,7 +809,10 @@ export function InlineScopingChatCard({
                 className={isUser ? styles.chatBubbleUser : styles.chatBubbleAssistant}
               >
                 <div className={styles.bubbleHeader}>
-                  <span>{isUser ? '👤 You' : '🤖 Scoping Architect'}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    {isUser ? <User size={12} aria-hidden="true" /> : <Bot size={12} aria-hidden="true" />}
+                    <span>{isUser ? 'You' : 'Scoping Architect'}</span>
+                  </span>
                   {msg.timestamp && (
                     <span>
                       {new Date(msg.timestamp).toLocaleTimeString([], {
@@ -840,8 +858,9 @@ export function InlineScopingChatCard({
                       <span className={styles.blueprintBadge}>
                         {blueprint.featureIds.length} Feature Modules
                       </span>
-                      <span className={styles.blueprintBadge}>
-                        ⏱️ {blueprint.suggestedTimeline}
+                      <span className={styles.blueprintBadge} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Clock size={11} aria-hidden="true" />
+                        <span>{blueprint.suggestedTimeline}</span>
                       </span>
                     </div>
 
@@ -868,7 +887,10 @@ export function InlineScopingChatCard({
                             </p>
                           )}
                           <div className={styles.phaseMetaRow}>
-                            <span>⏱️ {blueprint.phasedBreakdown.phase1.suggestedTimeline}</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <Clock size={11} aria-hidden="true" />
+                              <span>{blueprint.phasedBreakdown.phase1.suggestedTimeline}</span>
+                            </span>
                             <span>•</span>
                             <span>{blueprint.phasedBreakdown.phase1.featureIds.length} Modules</span>
                           </div>
@@ -886,8 +908,8 @@ export function InlineScopingChatCard({
                                   )
                                 }
                               >
-                                <Zap size={13} />
-                                <span>👉 Apply Phase 1 MVP</span>
+                                <Zap size={13} aria-hidden="true" />
+                                <span>Apply Phase 1 MVP</span>
                               </button>
                             ) : null}
                             <button
@@ -933,7 +955,10 @@ export function InlineScopingChatCard({
                             </p>
                           )}
                           <div className={styles.phaseMetaRow}>
-                            <span>⏱️ {blueprint.suggestedTimeline}</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <Clock size={11} aria-hidden="true" />
+                              <span>{blueprint.suggestedTimeline}</span>
+                            </span>
                             <span>•</span>
                             <span>{blueprint.featureIds.length} Total Modules</span>
                           </div>
@@ -943,8 +968,8 @@ export function InlineScopingChatCard({
                               className={styles.applyFullBtn}
                               onClick={() => handleApplyBlueprintClick(blueprint, idx)}
                             >
-                              <Zap size={13} />
-                              <span>👉 Apply Full Scope</span>
+                              <Zap size={13} aria-hidden="true" />
+                              <span>Apply Full Scope</span>
                             </button>
                           ) : null}
                         </div>
@@ -954,8 +979,8 @@ export function InlineScopingChatCard({
                     <div className={styles.blueprintActionRow}>
                       {isApplied ? (
                         <div className={styles.appliedBadge}>
-                          <CheckCircle2 size={14} />
-                          <span>✓ Applied to Interactive Quote</span>
+                          <CheckCircle2 size={14} aria-hidden="true" />
+                          <span>Applied to Interactive Quote</span>
                         </div>
                       ) : !blueprint.phasedBreakdown ? (
                         <button
@@ -963,8 +988,8 @@ export function InlineScopingChatCard({
                           className={styles.applyBlueprintBtn}
                           onClick={() => handleApplyBlueprintClick(blueprint, idx)}
                         >
-                          <Zap size={14} />
-                          <span>👉 Apply Blueprint to Quote</span>
+                          <Zap size={14} aria-hidden="true" />
+                          <span>Apply Blueprint to Quote</span>
                         </button>
                       ) : null}
 
@@ -980,7 +1005,7 @@ export function InlineScopingChatCard({
                         ) : (
                           <FileDown size={13} />
                         )}
-                        <span>📄 Executive Memo (PDF)</span>
+                        <span>Executive Memo (PDF)</span>
                       </button>
 
                       {onNavigateStep && (
@@ -994,8 +1019,9 @@ export function InlineScopingChatCard({
                             }
                           }}
                         >
-                          <span>🗺️ View in Architecture Topology Map</span>
-                          <ArrowRight size={12} />
+                          <MapIcon size={12} aria-hidden="true" />
+                          <span>View in Architecture Topology Map</span>
+                          <ArrowRight size={12} aria-hidden="true" />
                         </button>
                       )}
                     </div>

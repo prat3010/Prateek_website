@@ -63,11 +63,14 @@ export interface Lead {
   lead_name: string;
   company: string;
   role: string;
-  email: string;
+  email: string | null;
   source_url: string;
   ai_generated_pitch: string;
-  status: 'pending' | 'sent' | 'rejected';
+  status: 'pending' | 'approved' | 'sent' | 'rejected';
   created_at: string;
+  intent_source?: string;
+  quality_score?: number;
+  compensation?: string | null;
 }
 
 export interface ClientRecord {
@@ -558,7 +561,7 @@ export default function AdminControlCenter() {
     }
   };
 
-  const handleDispatch = async (leadId: string, action: 'approve' | 'reject') => {
+  const handleDispatch = async (leadId: string, action: 'approve' | 'reject' | 'mark_sent') => {
     try {
       const token = await getAccessToken();
       const res = await fetch('/api/outreach/dispatch', {
@@ -641,6 +644,7 @@ export default function AdminControlCenter() {
 
   // 3. Authorized Admin Control Center Dashboard
   const pendingLeads = leads.filter(l => l.status === 'pending');
+  const approvedLeads = leads.filter(l => l.status === 'approved');
 
   return (
     <div className={styles.wrapper}>
@@ -755,7 +759,7 @@ export default function AdminControlCenter() {
 
         {/* Tab 1: Autonomous Prospecting */}
         {activeTab === 'prospects' && (
-          <OutreachQueueTab {...{ handleGenerateProspects, loadingLeads, fetchLeads, pendingLeads, parsePitchFormats, editingPitchId, setEditingPitchId, editedPitchText, setEditedPitchText, handleDispatch }} />
+          <OutreachQueueTab {...{ handleGenerateProspects, loadingLeads, fetchLeads, pendingLeads, approvedLeads, parsePitchFormats, editingPitchId, setEditingPitchId, editedPitchText, setEditedPitchText, handleDispatch }} />
         )}
 
         {activeTab === 'clients' && (

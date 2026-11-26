@@ -3,7 +3,7 @@ title: "Architecting a Hybrid Cloud RAG Engine on OCI & Edge"
 date: "2026-08-29"
 excerpt: "How decoupling Vercel Edge UI from an OCI Mumbai compute plane cut AI costs by 85% while delivering sub-100ms latency and zero-trust security."
 tags: ["DevOps", "Cloud Architecture", "FastAPI", "Oracle Cloud", "Nginx", "RAG"]
-coverImage: "/images/projects/retriever.jpg"
+coverImage: "/images/project-rag-lab.webp"
 ---
 
 Scaling multi-tenant Retrieval-Augmented Generation (RAG) platforms introduces a harsh infrastructure reality: serverless execution timeouts and runaway embedding API fees will crush your budget. Standard serverless edge functions cap execution at 15 to 30 seconds, breaking under multi-hop GraphRAG traversals, recursive document summarization, and long-lived Server-Sent Events (SSE) streaming pipelines.
