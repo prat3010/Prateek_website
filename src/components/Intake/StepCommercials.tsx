@@ -23,7 +23,7 @@ import Portal from '@/components/ui/Portal';
 import type { BaseEngineItem, MaintenancePlanOption } from '@/data/resume';
 import { formatPricePair, type Currency, type PromoDiscountInfo } from '@/lib/pricing';
 import type { User } from '@supabase/supabase-js';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 
 interface StepCommercialsProps {
   selectedEngine: BaseEngineItem;

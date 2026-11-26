@@ -31,7 +31,7 @@ import Portal from '@/components/ui/Portal';
 import type { QuickServiceItem } from '@/data/resume';
 import { formatPricePair, type Currency } from '@/lib/pricing';
 import { QUICK_CATEGORIES } from './useIntakeFormState';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 import type { User } from '@supabase/supabase-js';
 
 const getQuickServiceIcon = (id: string): React.ReactNode => {

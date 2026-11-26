@@ -28,7 +28,7 @@ import { AiScopingPromptBar } from './AiScopingPromptBar';
 import { type CurrentScopeContext } from './InlineScopingChatCard';
 import { GOAL_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 import type { User } from '@supabase/supabase-js';
 
 const getArchetypeIcon = (id: string): React.ReactNode => {

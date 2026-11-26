@@ -1,0 +1,1022 @@
+
+:global([data-theme='noir']) .btnSecondary:hover {
+  border-color: var(--neon-cyan, #00f0ff);
+  color: #FFFFFF;
+  background: #121216;
+  text-shadow: none;
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+:global([data-theme='noir']) .stickyBar {
+  background: rgba(3, 3, 4, 0.95);
+  border: 1px solid #2F2F3D;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+}
+
+:global([data-theme='noir']) .stickyTitle {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .mobileFormulaToggle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e0e0e3;
+}
+
+:global([data-theme='noir']) .stickyBreakdown {
+  color: #e0e0e3;
+}
+
+:global([data-theme='noir']) .stickyTotal {
+  color: var(--neon-green, #39ff14);
+  text-shadow: none;
+}
+
+:global([data-theme='noir']) .discountBadge {
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
+  border: 1px solid var(--badge-success-border);
+}
+
+:global([data-theme='noir']) .careCard {
+  background: #0d0d10;
+  border: 1px solid #2F2F3D;
+}
+
+:global([data-theme='noir']) .careCardSelected {
+  border-color: var(--neon-cyan, #00f0ff);
+  background: #08080a;
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15);
+}
+
+:global([data-theme='noir']) .careCardBadge {
+  color: var(--neon-cyan, #00f0ff);
+  background: #08080a;
+  border: 1px solid #2F2F3D;
+}
+
+:global([data-theme='noir']) .careCardTitle {
+  color: #FAFAFA;
+}
+
+:global([data-theme='noir']) .careCardPrice {
+  color: var(--neon-green, #39ff14);
+  text-shadow: none;
+}
+
+:global([data-theme='noir']) .careCardList {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .infoBtn {
+  background: #0d0d10;
+  border: 1px solid #2F2F3D;
+  color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .infoBtn:hover,
+:global([data-theme='noir']) .infoBtnActive {
+  background: var(--neon-cyan, #00f0ff);
+  color: #08080a;
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .popoverBox {
+  background: #030304;
+  border: 1px solid var(--neon-pink, #ff2a55);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 42, 85, 0.15);
+}
+
+:global([data-theme='noir']) .popoverHeader {
+  color: var(--neon-cyan, #00f0ff);
+  border-bottom: 1px solid #2F2F3D;
+}
+
+:global([data-theme='noir']) .popoverTechText {
+  color: #e0e0e3;
+}
+
+:global([data-theme='noir']) .successIcon {
+  background: rgba(57, 255, 20, 0.1);
+  color: var(--neon-green, #39ff14);
+}
+
+/* ── Disabled Button Styling ── */
+.btnDisabled,
+.btnDisabled:hover {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: grayscale(80%);
+}
+
+/* ── Agreement Checkbox ── */
+.termsCheckboxBox {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.5;
+  color: inherit;
+}
+
+.checkboxInput {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: #0284c7;
+  cursor: pointer;
+}
+
+/* ── Terms Content Box ── */
+
+.termsContentBox {
+  background: #FFFFFF;
+  border: 1.5px solid #2B2B36;
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.5;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.termsContentBox p {
+  margin-bottom: 6px;
+}
+
+:global([data-theme='noir']) .termsContentBox {
+  background: #030304;
+  border-color: #2F2F3D;
+  color: var(--color-text-muted);
+}
+
+:global([data-theme='noir']) .chipCard {
+  background: #0d0d10;
+  border: 1px solid #2F2F3D;
+  color: #e0e0e3;
+}
+
+:global([data-theme='noir']) .chipCard:hover {
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .chipCardActive {
+  background: var(--neon-cyan, #00f0ff);
+  color: #08080a;
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.recaptchaWarning {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1.5px solid #f59e0b;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+:global([data-theme='noir']) .recaptchaWarning {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* ── Step 0: Service Type Gate ── */
+
+.step0TiltCard {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.step0Card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  min-height: 120px;
+  border-width: 2px;
+  width: 100%;
+  height: 100%;
+  padding: 18px 20px;
+  transition: all 0.25s ease;
+}
+
+.step0CardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.turnaroundBadge {
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--border-radius-sm);
+  background: var(--badge-active-bg);
+  border: 1px solid var(--badge-active-border);
+  color: var(--badge-active-text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.crosshairTL {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-family: var(--font-code);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--border-muted);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.crosshairBR {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-family: var(--font-code);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--border-muted);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.step0Card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(43, 43, 54, 0.14);
+  border-color: var(--pop-blue);
+}
+
+:global([data-theme='noir']) .step0Card:hover {
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.12);
+  border-color: var(--neon-cyan);
+}
+
+.backToStep0 {
+  margin-left: auto;
+  font-size: 12px;
+  font-family: var(--font-code);
+  opacity: 0.55;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.backToStep0:hover {
+  opacity: 1;
+}
+
+/* ── Quick Service Quote Summary ── */
+
+.quoteSummary {
+  margin-top: 16px;
+  background: #F7F2E8;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm, 6px);
+  padding: 16px;
+  font-family: var(--font-code);
+}
+
+.quoteTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-code);
+  font-size: 12px;
+}
+
+.quoteTable td {
+  padding: 4px 0;
+  vertical-align: top;
+}
+
+:global([data-theme='noir']) .quoteSummary {
+  background: rgba(30, 30, 40, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quoteTitle {
+  font-family: var(--font-code);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pop-black);
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+:global([data-theme='noir']) .quoteTitle {
+  color: var(--pop-cream, #f7f2e8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quoteRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .quoteRow {
+  color: rgba(247, 242, 232, 0.8);
+}
+
+.quoteRowTotal {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--pop-blue);
+  font-size: 14px;
+}
+
+:global([data-theme='noir']) .quoteRowTotal {
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+.totalPrice {
+  color: var(--pop-blue);
+  font-size: 16px;
+}
+
+:global([data-theme='noir']) .totalPrice {
+  color: var(--neon-cyan, #00f0ff);
+}
+
+/* ── Quick Service Compact Summary (inline total bar) ── */
+
+.quoteSummaryCompact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(90, 142, 182, 0.08);
+  border: 1.5px solid var(--pop-blue);
+  border-radius: var(--border-radius-sm, 6px);
+  font-family: var(--font-code);
+  font-size: 13px;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .quoteSummaryCompact {
+  background: rgba(0, 240, 255, 0.06);
+  border-color: var(--neon-cyan, #00f0ff);
+  color: var(--pop-cream, #f7f2e8);
+}
+
+/* ── Step 0 Card Content Layout ── */
+
+.step0CardContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.step0CardTitle {
+  font-weight: 800;
+  font-size: 15px;
+  text-align: left;
+}
+
+.step0CardDesc {
+  font-size: 13px;
+  opacity: 0.75;
+  margin: 0;
+  text-align: left;
+}
+
+/* ── Submitted Card Actions ── */
+
+.submittedActions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .submittedActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Error Message ── */
+
+.formError {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+/* ── Summary Box (Step 4 Commercials) ── */
+
+.summaryBox {
+  background: var(--intake-summary-bg);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: var(--intake-summary-text);
+  margin-bottom: 16px;
+  border: 1px solid var(--intake-summary-border);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--intake-summary-border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.summaryLabel {
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--intake-summary-label);
+}
+
+.summaryValue {
+  font-weight: 700;
+  color: var(--intake-summary-value);
+}
+
+.summaryAccent {
+  font-weight: 700;
+  color: var(--intake-summary-accent);
+}
+
+.summaryTotalRow {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.summaryTotalLabel {
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--intake-summary-text);
+}
+
+.summaryTotalValue {
+  font-family: var(--font-code);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--intake-summary-accent);
+}
+
+.summaryDisclaimer {
+  font-size: 11px;
+  opacity: 0.75;
+  line-height: 1.4;
+  margin: 4px 0 16px 0;
+  color: var(--intake-summary-text);
+}
+
+.summarySavingsRow {
+  background: var(--badge-success-bg);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin: 6px 0;
+  border: 1px solid var(--badge-success-border);
+  align-items: center;
+}
+
+.summarySavingsLabel {
+  font-family: var(--font-code);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--badge-success-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.03em;
+}
+
+.summarySavingsValue {
+  font-family: var(--font-code);
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--badge-success-text);
+}
+
+/* ── Step 3 Brand Deliverables Chips ── */
+.brandTitleCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.brandScopeTagIncluded {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--badge-success-bg);
+  border: 1px solid var(--badge-success-border);
+  color: var(--badge-success-text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.brandScopeTagAddon {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--badge-active-bg);
+  border: 1px solid var(--badge-active-border);
+  color: var(--badge-active-text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.brandDeliverablesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.brandDeliverableChip {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-muted);
+  color: var(--color-text-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Step 4 Commercial Guarantees ── */
+.guaranteesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.guaranteeCard {
+  background: var(--surface-card);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.guaranteeCard:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.guaranteeHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-headline);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.guaranteeIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.guaranteeDesc {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.termsAccordionToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--color-link);
+  font-family: var(--font-code);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 0;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.termsAccordionToggle:hover {
+  opacity: 0.8;
+}
+
+/* ── Card Content Layouts ── */
+
+.cardSelectable {
+  cursor: pointer;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardTitle {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.cardPrice {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cardDesc {
+  margin: 6px 0 0 0;
+  font-size: 11px;
+  opacity: 0.8;
+  line-height: 1.45;
+}
+
+.cardDescShort {
+  font-size: 12px;
+  opacity: 0.85;
+  margin: 6px 0 4px 0;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.cardTurnaround {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+/* ── Engine & Feature Card Inner Layouts ── */
+
+.engineCardInner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.engineCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.engineCardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.engineCardTitle {
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.engineCardDesc {
+  margin: 6px 0 0 0;
+  font-size: 11px;
+  opacity: 0.85;
+  line-height: 1.45;
+}
+
+/* ── Care Card Description ── */
+
+.careCardDesc {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* ── Popover Positioning Helpers ── */
+
+.popoverStatic {
+  position: static;
+  left: auto;
+  right: auto;
+}
+
+.popoverCloseBtn {
+  cursor: pointer;
+}
+
+/* ── Quick Service Summary ── */
+
+.quickSummaryLabel {
+  font-weight: 700;
+}
+
+.quickSummaryTotal {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.quickPdfBtn {
+  width: 100%;
+  justify-content: center;
+}
+
+.quickDisclaimer {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 10px;
+}
+
+/* ── Submit Row Layout ── */
+
+.submitRow {
+  margin-top: 0;
+}
+
+/* ── Field Spacing Helpers ── */
+
+.fieldMarginSm {
+  margin-bottom: 16px;
+}
+
+.fieldMarginMd {
+  margin-bottom: 20px;
+}
+
+.fieldMarginTop {
+  margin-top: 12px;
+}
+
+/* ── Inline Icon ── */
+
+.inlineIcon {
+  display: inline;
+  margin-right: 4px;
+}
+
+/* ── Submitted Card (new naming) ── */
+
+.submittedCard {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+}
+
+.submittedIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-md) auto;
+  border-radius: 50%;
+  background: rgba(121, 180, 139, 0.15);
+  color: var(--pop-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submittedTitle {
+  font-family: var(--font-headline);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--pop-green);
+  margin-bottom: var(--space-sm);
+}
+
+.submittedText {
+  font-family: var(--font-code);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.intentBarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: var(--space-md);
+}
+
+.copilotTriggerRow {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.copilotTriggerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--badge-active-bg, rgba(90, 142, 182, 0.18));
+  border: 1.5px solid var(--badge-active-border, rgba(44, 89, 125, 0.3));
+  color: var(--badge-active-text, #2c597d);
+  font-family: var(--font-code, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-md, 8px);
+  cursor: pointer;
+  box-shadow: var(--shadow-comic-sm, 1.5px 1.5px 0px rgba(43, 43, 54, 0.12));
+  transition: all 0.15s ease;
+}
+
+.copilotTriggerBtn:hover {
+  background: var(--pop-yellow, #F4DC95);
+  color: var(--pop-black, #2B2B36);
+  border-color: var(--color-border, #2B2B36);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-comic, 3px 3px 0px rgba(43, 43, 54, 0.18));
+}
+
+:global([data-theme='noir']) .copilotTriggerBtn {
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: var(--neon-cyan, #00f0ff);
+  box-shadow: none;
+}
+
+:global([data-theme='noir']) .copilotTriggerBtn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.discoveryWedgeBox {
+  margin: 1.25rem 0 1.75rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent-color);
+  background: linear-gradient(135deg, rgba(90, 142, 182, 0.08) 0%, rgba(90, 142, 182, 0.02) 100%);
+  padding: 1rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme='noir']) .discoveryWedgeBox {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(0, 240, 255, 0.02) 100%);
+}
+
+.discoveryWedgeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-color);
+  color: var(--surface-secondary);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.discoveryWedgeContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.discoveryWedgeText {
+  flex: 1;
+  min-width: 280px;
+}
+
+.discoveryWedgeTitle {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 0 0.4rem 0;
+}
+
+.discoveryWedgeDescription {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.discoveryWedgeActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.discoveryWedgePrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.discoveryWedgePriceTag {
+  font-family: var(--font-code);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--pop-yellow, #facc15);
+}
+
+.discoveryWedgeDuration {
+  font-size: 0.72rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.discoveryWedgeBtn {
+  background: var(--app-btn-primary-bg, #38bdf8);
+  color: var(--app-btn-primary-text, #0b0f19);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.discoveryWedgeBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.discoveryWedgeBtnActive {
+  background: var(--badge-success-bg, rgba(34, 197, 94, 0.2));
+  color: var(--badge-success-text, #4ade80);
+  border-color: var(--badge-success-border, rgba(34, 197, 94, 0.5));
+}
+
+

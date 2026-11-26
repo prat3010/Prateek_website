@@ -1,62 +1,17 @@
-export interface RetrieverConfig {
-  apiUrl: string;
-  tenantId: string;
-  apiKey: string;
-  userId: string;
-  llmKey?: string;
-  llmProvider?: string;
-}
+import {
+  fetchWithRetry,
+  generateTraceparent,
+  requireUserId,
+  REQUEST_TIMEOUT,
+  type RagRequestContext,
+  type RetrieverConfig,
+} from "./rag/http";
+import * as ragAdmin from "./rag/rag-admin";
+import * as ragChat from "./rag/rag-chat";
+import * as ragDocs from "./rag/rag-documents";
+import * as ragGraph from "./rag/rag-graph";
 
-interface ChatCompletionOptions {
-  temperature?: number;
-  max_tokens?: number;
-  enable_reranking?: boolean;
-  top_k?: number;
-  enable_query_rewriting?: boolean;
-  enable_self_query?: boolean;
-  enable_colbert_rerank?: boolean;
-  signal?: AbortSignal;
-}
-
-const REQUEST_TIMEOUT = 90_000;
-const MAX_RETRIES = 2;
-
-async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_RETRIES): Promise<Response> {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const res = await fetch(url, options);
-      if (!res.ok && res.status >= 500 && attempt < retries) {
-        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)));
-        continue;
-      }
-      return res;
-    } catch (err) {
-      if ((err as Error)?.name === 'AbortError' || options.signal?.aborted) {
-        throw err;
-      }
-      if (attempt < retries) {
-        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)));
-        continue;
-      }
-      throw err;
-    }
-  }
-  throw new Error("Request failed after retries");
-}
-
-const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-function requireUserId(userId?: string): string {
-  if (userId && UUID_REGEX.test(userId)) return userId;
-  throw new Error("A valid authenticated user ID is required for RAG requests.");
-}
-
-function generateTraceparent(): { traceparent: string; traceId: string } {
-  const hex = (len: number) =>
-    Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-  const traceId = hex(32);
-  const spanId = hex(16);
-  return { traceparent: `00-${traceId}-${spanId}-01`, traceId };
-}
+export type { RetrieverConfig };
 
 export class RetrieverClient {
   private config: RetrieverConfig;
@@ -68,6 +23,16 @@ export class RetrieverClient {
 
   get tenantId(): string {
     return this.config.tenantId;
+  }
+
+  private get ctx(): RagRequestContext {
+    return {
+      config: this.config,
+      request: this.request.bind(this),
+      setTraceId: (id) => {
+        this.lastTraceId = id;
+      },
+    };
   }
 
 
@@ -110,2506 +75,425 @@ export class RetrieverClient {
   }
 
 
-  async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string; hybridAlpha?: number; enableLoraAdapter?: boolean; rerankerEngine?: "cohere" | "colbert" | "none"; enableColbertRerank?: boolean }) {
-    const limit = options?.limit ?? 5;
-    return this.request<import("./rag-types").SearchResponse>(`/v1/tenants/${this.config.tenantId}/search`, {
-      method: "POST",
-      body: JSON.stringify({
-        query,
-        limit,
-        top_k: limit,
-        enable_query_rewriting: options?.enableQueryRewriting ?? true,
-        enable_hybrid: options?.enableHybrid ?? true,
-        hybridAlpha: options?.hybridAlpha ?? 0.7,
-        enableLoraAdapter: options?.enableLoraAdapter ?? false,
-        rerankerEngine: options?.rerankerEngine ?? "colbert",
-        enableColbertRerank: options?.enableColbertRerank ?? (options?.rerankerEngine === "colbert"),
-        ...(options?.strategy ? { strategy: options.strategy } : {}),
-      }),
-    });
+
+  search(...args: Parameters<typeof ragDocs.search> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.search(this.ctx, ...args);
   }
-
-  async listDocuments() {
-    return this.request<import("./rag-types").DocumentMeta[]>(`/v1/tenants/${this.config.tenantId}/documents`);
+  listDocuments(...args: Parameters<typeof ragDocs.listDocuments> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.listDocuments(this.ctx, ...args);
   }
-
-  async createSession(signal?: AbortSignal) {
-    const validUserId = requireUserId(this.config.userId);
-    return this.request<{ sessionId: string; createdAt: string }>(
-      `/v1/tenants/${this.config.tenantId}/chat/sessions`,
-      { method: "POST", body: JSON.stringify({ user_id: validUserId }), signal },
-    );
+  createSession(...args: Parameters<typeof ragChat.createSession> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.createSession(this.ctx, ...args);
   }
-
-  async chat(sessionId: string, message: string, signal?: AbortSignal, lastEventId?: string): Promise<ReadableStream<Uint8Array> | null> {
-    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages`;
-    const validUserId = requireUserId(this.config.userId);
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${this.config.apiKey}`,
-      "X-User-ID": validUserId,
-      Accept: "text/event-stream",
-    };
-    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
-    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
-    if (lastEventId) headers["Last-Event-ID"] = lastEventId;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-    const combinedSignal = signal
-      ? combineAbortSignals(signal, controller.signal)
-      : controller.signal;
-
-    try {
-      // A chat POST persists a message upstream; retrying on 5xx can duplicate
-      // the user turn and generate a second answer, so send it exactly once.
-      const res = await fetchWithRetry(url, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ query: message, stream: true }),
-        signal: combinedSignal,
-      }, 0);
-      clearTimeout(timeoutId);
-      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
-      return res.body;
-    } catch (err) {
-      clearTimeout(timeoutId);
-      throw err;
-    }
+  chat(...args: Parameters<typeof ragChat.chat> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.chat(this.ctx, ...args);
   }
-
-  async chatComplete(sessionId: string, message: string, signal?: AbortSignal): Promise<{ text: string; citations: unknown[] }> {
-    const stream = await this.chat(sessionId, message, signal);
-    if (!stream) {
-      return { text: '', citations: [] };
-    }
-    const reader = stream.getReader();
-    const decoder = new TextDecoder();
-    let text = '';
-    let citations: unknown[] = [];
-    let buffer = '';
-    let streamError = '';
-
-    const handleFrame = (rawLine: string) => {
-      const line = rawLine.replace(/\r$/, '');
-      if (!line.startsWith('data:')) return;
-      const jsonStr = line.slice(5).trim();
-      if (!jsonStr || jsonStr === '[DONE]') return;
-
-      let data: Record<string, unknown>;
-      try {
-        data = JSON.parse(jsonStr) as Record<string, unknown>;
-      } catch {
-        return;
-      }
-
-      if (data.event === 'error') {
-        streamError =
-          typeof data.message === 'string' && data.message.trim()
-            ? data.message
-            : 'Retriever stream failed.';
-        return;
-      }
-      if (data.event === 'token' && typeof data.delta === 'string') {
-        text += data.delta;
-        return;
-      }
-      if (data.event === 'done' && Array.isArray(data.citations)) {
-        citations = data.citations;
-        return;
-      }
-
-      // OpenAI-compatible frames from the completions endpoint.
-      const choices = data.choices as Array<{ delta?: { content?: unknown } }> | undefined;
-      const delta = choices?.[0]?.delta?.content;
-      if (typeof delta === 'string') text += delta;
-    };
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-      for (const line of lines) handleFrame(line);
-    }
-
-    buffer += decoder.decode();
-    if (buffer.trim()) handleFrame(buffer);
-
-    if (streamError) {
-      throw new Error(streamError);
-    }
-
-    // Some guardrail paths return a plain JSON body instead of SSE.
-    if (!text.trim() && buffer.trim() && !buffer.trim().startsWith('data:')) {
-      try {
-        const payload = JSON.parse(buffer.trim()) as {
-          content?: unknown;
-          choices?: Array<{ message?: { content?: unknown }; delta?: { content?: unknown } }>;
-        };
-        const plain =
-          typeof payload.content === 'string'
-            ? payload.content
-            : payload.choices?.[0]?.message?.content ??
-              payload.choices?.[0]?.delta?.content;
-        if (typeof plain === 'string') text = plain;
-      } catch {}
-    }
-
-    return { text: text.trim(), citations };
+  chatComplete(...args: Parameters<typeof ragChat.chatComplete> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.chatComplete(this.ctx, ...args);
   }
-
-  async completions(
-    messages: { role: string; content: string }[],
-    options?: ChatCompletionOptions
-  ): Promise<{ content: string; citations?: unknown[]; id?: string; model?: string }> {
-    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/completions`;
-    const validUserId = requireUserId(this.config.userId);
-    const { traceparent, traceId } = generateTraceparent();
-    this.lastTraceId = traceId;
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${this.config.apiKey}`,
-      "X-User-ID": validUserId,
-      "X-Tenant-ID": this.config.tenantId,
-      "traceparent": traceparent,
-    };
-    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
-    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(this.buildCompletionsPayload(messages, options, false)),
-      signal: options?.signal,
-    });
-
-    if (!res.ok) {
-      throw new Error(`Retriever completions error [${res.status}]: ${await res.text()}`);
-    }
-
-    const data = await res.json();
-    const content = data?.choices?.[0]?.message?.content || data?.content || '';
-    return {
-      content,
-      citations: data?.citations || [],
-      id: data?.id,
-      model: data?.model,
-    };
+  completions(...args: Parameters<typeof ragChat.completions> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.completions(this.ctx, ...args);
   }
-
-  /**
-   * Open a true token stream from Retriever's OpenAI-compatible completions
-   * endpoint. The caller owns the abort signal and must consume/cancel the body.
-   */
-  async completionsStream(
-    messages: { role: string; content: string }[],
-    options?: ChatCompletionOptions
-  ): Promise<ReadableStream<Uint8Array>> {
-    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/completions`;
-    const validUserId = requireUserId(this.config.userId);
-    const { traceparent, traceId } = generateTraceparent();
-    this.lastTraceId = traceId;
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${this.config.apiKey}`,
-      "X-User-ID": validUserId,
-      "X-Tenant-ID": this.config.tenantId,
-      "traceparent": traceparent,
-      Accept: "text/event-stream",
-    };
-    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
-    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(this.buildCompletionsPayload(messages, options, true)),
-      signal: options?.signal,
-    });
-
-    if (!res.ok) {
-      throw new Error(`Retriever completions stream error [${res.status}]: ${await res.text()}`);
-    }
-    if (!res.body) {
-      throw new Error("Retriever completions stream returned an empty body.");
-    }
-
-    return res.body;
+  completionsStream(...args: Parameters<typeof ragChat.completionsStream> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.completionsStream(this.ctx, ...args);
   }
-
-  private buildCompletionsPayload(
-    messages: { role: string; content: string }[],
-    options: ChatCompletionOptions | undefined,
-    stream: boolean
-  ) {
-    return {
-      messages,
-      stream,
-      use_repl: false,
-      temperature: options?.temperature ?? 0.4,
-      max_tokens: options?.max_tokens ?? 2048,
-      enable_reranking: options?.enable_reranking ?? false,
-      ...(options?.top_k !== undefined ? { top_k: options.top_k } : {}),
-      ...(options?.enable_query_rewriting !== undefined
-        ? { enable_query_rewriting: options.enable_query_rewriting }
-        : {}),
-      ...(options?.enable_self_query !== undefined
-        ? { enable_self_query: options.enable_self_query }
-        : {}),
-      ...(options?.enable_colbert_rerank !== undefined
-        ? { enable_colbert_rerank: options.enable_colbert_rerank }
-        : {}),
-    };
+  uploadDocument(...args: Parameters<typeof ragDocs.uploadDocument> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.uploadDocument(this.ctx, ...args);
   }
-
-  async uploadDocument(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
-    return this.request<{ documentId: string; status: string }>(`/v1/tenants/${this.config.tenantId}/documents`, {
-      method: "POST",
-      body: formData,
-    });
+  deleteDocument(...args: Parameters<typeof ragDocs.deleteDocument> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.deleteDocument(this.ctx, ...args);
   }
-
-  async extractDocument<T = Record<string, unknown>>(
+  extractDocument<T = Record<string, unknown>>(
     documentId: string,
     jsonSchema: Record<string, unknown> | string,
     model?: string
-  ): Promise<{ data: T; provider?: string; model?: string; inputTokens?: number; outputTokens?: number }> {
-    let schemaObj = jsonSchema;
-    if (typeof jsonSchema === "string") {
-      try {
-        schemaObj = JSON.parse(jsonSchema);
-      } catch {
-        schemaObj = { schema: jsonSchema };
-      }
-    }
-    return this.request<{ data: T; provider?: string; model?: string; inputTokens?: number; outputTokens?: number }>(
-      `/v1/tenants/${this.config.tenantId}/documents/${documentId}/extract`,
-      {
-        method: "POST",
-        body: JSON.stringify({ json_schema: schemaObj, model }),
-      }
-    );
-  }
-
-
-  async deleteDocument(documentId: string) {
-    return this.request(`/v1/tenants/${this.config.tenantId}/documents/${documentId}`, {
-      method: "DELETE",
-    });
-  }
-
-  async submitFeedback(sessionId: string, messageId: string, rating: "up" | "down", feedbackText?: string) {
-    const numericRating = rating === "up" ? 1 : -1;
-    return this.request(
-      `/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
-      {
-        method: "POST",
-        body: JSON.stringify({ rating: numericRating, feedback_text: feedbackText || "" }),
-      }
-    );
-  }
-
-  async getDownloadUrl(documentId: string): Promise<{ downloadUrl: string }> {
-    return this.request<{ downloadUrl: string }>(
-      `/v1/tenants/${this.config.tenantId}/documents/${documentId}/download-url`
-    );
-  }
-
-  async listTenants(): Promise<{ tenantId: string; name: string; status: string }[]> {
-    const res = await this.request<unknown>("/v1/admin/tenants");
-    if (Array.isArray(res)) return res as { tenantId: string; name: string; status: string }[];
-    if (res && typeof res === "object" && "items" in res && Array.isArray((res as { items: unknown[] }).items)) {
-      return (res as { items: { tenantId: string; name: string; status: string }[] }).items;
-    }
-    return [];
-  }
-
-  async getGraphCapabilities(): Promise<GraphCapabilitiesResponse> {
-    return this.request<GraphCapabilitiesResponse>(
-      `/v1/admin/tenants/${this.config.tenantId}/graph/capabilities`
-    );
-  }
-
-  async switchGraphEngine(engine: "postgres" | "neo4j") {
-    return this.request(
-      `/v1/admin/tenants/${this.config.tenantId}/graph/engine`,
-      {
-        method: "POST",
-        body: JSON.stringify({ engine }),
-      }
-    );
-  }
-
-  async getGraphSummary(): Promise<GraphSummaryResponse> {
-    return this.request<GraphSummaryResponse>(
-      `/v1/tenants/${this.config.tenantId}/graph`
-    );
-  }
-
-  async queryGraph(entity: string, maxHops = 2): Promise<GraphQueryResponse> {
-    return this.request<GraphQueryResponse>(
-      `/v1/tenants/${this.config.tenantId}/graph/query`,
-      {
-        method: "POST",
-        body: JSON.stringify({ entity, max_hops: maxHops }),
-      }
-    );
-  }
-
-  async deleteTriple(tripleId: string) {
-    return this.request(
-      `/v1/tenants/${this.config.tenantId}/graph/triples/${tripleId}`,
-      {
-        method: "DELETE",
-      }
-    );
-  }
-
-
-  async purgeCache(): Promise<{ status: string; purged: boolean; deleted_count?: number }> {
-    return this.request<{ status: string; purged: boolean; deleted_count?: number }>(
-      `/v1/tenants/${this.config.tenantId}/cache/purge`,
-      {
-        method: "POST",
-      }
-    );
-  }
-
-  async getCacheStats(): Promise<{ status: string; total_vectors: number }> {
-    return this.request<{ status: string; total_vectors: number }>(
-      `/v1/tenants/${this.config.tenantId}/cache/stats`,
-      {
-        method: "GET",
-      }
-    );
-  }
-
-  async compressContext(text: string, compressionRatio = 0.5): Promise<import("./rag-types").CompressionResponse> {
-    return this.request<import("./rag-types").CompressionResponse>(
-      `/v1/tenants/${this.config.tenantId}/context/compress`,
-      {
-        method: "POST",
-        body: JSON.stringify({ text, target_ratio: compressionRatio }),
-      }
-    );
-  }
-
-  async generateConsensus(
-    query: string,
-    options?: { generatorProvider?: string; criticProvider?: string }
-  ): Promise<import("./rag-types").ConsensusResponse> {
-    return this.request<import("./rag-types").ConsensusResponse>(
-      `/v1/tenants/${this.config.tenantId}/consensus/generate`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tenant_id: this.config.tenantId,
-          prompt: query,
-          query,
-          generator_provider_name: options?.generatorProvider,
-          critic_provider_name: options?.criticProvider,
-        }),
-      }
-    );
-  }
-
-
-  async executeRlmSubroutine(
-    query: string,
-    maxSteps = 3
-  ): Promise<import("./rag-types").RlmExecutionResponse> {
-    return this.request<import("./rag-types").RlmExecutionResponse>(
-      `/v1/tenants/${this.config.tenantId}/rlm/analyze`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tenant_id: this.config.tenantId,
-          prompt: query,
-          max_depth: maxSteps,
-        }),
-      }
-    );
-  }
-
-  async getOnlineEvaluationSummary(): Promise<import("./rag-types").OnlineEvaluationSummaryResponse> {
-    return this.request<import("./rag-types").OnlineEvaluationSummaryResponse>(
-      `/v1/tenants/${this.config.tenantId}/evaluations/summary`
-    );
-  }
-
-  async computeGroundingDiff(
-    answer: string,
-    contexts: string[] = []
-  ): Promise<import("./rag-types").GroundingDiffResponse> {
-    return this.request<import("./rag-types").GroundingDiffResponse>(
-      `/v1/tenants/${this.config.tenantId}/evaluations/grounding-diff`,
-      {
-        method: "POST",
-        body: JSON.stringify({ answer, contexts }),
-      }
-    );
-  }
-
-
-  async listLoraAdapters(): Promise<import("./rag-types").LoraAdapterInfo[]> {
-    return this.request<import("./rag-types").LoraAdapterInfo[]>(
-      `/v1/admin/tenants/${this.config.tenantId}/lora/adapters`
-    );
-  }
-
-  async trainLoraAdapter(payload: {
-    name?: string;
-    domain_tag?: string;
-    rank?: number;
-    epochs?: number;
-    learning_rate?: number;
-  }): Promise<import("./rag-types").LoraTrainResponse> {
-    return this.request<import("./rag-types").LoraTrainResponse>(
-      `/v1/admin/tenants/${this.config.tenantId}/lora/train`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async projectEmbeddings(
-    options?: import("./rag-types").EmbeddingProjectionRequest
-  ): Promise<import("./rag-types").EmbeddingProjectionResponse> {
-    return this.request<import("./rag-types").EmbeddingProjectionResponse>(
-      `/v1/tenants/${this.config.tenantId}/embeddings/project`,
-      {
-        method: "POST",
-        body: JSON.stringify(options || {}),
-      }
-    );
-  }
-
-  async classifyIntent(
-    prompt: string,
-    model?: string
-  ): Promise<import("./rag-types").IntentClassificationResponse> {
-    return this.request<import("./rag-types").IntentClassificationResponse>(
-      `/v1/tenants/${this.config.tenantId}/intent/classify`,
-      {
-        method: "POST",
-        body: JSON.stringify({ prompt, ...(model ? { model } : {}) }),
-      }
-    );
-  }
-
-  // ── Milestone 91: LangGraph Cyclic Agentic Workflows & HITL State Engine ────
-
-  async listAgentTools(): Promise<import("./rag-types").ToolDefinition[]> {
-    return this.request<import("./rag-types").ToolDefinition[]>(
-      `/v1/tenants/${this.config.tenantId}/agentic/tools`
-    );
-  }
-
-  async executeAgentWorkflow(
-    prompt: string,
-    options?: {
-      threadId?: string;
-      maxSteps?: number;
-      allowedTools?: string[];
-    }
-  ): Promise<import("./rag-types").AgentExecutionResult> {
-    return this.request<import("./rag-types").AgentExecutionResult>(
-      `/v1/tenants/${this.config.tenantId}/agentic/execute`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tenant_id: this.config.tenantId,
-          prompt,
-          thread_id: options?.threadId,
-          max_steps: options?.maxSteps ?? 10,
-          allowed_tools: options?.allowedTools,
-        }),
-      }
-    );
-  }
-
-  async streamAgenticWorkflow(
-    prompt: string,
-    onEvent: (event: import("./rag-types").ReActStreamEvent) => void,
-    signal?: AbortSignal,
-    options?: {
-      maxTurns?: number;
-      timeoutSeconds?: number;
-      allowedTools?: string[];
-    }
-  ): Promise<string> {
-    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/agentic/stream`;
-    const validUserId = requireUserId(this.config.userId);
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${this.config.apiKey}`,
-      "X-User-ID": validUserId,
-      Accept: "text/event-stream",
-    };
-    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
-    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
-
-    const res = await fetchWithRetry(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        prompt,
-        max_turns: options?.maxTurns ?? 8,
-        timeout_seconds: options?.timeoutSeconds ?? 30.0,
-        allowed_tools: options?.allowedTools,
-      }),
-      signal,
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "Unknown error");
-      throw new Error(`ReAct stream failed (${res.status}): ${errText}`);
-    }
-
-    const reader = res.body?.getReader();
-    if (!reader) throw new Error("No response body from ReAct stream");
-
-    const decoder = new TextDecoder();
-    let finalAnswer = "";
-    let buffer = "";
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data:")) continue;
-          const dataStr = trimmed.replace(/^data:\s*/, "");
-          if (dataStr === "[DONE]") break;
-
-          try {
-            const eventObj = JSON.parse(dataStr) as import("./rag-types").ReActStreamEvent;
-            onEvent(eventObj);
-            if (eventObj.event_type === "final_answer" && eventObj.data?.final_answer) {
-              finalAnswer = eventObj.data.final_answer;
-            }
-          } catch {
-            // ignore malformed frame
-          }
-        }
-      }
-    } finally {
-      reader.releaseLock();
-    }
-
-    return finalAnswer;
-  }
-
-  async resumeAgentWorkflow(
-    threadId: string,
-    decision: import("./rag-types").HITLApprovalDecision
-  ): Promise<import("./rag-types").AgentExecutionResult> {
-    return this.request<import("./rag-types").AgentExecutionResult>(
-      `/v1/tenants/${this.config.tenantId}/agentic/threads/${threadId}/resume`,
-      {
-        method: "POST",
-        body: JSON.stringify(decision),
-      }
-    );
-  }
-
-  async getAgentThreadHistory(
-    threadId: string
-  ): Promise<import("./rag-types").ThreadHistoryResponse> {
-    return this.request<import("./rag-types").ThreadHistoryResponse>(
-      `/v1/tenants/${this.config.tenantId}/agentic/threads/${threadId}/history`
-    );
-  }
-
-  async rollbackAgentThread(
-    threadId: string,
-    checkpointId: string,
-    fork = false
-  ): Promise<import("./rag-types").ThreadCheckpointItem> {
-    return this.request<import("./rag-types").ThreadCheckpointItem>(
-      `/v1/tenants/${this.config.tenantId}/agentic/threads/${threadId}/rollback`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          target_checkpoint_id: checkpointId,
-          fork,
-        }),
-      }
-    );
-  }
-
-  async getAgenticEconomicLedger(
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").EconomicLedgerSummary> {
-    return this.request<import("./rag-types").EconomicLedgerSummary>(
-      `/v1/tenants/${this.config.tenantId}/agentic/gateway/ledger`,
-      { signal }
-    );
-  }
-
-  async classifyAgenticComplexity(
-    query: string,
-    allowedTools?: string[],
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").TaskComplexity> {
-    return this.request<import("./rag-types").TaskComplexity>(
-      `/v1/tenants/${this.config.tenantId}/agentic/gateway/classify`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          query,
-          allowed_tools: allowedTools,
-        }),
-        signal,
-      }
-    );
-  }
-
-  // ── Milestone 108: Cognitive Agent Memory Consolidation & Experience Distillation ────
-
-  async getMemoryStats(
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").MemoryStats> {
-    return this.request<import("./rag-types").MemoryStats>(
-      `/v1/tenants/${this.config.tenantId}/memory/stats`,
-      { signal }
-    );
-  }
-
-  async listMemoryNodes(
-    params?: { type?: import("./rag-types").MemoryType; query?: string; limit?: number },
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").MemoryNode[]> {
-    const searchParams = new URLSearchParams();
-    if (params?.type) searchParams.set("type", params.type);
-    if (params?.query) searchParams.set("query", params.query);
-    if (params?.limit) searchParams.set("limit", params.limit.toString());
-    const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : "";
-    return this.request<import("./rag-types").MemoryNode[]>(
-      `/v1/tenants/${this.config.tenantId}/memory/nodes${queryStr}`,
-      { signal }
-    );
-  }
-
-  async testMemoryGuidance(
-    query: string,
-    limit: number = 3,
-    minSimilarity: number = 0.65,
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").DistilledGuidance> {
-    return this.request<import("./rag-types").DistilledGuidance>(
-      `/v1/tenants/${this.config.tenantId}/memory/guidance`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          query,
-          limit,
-          min_similarity: minSimilarity,
-        }),
-        signal,
-      }
-    );
-  }
-
-  async consolidateMemoryTrace(
-    payload: Omit<import("./rag-types").ConsolidationRequestPayload, "tenant_id">,
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").ConsolidationResponse> {
-    return this.request<import("./rag-types").ConsolidationResponse>(
-      `/v1/tenants/${this.config.tenantId}/memory/consolidate`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tenant_id: this.config.tenantId,
-          ...payload,
-        }),
-        signal,
-      }
-    );
-  }
-
-  async deleteMemoryNode(
-    nodeId: string,
-    signal?: AbortSignal
-  ): Promise<{ deleted: boolean; node_id: string }> {
-    return this.request<{ deleted: boolean; node_id: string }>(
-      `/v1/tenants/${this.config.tenantId}/memory/nodes/${nodeId}`,
-      {
-        method: "DELETE",
-        signal,
-      }
-    );
-  }
-
-  async pruneMemories(
-    minRetention: number = 0.15,
-    signal?: AbortSignal
-  ): Promise<{ pruned_count: number; min_retention: number }> {
-    return this.request<{ pruned_count: number; min_retention: number }>(
-      `/v1/tenants/${this.config.tenantId}/memory/prune`,
-      {
-        method: "POST",
-        body: JSON.stringify({ min_retention: minRetention }),
-        signal,
-      }
-    );
-  }
-
-  // ── Milestone 109: Multi-Agent Swarm Quorum & Dynamic Debate Consensus ────
-
-  async executeSwarmDebate(
-    payload: Omit<import("./rag-types").SwarmDebateRequest, "tenant_id">,
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").QuorumConsensusResult> {
-    return this.request<import("./rag-types").QuorumConsensusResult>(
-      `/v1/tenants/${this.config.tenantId}/agentic/swarm/debate`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tenant_id: this.config.tenantId,
-          ...payload,
-        }),
-        signal,
-      }
-    );
-  }
-
-  async getSwarmRoles(
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").SwarmAgentProfile[]> {
-    return this.request<import("./rag-types").SwarmAgentProfile[]>(
-      `/v1/tenants/${this.config.tenantId}/agentic/swarm/roles`,
-      { signal }
-    );
-  }
-
-  async getSwarmStats(
-    signal?: AbortSignal
-  ): Promise<import("./rag-types").SwarmStats> {
-    return this.request<import("./rag-types").SwarmStats>(
-      `/v1/tenants/${this.config.tenantId}/agentic/swarm/stats`,
-      { signal }
-    );
-  }
-
-  // ── Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline ────
-
-  async compilePrompt(
-    payload: import("./rag-types").PromptCompilationRequest
-  ): Promise<import("./rag-types").PromptCompilationResult> {
-    return this.request<import("./rag-types").PromptCompilationResult>(
-      `/v1/tenants/${this.config.tenantId}/prompts/compile`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async getCompiledPrompts(): Promise<import("./rag-types").CompiledPromptProgram[]> {
-    return this.request<import("./rag-types").CompiledPromptProgram[]>(
-      `/v1/tenants/${this.config.tenantId}/prompts/compiled`
-    );
-  }
-
-  async getActiveCompiledPrompt(): Promise<import("./rag-types").CompiledPromptProgram | null> {
-    return this.request<import("./rag-types").CompiledPromptProgram | null>(
-      `/v1/tenants/${this.config.tenantId}/prompts/compiled/active`
-    );
-  }
-
-  async activateCompiledPrompt(
-    programId: string
-  ): Promise<import("./rag-types").CompiledPromptProgram> {
-    return this.request<import("./rag-types").CompiledPromptProgram>(
-      `/v1/tenants/${this.config.tenantId}/prompts/compiled/${encodeURIComponent(programId)}/activate`,
-      {
-        method: "POST",
-      }
-    );
-  }
-
-  async deactivateCompiledPrompt(
-    programId: string
-  ): Promise<import("./rag-types").CompiledPromptProgram> {
-    return this.request<import("./rag-types").CompiledPromptProgram>(
-      `/v1/tenants/${this.config.tenantId}/prompts/compiled/${encodeURIComponent(programId)}/deactivate`,
-      {
-        method: "POST",
-      }
-    );
-  }
-
-  async deleteCompiledPrompt(
-    programId: string
-  ): Promise<{ success: boolean; program_id: string }> {
-    return this.request<{ success: boolean; program_id: string }>(
-      `/v1/tenants/${this.config.tenantId}/prompts/compiled/${encodeURIComponent(programId)}`,
-      {
-        method: "DELETE",
-      }
-    );
-  }
-
-  // ── Milestone 93: Enterprise LLM Gateway & Smart Router ────
-
-  async getGatewayModels(): Promise<import("./rag-types").GatewayModelInfo[]> {
-    return this.request<import("./rag-types").GatewayModelInfo[]>("/v1/gateway/models");
-  }
-
-  async probeGateway(): Promise<import("./rag-types").GatewayProbeResult[]> {
-    return this.request<import("./rag-types").GatewayProbeResult[]>("/v1/gateway/probe", {
-      method: "POST",
-      body: JSON.stringify({}),
-    });
-  }
-
-  async getTenantGatewayRoutes(
-    tenantId?: string
-  ): Promise<import("./rag-types").TenantGatewayRoutesResponse> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").TenantGatewayRoutesResponse>(
-      `/v1/tenants/${tid}/gateway/routes`
-    );
-  }
-
-  async updateTenantGatewayRoutes(
-    payload: import("./rag-types").UpdateGatewayRoutesPayload,
-    tenantId?: string
-  ): Promise<{ status: string; tenant_id: string; gateway_settings: Record<string, unknown>; budget_settings: Record<string, unknown> }> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<{ status: string; tenant_id: string; gateway_settings: Record<string, unknown>; budget_settings: Record<string, unknown> }>(
-      `/v1/tenants/${tid}/gateway/routes`,
-      {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async getTenantGatewayBudget(
-    tenantId?: string
-  ): Promise<import("./rag-types").VirtualTenantBudget> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").VirtualTenantBudget>(
-      `/v1/tenants/${tid}/gateway/budget`
-    );
-  }
-
-  // ── Milestone 94: NeMo Guardrails & Safety API Methods ─────────────────────
-
-  async getGuardrailTemplates(): Promise<Record<string, import("./rag-types").ColangTemplate>> {
-    return this.request<Record<string, import("./rag-types").ColangTemplate>>("/v1/guardrails/templates");
-  }
-
-  async getGuardrailConfig(tenantId?: string): Promise<import("./rag-types").TenantGuardrailsConfig> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").TenantGuardrailsConfig>(`/v1/tenants/${tid}/guardrails/config`);
-  }
-
-  async updateGuardrailConfig(
-    payload: Partial<import("./rag-types").TenantGuardrailsConfig>,
-    tenantId?: string
-  ): Promise<import("./rag-types").TenantGuardrailsConfig> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").TenantGuardrailsConfig>(`/v1/tenants/${tid}/guardrails/config`, {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    });
-  }
-
-  async validateGuardrailInput(
-    query: string,
-    history?: Array<{ role: string; content: string }>,
-    tenantId?: string
-  ): Promise<import("./rag-types").GuardrailCheckResult> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").GuardrailCheckResult>(`/v1/tenants/${tid}/guardrails/validate-input`, {
-      method: "POST",
-      body: JSON.stringify({ query, conversation_history: history }),
-    });
-  }
-
-  async validateGuardrailOutput(
-    query: string,
-    generatedResponse: string,
-    retrievedContexts: string[] = [],
-    tenantId?: string
-  ): Promise<import("./rag-types").GuardrailCheckResult> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").GuardrailCheckResult>(`/v1/tenants/${tid}/guardrails/validate-output`, {
-      method: "POST",
-      body: JSON.stringify({
-        query,
-        generated_response: generatedResponse,
-        retrieved_contexts: retrievedContexts,
-      }),
-    });
-  }
-
-  async testGuardrailFlow(
-    query: string,
-    customColang?: string,
-    tenantId?: string
-  ): Promise<import("./rag-types").GuardrailCheckResult> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").GuardrailCheckResult>(`/v1/tenants/${tid}/guardrails/test-flow`, {
-      method: "POST",
-      body: JSON.stringify({ query, custom_colang: customColang }),
-    });
-  }
-
-  async getGuardrailTelemetry(tenantId?: string): Promise<import("./rag-types").GuardrailTelemetry> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").GuardrailTelemetry>(`/v1/tenants/${tid}/guardrails/telemetry`);
-  }
-
-  // ── Milestone 95: Durable Asynchronous Workflows & Jobs Methods ─────────────
-
-  async listWorkflowBlueprints(tenantId?: string): Promise<import("./rag-types").WorkflowDefinition[]> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").WorkflowDefinition[]>(`/v1/tenants/${tid}/workflows/blueprints`);
-  }
-
-  async startWorkflow(
-    workflowName: string,
-    inputPayload: Record<string, unknown> = {},
-    idempotencyKey?: string | null,
-    webhookUrl?: string | null,
-    tenantId?: string
-  ): Promise<import("./rag-types").WorkflowExecution> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").WorkflowExecution>(`/v1/tenants/${tid}/workflows/${workflowName}/run`, {
-      method: "POST",
-      body: JSON.stringify({
-        input_payload: inputPayload,
-        idempotency_key: idempotencyKey,
-        webhook_url: webhookUrl,
-      }),
-    });
-  }
-
-  async listWorkflowExecutions(
-    params: { limit?: number; offset?: number; status?: string; tenantId?: string } = {}
-  ): Promise<import("./rag-types").WorkflowListResponse> {
-    const tid = params.tenantId || this.config.tenantId;
-    const query = new URLSearchParams();
-    if (params.limit) query.set("limit", String(params.limit));
-    if (params.offset) query.set("offset", String(params.offset));
-    if (params.status) query.set("status", params.status);
-    const qs = query.toString();
-    return this.request<import("./rag-types").WorkflowListResponse>(
-      `/v1/tenants/${tid}/workflows/executions${qs ? `?${qs}` : ""}`
-    );
-  }
-
-  async getWorkflowExecution(
-    executionId: string,
-    tenantId?: string
-  ): Promise<import("./rag-types").WorkflowExecution> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").WorkflowExecution>(
-      `/v1/tenants/${tid}/workflows/executions/${executionId}`
-    );
-  }
-
-  async retryWorkflowExecution(
-    executionId: string,
-    tenantId?: string
-  ): Promise<import("./rag-types").WorkflowExecution> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").WorkflowExecution>(
-      `/v1/tenants/${tid}/workflows/executions/${executionId}/retry`,
-      { method: "POST" }
-    );
-  }
-
-  async cancelWorkflowExecution(
-    executionId: string,
-    tenantId?: string
-  ): Promise<import("./rag-types").WorkflowExecution> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").WorkflowExecution>(
-      `/v1/tenants/${tid}/workflows/executions/${executionId}/cancel`,
-      { method: "POST" }
-    );
-  }
-
-  async getWorkflowOverview(): Promise<import("./rag-types").WorkflowOverviewResponse> {
-    return this.request<import("./rag-types").WorkflowOverviewResponse>("/v1/admin/workflows/overview");
-  }
-
-  // ── Milestone 96: Serverless GPU Serving & Custom vLLM / LoRA ────
-
-  async getServerlessStatus(): Promise<import("./rag-types").ServerlessDeploymentStatus> {
-    return this.request<import("./rag-types").ServerlessDeploymentStatus>("/v1/admin/serverless/status");
-  }
-
-  async probeServerlessGpu(): Promise<import("./rag-types").WarmBootMetrics> {
-    return this.request<import("./rag-types").WarmBootMetrics>("/v1/admin/serverless/probe", {
-      method: "POST",
-    });
-  }
-
-  async getServerlessCostSavings(
-    activeComputeHours: number = 15.0,
-    gpuTier: import("./rag-types").ServerlessGpuTier = "A10G"
-  ): Promise<import("./rag-types").ServerlessCostComparison> {
-    const qs = new URLSearchParams({
-      active_compute_hours: String(activeComputeHours),
-      gpu_tier: gpuTier,
-    }).toString();
-    return this.request<import("./rag-types").ServerlessCostComparison>(
-      `/v1/admin/serverless/cost-savings?${qs}`
-    );
-  }
-
-  async getTenantLoraAdapters(tenantId?: string): Promise<import("./rag-types").LoraAdapterMetadata[]> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").LoraAdapterMetadata[]>(
-      `/v1/tenants/${tid}/lora-adapters`
-    );
-  }
-
-  async getActiveTenantLoraAdapter(tenantId?: string): Promise<import("./rag-types").LoraAdapterMetadata | null> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").LoraAdapterMetadata | null>(
-      `/v1/tenants/${tid}/lora-adapters/active`
-    );
-  }
-
-  async registerTenantLoraAdapter(
-    payload: {
-      name: string;
-      base_model: string;
-      artifact_uri: string;
-      rank?: number;
-      alpha?: number;
-      target_modules?: string[];
-      adapter_type?: string;
-      description?: string;
-      activate_immediately?: boolean;
-    },
-    tenantId?: string
-  ): Promise<import("./rag-types").LoraAdapterMetadata> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").LoraAdapterMetadata>(
-      `/v1/tenants/${tid}/lora-adapters`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async activateTenantLoraAdapter(
-    adapterId: string,
-    tenantId?: string
-  ): Promise<import("./rag-types").LoraAdapterMetadata> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<import("./rag-types").LoraAdapterMetadata>(
-      `/v1/tenants/${tid}/lora-adapters/${adapterId}/activate`,
-      { method: "POST" }
-    );
-  }
-
-  async deactivateTenantLoraAdapter(
-    adapterId: string,
-    tenantId?: string
-  ): Promise<{ status: string; adapter_id: string }> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<{ status: string; adapter_id: string }>(
-      `/v1/tenants/${tid}/lora-adapters/${adapterId}/deactivate`,
-      { method: "POST" }
-    );
-  }
-
-  async deleteTenantLoraAdapter(
-    adapterId: string,
-    tenantId?: string
-  ): Promise<{ deleted: boolean; adapter_id: string }> {
-    const tid = tenantId || this.config.tenantId;
-    return this.request<{ deleted: boolean; adapter_id: string }>(
-      `/v1/tenants/${tid}/lora-adapters/${adapterId}`,
-      { method: "DELETE" }
-    );
-  }
-
-  // ── Milestone 97: Autonomous FDE Metaprogrammer & Capability Studio Methods ──
-
-  async analyzeScaffoldingRequirement(
-    req: import("./rag-types").UseCaseRequirement
-  ): Promise<import("./rag-types").ScaffoldingAnalysisResponse> {
-    return this.request<import("./rag-types").ScaffoldingAnalysisResponse>("/v1/scaffold/analyze", {
-      method: "POST",
-      body: JSON.stringify(req),
-    });
-  }
-
-  async generateScaffoldingPlan(
-    req: import("./rag-types").UseCaseRequirement
-  ): Promise<import("./rag-types").ScaffoldingPlan> {
-    return this.request<import("./rag-types").ScaffoldingPlan>("/v1/scaffold/generate", {
-      method: "POST",
-      body: JSON.stringify(req),
-    });
-  }
-
-  async verifyScaffoldingCode(
-    files: import("./rag-types").ScaffoldedFile[]
-  ): Promise<import("./rag-types").AstValidationResult> {
-    return this.request<import("./rag-types").AstValidationResult>("/v1/scaffold/verify", {
-      method: "POST",
-      body: JSON.stringify(files),
-    });
-  }
-
-  async applyScaffoldingPlan(
-    plan: import("./rag-types").ScaffoldingPlan,
-    dryRun = false
-  ): Promise<import("./rag-types").ScaffoldingApplyResponse> {
-    return this.request<import("./rag-types").ScaffoldingApplyResponse>(
-      `/v1/scaffold/apply?dry_run=${dryRun}`,
-      {
-        method: "POST",
-        body: JSON.stringify(plan),
-      }
-    );
-  }
-
-  async reloadCustomPlugins(): Promise<{ success: boolean; mounted_count: number; mounted_plugins: string[] }> {
-    return this.request<{ success: boolean; mounted_count: number; mounted_plugins: string[] }>(
-      "/v1/scaffold/reload",
-      { method: "POST" }
-    );
-  }
-
-  async listCustomPlugins(): Promise<import("./rag-types").CustomPluginSummary[]> {
-    return this.request<import("./rag-types").CustomPluginSummary[]>("/v1/scaffold/plugins", {
-      method: "GET",
-    });
-  }
-
-  async deleteCustomPlugin(
-    pluginId: string
-  ): Promise<{ success: boolean; deleted: boolean; plugin_id: string }> {
-    return this.request<{ success: boolean; deleted: boolean; plugin_id: string }>(
-      `/v1/scaffold/plugins/${pluginId}`,
-      { method: "DELETE" }
-    );
-  }
-
-  async getScaffoldingStatus(): Promise<{
-    battery_id: string;
-    name: string;
-    status: string;
-    version: string;
-    milestone: string;
-  }> {
-    return this.request<{
-      battery_id: string;
-      name: string;
-      status: string;
-      version: string;
-      milestone: string;
-    }>("/v1/scaffold/status", { method: "GET" });
-  }
-
-  // --- Milestone 98: Sovereign Edge SQLite & Vector Sync Engine ---
-
-  async getEdgeNodes(): Promise<import("./rag-types").EdgeNodeMetadata[]> {
-    return this.request<import("./rag-types").EdgeNodeMetadata[]>(
-      `/v1/tenants/${this.tenantId}/edge/nodes`,
-      { method: "GET" }
-    );
-  }
-
-  async registerEdgeNode(payload: {
-    node_id: string;
-    device_name: string;
-    platform?: string;
-    tier?: import("./rag-types").OfflineExecutionTier;
-    client_version?: string;
-    hardware_specs?: Record<string, unknown>;
-  }): Promise<import("./rag-types").EdgeNodeMetadata> {
-    return this.request<import("./rag-types").EdgeNodeMetadata>(
-      `/v1/tenants/${this.tenantId}/edge/nodes/register`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async getEdgeDelta(sinceSeq: number = 0, limit: number = 1000, nodeId?: string): Promise<import("./rag-types").EdgeSyncDelta> {
-    const params = new URLSearchParams({
-      since_seq: sinceSeq.toString(),
-      limit: limit.toString(),
-    });
-    if (nodeId) params.append("node_id", nodeId);
-    return this.request<import("./rag-types").EdgeSyncDelta>(
-      `/v1/tenants/${this.tenantId}/edge/delta?${params.toString()}`,
-      { method: "GET" }
-    );
-  }
-
-  async generateEdgeBundleManifest(): Promise<import("./rag-types").EdgeBundleManifest> {
-    return this.request<import("./rag-types").EdgeBundleManifest>(
-      `/v1/tenants/${this.tenantId}/edge/bundle`,
-      { method: "POST" }
-    );
-  }
-
-  async downloadEdgeBundle(): Promise<Blob> {
-    const res = await fetch(`${this.config.apiUrl}/v1/tenants/${this.tenantId}/edge/bundle?download=true`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${this.config.apiKey}`,
-        "X-Tenant-ID": this.tenantId,
-      },
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to download sovereign edge bundle: HTTP ${res.status}`);
-    }
-    return res.blob();
-  }
-
-  async searchEdgeSimulated(request: {
-    query: string;
-    top_k?: number;
-    use_hybrid?: boolean;
-    alpha?: number;
-  }): Promise<import("./rag-types").EdgeSearchResponse> {
-    return this.request<import("./rag-types").EdgeSearchResponse>(
-      `/v1/tenants/${this.tenantId}/edge/search`,
-      {
-        method: "POST",
-        body: JSON.stringify(request),
-      }
-    );
-  }
-
-  async reconcileEdgeMutations(
-    mutations: import("./rag-types").EdgeMutation[]
-  ): Promise<import("./rag-types").EdgeSyncConflictResolution[]> {
-    return this.request<import("./rag-types").EdgeSyncConflictResolution[]>(
-      `/v1/tenants/${this.tenantId}/edge/mutations`,
-      {
-        method: "POST",
-        body: JSON.stringify(mutations),
-      }
-    );
-  }
-
-  // ── Milestone 99: Distributed Multi-Cloud Failover & Edge Turso LibSQL ────
-
-  async getMultiCloudClusters(): Promise<import("./rag-types").MultiCloudClusterOverviewResponse> {
-    return this.request<import("./rag-types").MultiCloudClusterOverviewResponse>(
-      "/v1/admin/multicloud/clusters"
-    );
-  }
-
-  async probeMultiCloudRegions(): Promise<import("./rag-types").RegionHealthProbe[]> {
-    return this.request<import("./rag-types").RegionHealthProbe[]>(
-      "/v1/admin/multicloud/probe",
-      {
-        method: "POST",
-        body: JSON.stringify({}),
-      }
-    );
-  }
-
-  async triggerMultiCloudFailover(
-    request: import("./rag-types").FailoverRequest
-  ): Promise<import("./rag-types").FailoverResult> {
-    return this.request<import("./rag-types").FailoverResult>(
-      "/v1/admin/multicloud/failover",
-      {
-        method: "POST",
-        body: JSON.stringify(request),
-      }
-    );
-  }
-
-  async getLibsqlReplicationStatus(): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>(
-      "/v1/admin/multicloud/replication-status"
-    );
-  }
-
-  async getTenantLibsqlConfig(): Promise<import("./rag-types").LibsqlReplicaConfig> {
-    return this.request<import("./rag-types").LibsqlReplicaConfig>(
-      `/v1/tenants/${this.tenantId}/multicloud/replica-config`
-    );
-  }
-
-  async syncTenantLibsqlReplica(): Promise<import("./rag-types").LibsqlReplicationStats> {
-    return this.request<import("./rag-types").LibsqlReplicationStats>(
-      `/v1/tenants/${this.tenantId}/multicloud/sync`,
-      {
-        method: "POST",
-      }
-    );
-  }
-
-  // ── Milestone 100: Sovereign Edge Voice & Local Whisper / WebRTC Speech Synthesis ──
-
-  async createVoiceSession(
-    config?: Partial<import("./rag-types").VoiceSessionConfig>
-  ): Promise<import("./rag-types").VoiceSession> {
-    return this.request<import("./rag-types").VoiceSession>(
-      `/v1/tenants/${this.tenantId}/voice/session`,
-      {
-        method: "POST",
-        body: JSON.stringify(config || {}),
-      }
-    );
-  }
-
-  async sendVoiceSignal(
-    payload: import("./rag-types").WebRtcSignalingMessage
-  ): Promise<import("./rag-types").WebRtcSignalingMessage> {
-    return this.request<import("./rag-types").WebRtcSignalingMessage>(
-      `/v1/tenants/${this.tenantId}/voice/signal`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async transcribeAudio(
-    audioBase64: string,
-    sampleRateHz: number = 16000
-  ): Promise<import("./rag-types").TranscriptionResult> {
-    return this.request<import("./rag-types").TranscriptionResult>(
-      `/v1/tenants/${this.tenantId}/voice/transcribe`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          audio_base64: audioBase64,
-          sample_rate_hz: sampleRateHz,
-        }),
-      }
-    );
-  }
-
-  async synthesizeSpeech(
-    text: string,
-    options?: {
-      selected_voice?: import("./rag-types").VoiceTimbre;
-      speed?: number;
-    }
-  ): Promise<{
-    text: string;
-    chunks_count: number;
-    total_bytes: number;
-    audio_base64: string;
-    sample_rate_hz: number;
-    format: string;
-  }> {
-    return this.request(
-      `/v1/tenants/${this.tenantId}/voice/synthesize`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          text,
-          selected_voice: options?.selected_voice || "neural_natural",
-          speed: options?.speed ?? 1.0,
-        }),
-      }
-    );
-  }
-
-  async sendVoiceTurn(request: {
-    session_id: string;
-    audio_base64?: string;
-    text_override?: string;
-    selected_voice?: import("./rag-types").VoiceTimbre;
-    speed?: number;
-  }): Promise<import("./rag-types").VoiceTurnResponse> {
-    return this.request<import("./rag-types").VoiceTurnResponse>(
-      `/v1/tenants/${this.tenantId}/voice/turn`,
-      {
-        method: "POST",
-        body: JSON.stringify(request),
-      }
-    );
-  }
-
-  async getVoiceSession(
-    sessionId: string
-  ): Promise<{
-    session: import("./rag-types").VoiceSession;
-    turns: import("./rag-types").VoiceTurn[];
-  }> {
-    return this.request(
-      `/v1/tenants/${this.tenantId}/voice/session/${sessionId}`
-    );
-  }
-
-  async getVoiceTelemetry(): Promise<import("./rag-types").VoiceSessionTelemetry> {
-    return this.request<import("./rag-types").VoiceSessionTelemetry>(
-      "/v1/admin/voice/telemetry"
-    );
-  }
-
-  // ── Milestone 114: Real-Time Audio Streaming & Full-Duplex Voice Agent ───────
-
-  createVoiceStream(
-    sessionId: string,
-    callbacks: import("./rag-types").VoiceStreamCallbacks,
-    options?: {
-      sensitivity?: number;
-      silenceThresholdMs?: number;
-      voice?: import("./rag-types").VoiceTimbre;
-      speed?: number;
-    }
-  ): import("./rag-types").VoiceStreamSession {
-    const apiUrl = this.config.apiUrl || "http://localhost:8000";
-    const wsProto = apiUrl.startsWith("https") ? "wss" : "ws";
-    const host = apiUrl.replace(/^https?:\/\//, "").replace(/\/+$/, "");
-    const params = new URLSearchParams({
-      token: this.config.apiKey,
-      sensitivity: String(options?.sensitivity ?? 0.65),
-      silence_threshold_ms: String(options?.silenceThresholdMs ?? 400),
-      voice: options?.voice ?? "neural_natural",
-      speed: String(options?.speed ?? 1.0),
-    });
-    const url = `${wsProto}://${host}/v1/tenants/${this.tenantId}/voice/stream/${sessionId}?${params.toString()}`;
-
-    const WebSocketImpl =
-      typeof WebSocket !== "undefined"
-        ? WebSocket
-        : (globalThis as unknown as { WebSocket: typeof WebSocket }).WebSocket;
-    if (!WebSocketImpl) {
-      throw new Error("WebSocket implementation not found in global scope");
-    }
-
-    const ws = new WebSocketImpl(url);
-    ws.binaryType = "arraybuffer";
-
-    ws.onmessage = (event: MessageEvent) => {
-      if (typeof event.data === "string") {
-        try {
-          const msg = JSON.parse(event.data) as import("./rag-types").VoiceStreamControlMessage;
-          switch (msg.event_type) {
-            case "session_ready":
-              callbacks.onSessionReady?.(
-                msg.payload as { codec: string; sample_rate_hz: number; channels: number }
-              );
-              break;
-            case "vad_state":
-              callbacks.onVadState?.(
-                msg.payload?.state as "speech_detected" | "endpoint_detected",
-                msg.payload
-              );
-              break;
-            case "transcript_partial":
-            case "transcript_final":
-              callbacks.onTranscript?.({
-                text: String(msg.payload?.text ?? ""),
-                confidence: Number(msg.payload?.confidence ?? 1.0),
-                is_final: msg.event_type === "transcript_final",
-                latency_ms: msg.payload?.latency_ms as number | undefined,
-              });
-              break;
-            case "agent_thinking":
-              callbacks.onAgentThinking?.(msg.payload);
-              break;
-            case "agent_text_delta":
-              callbacks.onAgentTextDelta?.(String(msg.payload?.delta || ""));
-              break;
-            case "interrupted":
-              callbacks.onInterrupted?.(
-                msg.payload as { reason: string; cancelled_turn_id?: string; speech_frames?: number }
-              );
-              break;
-            case "turn_complete":
-              callbacks.onTurnComplete?.(msg.payload?.turn as import("./rag-types").VoiceTurn);
-              break;
-            case "error":
-              callbacks.onError?.(String(msg.payload?.error || "Unknown stream error"));
-              break;
-          }
-        } catch (e: unknown) {
-          callbacks.onError?.(e instanceof Error ? e : String(e));
-        }
-      } else if (event.data instanceof ArrayBuffer || ArrayBuffer.isView(event.data)) {
-        const chunk = event.data instanceof ArrayBuffer ? new Uint8Array(event.data) : new Uint8Array(event.data.buffer);
-        callbacks.onAgentAudioChunk?.(chunk);
-      }
-    };
-
-    ws.onerror = (err: Event | unknown) => {
-      callbacks.onError?.(err instanceof Error ? err : String(err));
-    };
-
-    ws.onclose = () => {
-      callbacks.onClose?.();
-    };
-
-    return {
-      sendAudioFrame: (frameBytes: Uint8Array | ArrayBuffer) => {
-        if (ws.readyState === (ws.OPEN ?? 1)) {
-          ws.send(frameBytes);
-        }
-      },
-      sendTextInput: (text: string) => {
-        if (ws.readyState === (ws.OPEN ?? 1)) {
-          ws.send(JSON.stringify({ event_type: "text_input", text }));
-        }
-      },
-      interrupt: (reason: string = "client_interrupt") => {
-        if (ws.readyState === (ws.OPEN ?? 1)) {
-          ws.send(JSON.stringify({ event_type: "interrupt", reason }));
-        }
-      },
-      ping: () => {
-        if (ws.readyState === (ws.OPEN ?? 1)) {
-          ws.send(JSON.stringify({ event_type: "ping" }));
-        }
-      },
-      close: () => {
-        ws.close();
-      },
-    };
-  }
-
-
-  async getMcpConfig(tenantId?: string): Promise<import("./rag-types").McpConfigResponse> {
-    const targetTenant = tenantId || this.tenantId;
-    return this.request<import("./rag-types").McpConfigResponse>(
-      `/v1/mcp/config?tenant_id=${encodeURIComponent(targetTenant)}`
-    );
-  }
-
-  async getMcpTools(tenantId?: string): Promise<import("./rag-types").McpToolSummary[]> {
-    const targetTenant = tenantId || this.tenantId;
-    return this.request<import("./rag-types").McpToolSummary[]>(
-      `/v1/mcp/tools?tenant_id=${encodeURIComponent(targetTenant)}`
-    );
-  }
-
-  async testMcpTool(
-    toolName: string,
-    argumentsObj: Record<string, unknown> = {},
-    tenantId?: string
-  ): Promise<import("./rag-types").McpToolExecutionResult> {
-    const targetTenant = tenantId || this.tenantId;
-    return this.request<import("./rag-types").McpToolExecutionResult>(
-      `/v1/mcp/test-tool?tenant_id=${encodeURIComponent(targetTenant)}`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tool_name: toolName,
-          arguments: argumentsObj,
-        }),
-      }
-    );
-  }
-
-  // ── Distributed Model Context Protocol (MCP) Mesh & Agent Federation (Battery #30) ────
-
-  async getMeshStatus(): Promise<import("./rag-types").MeshStatusSummary> {
-    return this.request<import("./rag-types").MeshStatusSummary>("/v1/mesh/status");
-  }
-
-  async listMeshNodes(statusFilter?: import("./rag-types").MeshNodeStatus): Promise<import("./rag-types").MeshPeerNode[]> {
-    const query = statusFilter ? `?status=${statusFilter}` : "";
-    return this.request<import("./rag-types").MeshPeerNode[]>(`/v1/mesh/nodes${query}`);
-  }
-
-  async listMeshTools(): Promise<import("./rag-types").McpToolSummary[]> {
-    return this.request<import("./rag-types").McpToolSummary[]>("/v1/mesh/tools");
-  }
-
-  async executeMeshTool(
-    toolName: string,
-    argumentsObj: Record<string, unknown> = {},
-    targetClusterId: string = "cluster_local",
-    policy: import("./rag-types").MeshRoutingPolicy = "local_first"
-  ): Promise<import("./rag-types").McpToolExecutionResult> {
-    return this.request<import("./rag-types").McpToolExecutionResult>(`/v1/mesh/tools/execute?policy=${policy}`, {
-      method: "POST",
-      body: JSON.stringify({
-        call_id: `call_${Math.random().toString(36).slice(2, 10)}`,
-        tool_name: toolName,
-        arguments: argumentsObj,
-        tenant_id: this.tenantId,
-        source_cluster_id: "cluster_web_studio",
-        target_cluster_id: targetClusterId,
-      }),
-    });
-  }
-
-  async delegateFederatedTask(params: {
-    target_cluster_id: string;
-    intent: string;
-    target_agent_role?: string;
-    context_scope?: Record<string, unknown>;
-    max_depth?: number;
-    visited_clusters?: string[];
-  }): Promise<import("./rag-types").FederatedDelegationResponse> {
-    return this.request<import("./rag-types").FederatedDelegationResponse>("/v1/mesh/federation/delegate", {
-      method: "POST",
-      body: JSON.stringify({
-        target_cluster_id: params.target_cluster_id,
-        tenant_id: this.tenantId,
-        intent: params.intent,
-        target_agent_role: params.target_agent_role || "forensic_auditor",
-        context_scope: params.context_scope || {},
-        max_depth: params.max_depth || 2,
-        visited_clusters: params.visited_clusters || [],
-      }),
-    });
-  }
-
-  async getFederatedTaskStatus(delegationId: string): Promise<import("./rag-types").FederatedDelegationResponse> {
-    return this.request<import("./rag-types").FederatedDelegationResponse>(`/v1/mesh/federation/tasks/${delegationId}`);
-  }
-
-  // ── Autonomous Mesh Dynamic Load-Balancing & Autoscaling (Battery #31 / M116) ──
-
-  async getMeshLoadMetrics(): Promise<import("./rag-types").ClusterLoadSummary> {
-    return this.request<import("./rag-types").ClusterLoadSummary>("/v1/mesh/load/metrics");
-  }
-
-  async getAutoscalingEvents(limit: number = 50): Promise<import("./rag-types").AutoscalingEvent[]> {
-    return this.request<import("./rag-types").AutoscalingEvent[]>(`/v1/mesh/load/autoscaling/events?limit=${limit}`);
-  }
-
-  async updateAutoscalingPolicy(
-    policy: import("./rag-types").AutoscalingPolicy
-  ): Promise<import("./rag-types").AutoscalingPolicy> {
-    return this.request<import("./rag-types").AutoscalingPolicy>("/v1/mesh/load/autoscaling/policy", {
-      method: "POST",
-      body: JSON.stringify(policy),
-    });
-  }
-
-  async reapIdleEnclaves(
-    clusterId: string = "cluster-primary"
-  ): Promise<import("./rag-types").AutoscalingEvent[]> {
-    return this.request<import("./rag-types").AutoscalingEvent[]>(
-      `/v1/mesh/load/scale-down/reap?cluster_id=${encodeURIComponent(clusterId)}`,
-      {
-        method: "POST",
-      }
-    );
-  }
-
-  // ── Multimodal Vision GraphRAG & Schematic Ingestion (Battery #29) ─────────
-
-  async extractSchematicText(
-    content: string,
-    filename: string = "architecture.svg",
-    documentId?: string
-  ): Promise<import("./rag-types").SchematicDiagram> {
-    return this.request<import("./rag-types").SchematicDiagram>(
-      `/v1/tenants/${this.tenantId}/vision/schematic/extract-text`,
-      {
-        method: "POST",
-        body: JSON.stringify({ content, filename, document_id: documentId }),
-      }
-    );
-  }
-
-  async queryMultimodalGraph(
-    entityQuery: string,
-    maxHops: number = 2
-  ): Promise<import("./rag-types").MultimodalGraphResponse> {
-    return this.request<import("./rag-types").MultimodalGraphResponse>(
-      `/v1/tenants/${this.tenantId}/vision/graph/query`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          tenant_id: this.tenantId,
-          entity_query: entityQuery,
-          max_hops: maxHops,
-          include_visual_boxes: true,
-        }),
-      }
-    );
-  }
-
-  async getDocumentSchematics(
-    documentId: string
-  ): Promise<{ document_id: string; total_triples: number; triples: import("./rag-types").EntityTripleItem[] }> {
-    return this.request<{ document_id: string; total_triples: number; triples: import("./rag-types").EntityTripleItem[] }>(
-      `/v1/tenants/${this.tenantId}/vision/schematics/${encodeURIComponent(documentId)}`
-    );
-  }
-
-  async getMultimodalVisionStatus(): Promise<{
-    battery_id: string;
-    status: string;
-    version: string;
-    milestone: string;
-  }> {
-    return this.request<{
-      battery_id: string;
-      status: string;
-      version: string;
-      milestone: string;
-    }>("/v1/graph/multimodal/status");
-  }
-
-  // ── Decentralized Vector Sharding & Distributed Raft Consensus (Battery #32 / M117) ──
-
-  async getShardTopology(): Promise<import("./rag-types").ShardTopologyResponse> {
-    return this.request<import("./rag-types").ShardTopologyResponse>("/v1/shards/topology");
-  }
-
-  async queryShardedVectors(
-    query: import("./rag-types").ScatterGatherQuery
-  ): Promise<import("./rag-types").ScatterGatherResponse> {
-    return this.request<import("./rag-types").ScatterGatherResponse>("/v1/shards/query", {
-      method: "POST",
-      body: JSON.stringify(query),
-    });
-  }
-
-  async mutateShardedVectors(
-    mutation: import("./rag-types").ShardMutationRequest
-  ): Promise<import("./rag-types").ShardMutationResponse> {
-    return this.request<import("./rag-types").ShardMutationResponse>("/v1/shards/mutate", {
-      method: "POST",
-      body: JSON.stringify(mutation),
-    });
-  }
-
-  async getRaftConsensusStatus(): Promise<import("./rag-types").RaftConsensusStatus> {
-    return this.request<import("./rag-types").RaftConsensusStatus>("/v1/shards/raft/status");
-  }
-
-  async triggerRaftElection(
-    candidateNodeId: string
-  ): Promise<{ success: boolean; current_term: number; active_leader_id: string }> {
-    return this.request<{ success: boolean; current_term: number; active_leader_id: string }>("/v1/shards/election", {
-      method: "POST",
-      body: JSON.stringify({ candidate_node_id: candidateNodeId }),
-    });
-  }
-
-  async rebalanceShards(
-    payload?: { source_node_id?: string; target_node_id?: string; shard_id?: string }
-  ): Promise<import("./rag-types").ShardRebalancePlan> {
-    return this.request<import("./rag-types").ShardRebalancePlan>("/v1/shards/rebalance", {
-      method: "POST",
-      body: payload ? JSON.stringify(payload) : undefined,
-    });
-  }
-
-  async snapshotShard(shardId: string): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>(`/v1/shards/${encodeURIComponent(shardId)}/snapshot`, {
-      method: "POST",
-    });
-  }
-
-  // --- Zero-Knowledge Proof (ZKP) Vector Attestation & Grounding (Battery #33 / M118) ---
-
-  async getZkpHealth(): Promise<ZkpHealthResponse> {
-    return this.request<ZkpHealthResponse>("/v1/zkp/health");
-  }
-
-  async computeDocumentMerkleRoot(documentId: string, chunks: Record<string, unknown>[] = []): Promise<DocumentMerkleRoot> {
-    return this.request<DocumentMerkleRoot>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/merkle-root/${encodeURIComponent(documentId)}`, {
-      method: "POST",
-      body: JSON.stringify({ chunks }),
-    });
-  }
-
-  async getChunkInclusionProof(chunkId: string, documentId: string, chunks: Record<string, unknown>[] = []): Promise<ChunkMerkleProof> {
-    return this.request<ChunkMerkleProof>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/proof/chunk/${encodeURIComponent(chunkId)}`, {
-      method: "POST",
-      body: JSON.stringify({ document_id: documentId, chunks }),
-    });
-  }
-
-  async issueGroundingCertificate(payload: IssueCertificatePayload): Promise<ZkpGroundingCertificate> {
-    return this.request<ZkpGroundingCertificate>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/attest`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-  }
-
-  async verifyGroundingCertificate(payload: VerifyCertificatePayload): Promise<GroundingVerificationResult> {
-    return this.request<GroundingVerificationResult>("/v1/zkp/verify", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-  }
-
-  async listGroundingCertificates(limit = 50): Promise<ZkpGroundingCertificate[]> {
-    return this.request<ZkpGroundingCertificate[]>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/certificates?limit=${limit}`);
-  }
-
-  // --- Enterprise Identity Federation & RB-VAC (M119, Battery #34) ---
-
-  async getSamlConfig(): Promise<import("./rag-types").SamlIdpConfig> {
-    return this.request<import("./rag-types").SamlIdpConfig>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/config`);
-  }
-
-  async configureSamlIdp(config: Partial<import("./rag-types").SamlIdpConfig>): Promise<import("./rag-types").SamlIdpConfig> {
-    return this.request<import("./rag-types").SamlIdpConfig>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/config`, {
-      method: "POST",
-      body: JSON.stringify(config),
-    });
-  }
-
-  async getSpMetadataXml(): Promise<string> {
-    const res = await fetch(`${this.config.apiUrl}/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/metadata`, {
-      headers: { "X-API-Key": this.config.apiKey },
-    });
-    return res.text();
-  }
-
-  async validateSamlAcs(samlResponseB64: string): Promise<import("./rag-types").SamlAssertionPayload> {
-    return this.request<import("./rag-types").SamlAssertionPayload>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/acs`, {
-      method: "POST",
-      body: JSON.stringify({ saml_response: samlResponseB64 }),
-    });
-  }
-
-  async generateScimToken(): Promise<{ tenant_id: string; token: string; token_type: string }> {
-    return this.request<{ tenant_id: string; token: string; token_type: string }>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/scim/token`,
-      { method: "POST" }
-    );
-  }
-
-  async listScimUsers(startIndex = 1, count = 20, filter?: string): Promise<import("./rag-types").ScimListResponse<import("./rag-types").ScimUser>> {
-    const params = new URLSearchParams({ startIndex: String(startIndex), count: String(count) });
-    if (filter) params.set("filter", filter);
-    return this.request<import("./rag-types").ScimListResponse<import("./rag-types").ScimUser>>(
-      `/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users?${params.toString()}`
-    );
-  }
-
-  async createScimUser(user: Record<string, unknown>): Promise<import("./rag-types").ScimUser> {
-    return this.request<import("./rag-types").ScimUser>(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users`, {
-      method: "POST",
-      body: JSON.stringify(user),
-    });
-  }
-
-  async patchScimUser(userId: string, operations: unknown[]): Promise<import("./rag-types").ScimUser> {
-    return this.request<import("./rag-types").ScimUser>(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users/${encodeURIComponent(userId)}`, {
-      method: "PATCH",
-      body: JSON.stringify({ Operations: operations }),
-    });
-  }
-
-  async deleteScimUser(userId: string): Promise<void> {
-    await this.request(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users/${encodeURIComponent(userId)}`, {
-      method: "DELETE",
-    });
-  }
-
-  async listScimGroups(startIndex = 1, count = 20): Promise<import("./rag-types").ScimListResponse<import("./rag-types").ScimGroup>> {
-    return this.request<import("./rag-types").ScimListResponse<import("./rag-types").ScimGroup>>(
-      `/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Groups?startIndex=${startIndex}&count=${count}`
-    );
-  }
-
-  async createScimGroup(group: Record<string, unknown>): Promise<import("./rag-types").ScimGroup> {
-    return this.request<import("./rag-types").ScimGroup>(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Groups`, {
-      method: "POST",
-      body: JSON.stringify(group),
-    });
-  }
-
-  async simulateRbVac(
-    userId: string,
-    email: string,
-    securityGroups: string[],
-    candidates: import("./rag-types").RbVacCandidateChunk[] = []
-  ): Promise<import("./rag-types").RbVacSimulationResult> {
-    return this.request<import("./rag-types").RbVacSimulationResult>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/rbvac/simulate`, {
-      method: "POST",
-      body: JSON.stringify({ user_id: userId, email, security_groups: securityGroups, candidates }),
-    });
-  }
-
-  // --- Continuous DPO / ORPO Preference Fine-Tuning (M120 / Battery #35) ---
-
-  async getTuningConfig(): Promise<import("./rag-types").ContinuousTuningConfig> {
-    return this.request<import("./rag-types").ContinuousTuningConfig>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/config`
-    );
-  }
-
-  async updateTuningConfig(
-    config: Partial<import("./rag-types").ContinuousTuningConfig>
-  ): Promise<import("./rag-types").ContinuousTuningConfig> {
-    return this.request<import("./rag-types").ContinuousTuningConfig>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/config`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ ...config, tenant_id: this.tenantId }),
-      }
-    );
-  }
-
-  async listPreferencePairs(limit = 50, offset = 0): Promise<import("./rag-types").PreferenceListResponse> {
-    return this.request<import("./rag-types").PreferenceListResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/pairs?limit=${limit}&offset=${offset}`
-    );
-  }
-
-  async harvestPreferencePair(pair: {
-    prompt: string;
-    winning_response: string;
-    losing_response: string;
-    source_message_id?: string;
-    feedback_rating?: number;
-    tags?: string[];
-  }): Promise<import("./rag-types").PreferencePair> {
-    return this.request<import("./rag-types").PreferencePair>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/pairs`,
-      {
-        method: "POST",
-        body: JSON.stringify(pair),
-      }
-    );
-  }
-
-  async deletePreferencePair(pairId: string): Promise<void> {
-    await this.request(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/pairs/${encodeURIComponent(pairId)}`,
-      { method: "DELETE" }
-    );
-  }
-
-  async triggerTuningJob(
-    objective: import("./rag-types").TuningObjective = "dpo",
-    hyperparams?: Partial<import("./rag-types").TuningHyperparameters>
-  ): Promise<import("./rag-types").TuningJob> {
-    return this.request<import("./rag-types").TuningJob>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs`,
-      {
-        method: "POST",
-        body: JSON.stringify({ objective, hyperparameters: hyperparams }),
-      }
-    );
-  }
-
-  async listTuningJobs(limit = 20): Promise<import("./rag-types").TuningJob[]> {
-    return this.request<import("./rag-types").TuningJob[]>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs?limit=${limit}`
-    );
-  }
-
-  async getTuningJob(jobId: string): Promise<import("./rag-types").TuningJob> {
-    return this.request<import("./rag-types").TuningJob>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs/${encodeURIComponent(jobId)}`
-    );
-  }
-
-  async promoteTuningJobAdapter(jobId: string): Promise<import("./rag-types").ContinuousTuningConfig> {
-    return this.request<import("./rag-types").ContinuousTuningConfig>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs/${encodeURIComponent(jobId)}/promote`,
-      { method: "POST" }
-    );
-  }
-
-  async rollbackTuningAdapter(targetAdapterId?: string): Promise<import("./rag-types").ContinuousTuningConfig> {
-    const url = targetAdapterId
-      ? `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/rollback?target_adapter_id=${encodeURIComponent(targetAdapterId)}`
-      : `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/rollback`;
-    return this.request<import("./rag-types").ContinuousTuningConfig>(url, { method: "POST" });
-  }
-
-  async simulateTuningMath(req: {
-    prompt: string;
-    beta?: number;
-    lambda_orpo?: number;
-    pi_theta_win_prob?: number;
-    pi_ref_win_prob?: number;
-    pi_theta_lose_prob?: number;
-    pi_ref_lose_prob?: number;
-  }): Promise<import("./rag-types").TuningMathSimulationResult> {
-    return this.request<import("./rag-types").TuningMathSimulationResult>(
-      `/v1/tuning/math/simulate`,
-      {
-        method: "POST",
-        body: JSON.stringify(req),
-      }
-    );
-  }
-
-  // --- Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves (M121 / Battery #36) ---
-
-  async createMpcSession(payload: {
-    title: string;
-    protocol?: import("./rag-types").MpcProtocolType;
-    required_parties_count?: number;
-    dimension?: number;
-    privacy_threshold?: number;
-    top_k?: number;
-    epsilon_budget?: number;
-  }): Promise<import("./rag-types").MpcSession> {
-    return this.request<import("./rag-types").MpcSession>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async listMpcSessions(): Promise<import("./rag-types").MpcSession[]> {
-    return this.request<import("./rag-types").MpcSession[]>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions`
-    );
-  }
-
-  async getMpcSession(sessionId: string): Promise<import("./rag-types").MpcSession> {
-    return this.request<import("./rag-types").MpcSession>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}`
-    );
-  }
-
-  async joinMpcSession(
-    sessionId: string,
-    party: {
-      party_id: string;
-      display_name: string;
-      public_key: string;
-      role?: import("./rag-types").EnclavePartyRole;
-    }
-  ): Promise<import("./rag-types").MpcSession> {
-    return this.request<import("./rag-types").MpcSession>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/join`,
-      {
-        method: "POST",
-        body: JSON.stringify(party),
-      }
-    );
-  }
-
-  async submitMpcVectorShares(
-    sessionId: string,
-    payload: {
-      party_id: string;
-      shares: import("./rag-types").EncryptedVectorShare[];
-    }
-  ): Promise<import("./rag-types").MpcSession> {
-    return this.request<import("./rag-types").MpcSession>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/shares`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async executeMpcCompute(sessionId: string): Promise<import("./rag-types").MpcResultsResponse> {
-    return this.request<import("./rag-types").MpcResultsResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/compute`,
-      { method: "POST" }
-    );
-  }
-
-  async getMpcResults(sessionId: string): Promise<import("./rag-types").MpcResultsResponse> {
-    return this.request<import("./rag-types").MpcResultsResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/results`
-    );
-  }
-
-  async abortMpcSession(sessionId: string, reason = "User aborted"): Promise<import("./rag-types").MpcSession> {
-    return this.request<import("./rag-types").MpcSession>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/abort`,
-      {
-        method: "POST",
-        body: JSON.stringify({ reason }),
-      }
-    );
-  }
-
-  async simulateMpcMath(
-    request: import("./rag-types").MpcMathSimulationRequest
-  ): Promise<import("./rag-types").MpcMathSimulationResponse> {
-    return this.request<import("./rag-types").MpcMathSimulationResponse>("/v1/mpc/math/simulate", {
-      method: "POST",
-      body: JSON.stringify(request),
-    });
-  }
-
-  // ── Milestone 122: Continuous Benchmark & Regression Gatekeeper (Battery #37) ─
-
-  async listBenchmarkSuites(): Promise<import("./rag-types").BenchmarkSuite[]> {
-    return this.request<import("./rag-types").BenchmarkSuite[]>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/suites`
-    );
-  }
-
-  async createBenchmarkSuite(payload: {
-    name: string;
-    description?: string;
-    k_cutoff?: number;
-    gate_policy?: Partial<import("./rag-types").GatePolicy>;
-  }): Promise<import("./rag-types").BenchmarkSuite> {
-    return this.request<import("./rag-types").BenchmarkSuite>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/suites`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async listBenchmarkRuns(suiteId?: string): Promise<import("./rag-types").BenchmarkRun[]> {
-    const query = suiteId ? `?suite_id=${encodeURIComponent(suiteId)}` : "";
-    return this.request<import("./rag-types").BenchmarkRun[]>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/runs${query}`
-    );
-  }
-
-  async getBenchmarkRun(runId: string): Promise<import("./rag-types").BenchmarkRun> {
-    return this.request<import("./rag-types").BenchmarkRun>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/runs/${encodeURIComponent(runId)}`
-    );
-  }
-
-  async triggerBenchmarkRun(payload: {
-    suite_id: string;
-    checkpoint_or_commit: string;
-    is_baseline?: boolean;
-    samples?: import("./rag-types").BenchmarkItemSample[];
-  }): Promise<import("./rag-types").BenchmarkRun> {
-    return this.request<import("./rag-types").BenchmarkRun>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/runs`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async evaluateRegressionGate(payload: {
-    suite_id: string;
-    candidate_run_id: string;
-    baseline_run_id?: string;
-  }): Promise<import("./rag-types").GateEvaluationResult> {
-    return this.request<import("./rag-types").GateEvaluationResult>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/evaluate-gate`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async simulateBenchmarkMath(
-    request: import("./rag-types").BenchmarkMathSimulationRequest
-  ): Promise<import("./rag-types").BenchmarkMathSimulationResponse> {
-    return this.request<import("./rag-types").BenchmarkMathSimulationResponse>(
-      "/v1/benchmarks/math/simulate",
-      {
-        method: "POST",
-        body: JSON.stringify(request),
-      }
-    );
-  }
-
-  // ── Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (Battery #38 / M123) ──
-
-  async createGoTPlan(
-    payload: import("./rag-types").GoTPlanRequest
-  ): Promise<import("./rag-types").GoTPlanResponse> {
-    return this.request<import("./rag-types").GoTPlanResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async getGoTPlan(planId: string): Promise<import("./rag-types").GoTPlanResponse> {
-    return this.request<import("./rag-types").GoTPlanResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}`
-    );
-  }
-
-  async stepGoTPlan(
-    planId: string,
-    payload: import("./rag-types").GoTStepRequest
-  ): Promise<import("./rag-types").GoTPlanResponse> {
-    return this.request<import("./rag-types").GoTPlanResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/step`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async executeGoTPlan(
-    planId: string,
-    maxIterations: number = 10
-  ): Promise<import("./rag-types").GoTPlanResponse> {
-    return this.request<import("./rag-types").GoTPlanResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/execute?max_iterations=${maxIterations}`,
-      {
-        method: "POST",
-      }
-    );
-  }
-
-  async aggregateGoTThoughts(
-    planId: string,
-    payload: import("./rag-types").GoTAggregateRequest
-  ): Promise<import("./rag-types").GoTPlanResponse> {
-    return this.request<import("./rag-types").GoTPlanResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/aggregate`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
-  }
-
-  async getHierarchicalMemory(): Promise<import("./rag-types").HierarchicalMemoryView> {
-    return this.request<import("./rag-types").HierarchicalMemoryView>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/memory`
-    );
-  }
-
-  async distillGoTPlan(
-    planId: string,
-    payload?: import("./rag-types").DistillationRequest
-  ): Promise<import("./rag-types").DistillationResult> {
-    return this.request<import("./rag-types").DistillationResult>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/distill`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload || { target_tier: "L3_SEMANTIC" }),
-      }
-    );
-  }
-
-  async simulateGoTMath(
-    payload?: import("./rag-types").GoTSimulateRequest
-  ): Promise<import("./rag-types").GoTSimulateResponse> {
-    return this.request<import("./rag-types").GoTSimulateResponse>("/v1/got/simulate", {
-      method: "POST",
-      body: JSON.stringify(payload || {}),
-    });
-  }
-
-  // ── Master System Prompt & Governance Policy Lock ────────────────────────
-
-  async getSystemPrompt(): Promise<TenantPromptResponse> {
-    return this.request<TenantPromptResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/prompts/default`
-    );
-  }
-
-  async updateSystemPrompt(content: string): Promise<TenantPromptResponse> {
-    return this.request<TenantPromptResponse>(
-      `/v1/tenants/${encodeURIComponent(this.tenantId)}/prompts/default`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      }
-    );
+  ) {
+    return ragDocs.extractDocument<T>(this.ctx, documentId, jsonSchema, model);
+  }
+  submitFeedback(...args: Parameters<typeof ragChat.submitFeedback> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.submitFeedback(this.ctx, ...args);
+  }
+  getDownloadUrl(...args: Parameters<typeof ragDocs.getDownloadUrl> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.getDownloadUrl(this.ctx, ...args);
+  }
+  listTenants(...args: Parameters<typeof ragAdmin.listTenants> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listTenants(this.ctx, ...args);
+  }
+  getGraphCapabilities(...args: Parameters<typeof ragGraph.getGraphCapabilities> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.getGraphCapabilities(this.ctx, ...args);
+  }
+  switchGraphEngine(...args: Parameters<typeof ragGraph.switchGraphEngine> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.switchGraphEngine(this.ctx, ...args);
+  }
+  getGraphSummary(...args: Parameters<typeof ragGraph.getGraphSummary> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.getGraphSummary(this.ctx, ...args);
+  }
+  queryGraph(...args: Parameters<typeof ragGraph.queryGraph> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.queryGraph(this.ctx, ...args);
+  }
+  deleteTriple(...args: Parameters<typeof ragGraph.deleteTriple> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.deleteTriple(this.ctx, ...args);
+  }
+  purgeCache(...args: Parameters<typeof ragDocs.purgeCache> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.purgeCache(this.ctx, ...args);
+  }
+  getCacheStats(...args: Parameters<typeof ragDocs.getCacheStats> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.getCacheStats(this.ctx, ...args);
+  }
+  compressContext(...args: Parameters<typeof ragDocs.compressContext> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.compressContext(this.ctx, ...args);
+  }
+  generateConsensus(...args: Parameters<typeof ragGraph.generateConsensus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.generateConsensus(this.ctx, ...args);
+  }
+  executeRlmSubroutine(...args: Parameters<typeof ragGraph.executeRlmSubroutine> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.executeRlmSubroutine(this.ctx, ...args);
+  }
+  getOnlineEvaluationSummary(...args: Parameters<typeof ragAdmin.getOnlineEvaluationSummary> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getOnlineEvaluationSummary(this.ctx, ...args);
+  }
+  computeGroundingDiff(...args: Parameters<typeof ragAdmin.computeGroundingDiff> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.computeGroundingDiff(this.ctx, ...args);
+  }
+  listLoraAdapters(...args: Parameters<typeof ragAdmin.listLoraAdapters> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listLoraAdapters(this.ctx, ...args);
+  }
+  trainLoraAdapter(...args: Parameters<typeof ragAdmin.trainLoraAdapter> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.trainLoraAdapter(this.ctx, ...args);
+  }
+  projectEmbeddings(...args: Parameters<typeof ragDocs.projectEmbeddings> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.projectEmbeddings(this.ctx, ...args);
+  }
+  classifyIntent(...args: Parameters<typeof ragChat.classifyIntent> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.classifyIntent(this.ctx, ...args);
+  }
+  listAgentTools(...args: Parameters<typeof ragGraph.listAgentTools> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.listAgentTools(this.ctx, ...args);
+  }
+  executeAgentWorkflow(...args: Parameters<typeof ragGraph.executeAgentWorkflow> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.executeAgentWorkflow(this.ctx, ...args);
+  }
+  streamAgenticWorkflow(...args: Parameters<typeof ragGraph.streamAgenticWorkflow> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.streamAgenticWorkflow(this.ctx, ...args);
+  }
+  resumeAgentWorkflow(...args: Parameters<typeof ragGraph.resumeAgentWorkflow> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.resumeAgentWorkflow(this.ctx, ...args);
+  }
+  getAgentThreadHistory(...args: Parameters<typeof ragGraph.getAgentThreadHistory> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.getAgentThreadHistory(this.ctx, ...args);
+  }
+  rollbackAgentThread(...args: Parameters<typeof ragGraph.rollbackAgentThread> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.rollbackAgentThread(this.ctx, ...args);
+  }
+  getAgenticEconomicLedger(...args: Parameters<typeof ragGraph.getAgenticEconomicLedger> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.getAgenticEconomicLedger(this.ctx, ...args);
+  }
+  classifyAgenticComplexity(...args: Parameters<typeof ragGraph.classifyAgenticComplexity> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.classifyAgenticComplexity(this.ctx, ...args);
+  }
+  getMemoryStats(...args: Parameters<typeof ragChat.getMemoryStats> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.getMemoryStats(this.ctx, ...args);
+  }
+  listMemoryNodes(...args: Parameters<typeof ragChat.listMemoryNodes> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.listMemoryNodes(this.ctx, ...args);
+  }
+  testMemoryGuidance(...args: Parameters<typeof ragChat.testMemoryGuidance> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.testMemoryGuidance(this.ctx, ...args);
+  }
+  consolidateMemoryTrace(...args: Parameters<typeof ragChat.consolidateMemoryTrace> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.consolidateMemoryTrace(this.ctx, ...args);
+  }
+  deleteMemoryNode(...args: Parameters<typeof ragChat.deleteMemoryNode> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.deleteMemoryNode(this.ctx, ...args);
+  }
+  pruneMemories(...args: Parameters<typeof ragChat.pruneMemories> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.pruneMemories(this.ctx, ...args);
+  }
+  getGatewayModels(...args: Parameters<typeof ragAdmin.getGatewayModels> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getGatewayModels(this.ctx, ...args);
+  }
+  probeGateway(...args: Parameters<typeof ragAdmin.probeGateway> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.probeGateway(this.ctx, ...args);
+  }
+  getTenantGatewayRoutes(...args: Parameters<typeof ragAdmin.getTenantGatewayRoutes> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getTenantGatewayRoutes(this.ctx, ...args);
+  }
+  updateTenantGatewayRoutes(...args: Parameters<typeof ragAdmin.updateTenantGatewayRoutes> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.updateTenantGatewayRoutes(this.ctx, ...args);
+  }
+  getTenantGatewayBudget(...args: Parameters<typeof ragAdmin.getTenantGatewayBudget> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getTenantGatewayBudget(this.ctx, ...args);
+  }
+  getGuardrailTemplates(...args: Parameters<typeof ragAdmin.getGuardrailTemplates> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getGuardrailTemplates(this.ctx, ...args);
+  }
+  getGuardrailConfig(...args: Parameters<typeof ragAdmin.getGuardrailConfig> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getGuardrailConfig(this.ctx, ...args);
+  }
+  updateGuardrailConfig(...args: Parameters<typeof ragAdmin.updateGuardrailConfig> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.updateGuardrailConfig(this.ctx, ...args);
+  }
+  validateGuardrailInput(...args: Parameters<typeof ragAdmin.validateGuardrailInput> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.validateGuardrailInput(this.ctx, ...args);
+  }
+  validateGuardrailOutput(...args: Parameters<typeof ragAdmin.validateGuardrailOutput> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.validateGuardrailOutput(this.ctx, ...args);
+  }
+  testGuardrailFlow(...args: Parameters<typeof ragAdmin.testGuardrailFlow> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.testGuardrailFlow(this.ctx, ...args);
+  }
+  getGuardrailTelemetry(...args: Parameters<typeof ragAdmin.getGuardrailTelemetry> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getGuardrailTelemetry(this.ctx, ...args);
+  }
+  getServerlessStatus(...args: Parameters<typeof ragAdmin.getServerlessStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getServerlessStatus(this.ctx, ...args);
+  }
+  probeServerlessGpu(...args: Parameters<typeof ragAdmin.probeServerlessGpu> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.probeServerlessGpu(this.ctx, ...args);
+  }
+  getServerlessCostSavings(...args: Parameters<typeof ragAdmin.getServerlessCostSavings> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getServerlessCostSavings(this.ctx, ...args);
+  }
+  getTenantLoraAdapters(...args: Parameters<typeof ragAdmin.getTenantLoraAdapters> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getTenantLoraAdapters(this.ctx, ...args);
+  }
+  getActiveTenantLoraAdapter(...args: Parameters<typeof ragAdmin.getActiveTenantLoraAdapter> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getActiveTenantLoraAdapter(this.ctx, ...args);
+  }
+  registerTenantLoraAdapter(...args: Parameters<typeof ragAdmin.registerTenantLoraAdapter> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.registerTenantLoraAdapter(this.ctx, ...args);
+  }
+  activateTenantLoraAdapter(...args: Parameters<typeof ragAdmin.activateTenantLoraAdapter> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.activateTenantLoraAdapter(this.ctx, ...args);
+  }
+  deactivateTenantLoraAdapter(...args: Parameters<typeof ragAdmin.deactivateTenantLoraAdapter> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.deactivateTenantLoraAdapter(this.ctx, ...args);
+  }
+  deleteTenantLoraAdapter(...args: Parameters<typeof ragAdmin.deleteTenantLoraAdapter> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.deleteTenantLoraAdapter(this.ctx, ...args);
+  }
+  analyzeScaffoldingRequirement(...args: Parameters<typeof ragAdmin.analyzeScaffoldingRequirement> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.analyzeScaffoldingRequirement(this.ctx, ...args);
+  }
+  generateScaffoldingPlan(...args: Parameters<typeof ragAdmin.generateScaffoldingPlan> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.generateScaffoldingPlan(this.ctx, ...args);
+  }
+  verifyScaffoldingCode(...args: Parameters<typeof ragAdmin.verifyScaffoldingCode> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.verifyScaffoldingCode(this.ctx, ...args);
+  }
+  applyScaffoldingPlan(...args: Parameters<typeof ragAdmin.applyScaffoldingPlan> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.applyScaffoldingPlan(this.ctx, ...args);
+  }
+  reloadCustomPlugins(...args: Parameters<typeof ragAdmin.reloadCustomPlugins> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.reloadCustomPlugins(this.ctx, ...args);
+  }
+  listCustomPlugins(...args: Parameters<typeof ragAdmin.listCustomPlugins> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listCustomPlugins(this.ctx, ...args);
+  }
+  deleteCustomPlugin(...args: Parameters<typeof ragAdmin.deleteCustomPlugin> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.deleteCustomPlugin(this.ctx, ...args);
+  }
+  getScaffoldingStatus(...args: Parameters<typeof ragAdmin.getScaffoldingStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getScaffoldingStatus(this.ctx, ...args);
+  }
+  getEdgeNodes(...args: Parameters<typeof ragAdmin.getEdgeNodes> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getEdgeNodes(this.ctx, ...args);
+  }
+  registerEdgeNode(...args: Parameters<typeof ragAdmin.registerEdgeNode> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.registerEdgeNode(this.ctx, ...args);
+  }
+  getEdgeDelta(...args: Parameters<typeof ragAdmin.getEdgeDelta> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getEdgeDelta(this.ctx, ...args);
+  }
+  generateEdgeBundleManifest(...args: Parameters<typeof ragAdmin.generateEdgeBundleManifest> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.generateEdgeBundleManifest(this.ctx, ...args);
+  }
+  downloadEdgeBundle(...args: Parameters<typeof ragAdmin.downloadEdgeBundle> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.downloadEdgeBundle(this.ctx, ...args);
+  }
+  searchEdgeSimulated(...args: Parameters<typeof ragAdmin.searchEdgeSimulated> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.searchEdgeSimulated(this.ctx, ...args);
+  }
+  reconcileEdgeMutations(...args: Parameters<typeof ragAdmin.reconcileEdgeMutations> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.reconcileEdgeMutations(this.ctx, ...args);
+  }
+  getMultiCloudClusters(...args: Parameters<typeof ragAdmin.getMultiCloudClusters> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMultiCloudClusters(this.ctx, ...args);
+  }
+  probeMultiCloudRegions(...args: Parameters<typeof ragAdmin.probeMultiCloudRegions> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.probeMultiCloudRegions(this.ctx, ...args);
+  }
+  triggerMultiCloudFailover(...args: Parameters<typeof ragAdmin.triggerMultiCloudFailover> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.triggerMultiCloudFailover(this.ctx, ...args);
+  }
+  getLibsqlReplicationStatus(...args: Parameters<typeof ragAdmin.getLibsqlReplicationStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getLibsqlReplicationStatus(this.ctx, ...args);
+  }
+  getTenantLibsqlConfig(...args: Parameters<typeof ragAdmin.getTenantLibsqlConfig> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getTenantLibsqlConfig(this.ctx, ...args);
+  }
+  syncTenantLibsqlReplica(...args: Parameters<typeof ragAdmin.syncTenantLibsqlReplica> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.syncTenantLibsqlReplica(this.ctx, ...args);
+  }
+  getMcpConfig(...args: Parameters<typeof ragAdmin.getMcpConfig> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMcpConfig(this.ctx, ...args);
+  }
+  getMcpTools(...args: Parameters<typeof ragAdmin.getMcpTools> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMcpTools(this.ctx, ...args);
+  }
+  testMcpTool(...args: Parameters<typeof ragAdmin.testMcpTool> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.testMcpTool(this.ctx, ...args);
+  }
+  getMeshStatus(...args: Parameters<typeof ragAdmin.getMeshStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMeshStatus(this.ctx, ...args);
+  }
+  listMeshNodes(...args: Parameters<typeof ragAdmin.listMeshNodes> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listMeshNodes(this.ctx, ...args);
+  }
+  listMeshTools(...args: Parameters<typeof ragAdmin.listMeshTools> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listMeshTools(this.ctx, ...args);
+  }
+  executeMeshTool(...args: Parameters<typeof ragAdmin.executeMeshTool> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.executeMeshTool(this.ctx, ...args);
+  }
+  delegateFederatedTask(...args: Parameters<typeof ragAdmin.delegateFederatedTask> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.delegateFederatedTask(this.ctx, ...args);
+  }
+  getFederatedTaskStatus(...args: Parameters<typeof ragAdmin.getFederatedTaskStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getFederatedTaskStatus(this.ctx, ...args);
+  }
+  getMeshLoadMetrics(...args: Parameters<typeof ragAdmin.getMeshLoadMetrics> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMeshLoadMetrics(this.ctx, ...args);
+  }
+  getAutoscalingEvents(...args: Parameters<typeof ragAdmin.getAutoscalingEvents> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getAutoscalingEvents(this.ctx, ...args);
+  }
+  updateAutoscalingPolicy(...args: Parameters<typeof ragAdmin.updateAutoscalingPolicy> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.updateAutoscalingPolicy(this.ctx, ...args);
+  }
+  reapIdleEnclaves(...args: Parameters<typeof ragAdmin.reapIdleEnclaves> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.reapIdleEnclaves(this.ctx, ...args);
+  }
+  extractSchematicText(...args: Parameters<typeof ragDocs.extractSchematicText> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.extractSchematicText(this.ctx, ...args);
+  }
+  queryMultimodalGraph(...args: Parameters<typeof ragGraph.queryMultimodalGraph> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragGraph.queryMultimodalGraph(this.ctx, ...args);
+  }
+  getDocumentSchematics(...args: Parameters<typeof ragDocs.getDocumentSchematics> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.getDocumentSchematics(this.ctx, ...args);
+  }
+  getMultimodalVisionStatus(...args: Parameters<typeof ragDocs.getMultimodalVisionStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragDocs.getMultimodalVisionStatus(this.ctx, ...args);
+  }
+  getShardTopology(...args: Parameters<typeof ragAdmin.getShardTopology> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getShardTopology(this.ctx, ...args);
+  }
+  queryShardedVectors(...args: Parameters<typeof ragAdmin.queryShardedVectors> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.queryShardedVectors(this.ctx, ...args);
+  }
+  mutateShardedVectors(...args: Parameters<typeof ragAdmin.mutateShardedVectors> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.mutateShardedVectors(this.ctx, ...args);
+  }
+  getRaftConsensusStatus(...args: Parameters<typeof ragAdmin.getRaftConsensusStatus> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getRaftConsensusStatus(this.ctx, ...args);
+  }
+  triggerRaftElection(...args: Parameters<typeof ragAdmin.triggerRaftElection> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.triggerRaftElection(this.ctx, ...args);
+  }
+  rebalanceShards(...args: Parameters<typeof ragAdmin.rebalanceShards> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.rebalanceShards(this.ctx, ...args);
+  }
+  snapshotShard(...args: Parameters<typeof ragAdmin.snapshotShard> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.snapshotShard(this.ctx, ...args);
+  }
+  getAttestationHealth(...args: Parameters<typeof ragAdmin.getAttestationHealth> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getAttestationHealth(this.ctx, ...args);
+  }
+  computeDocumentMerkleRoot(...args: Parameters<typeof ragAdmin.computeDocumentMerkleRoot> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.computeDocumentMerkleRoot(this.ctx, ...args);
+  }
+  getChunkInclusionProof(...args: Parameters<typeof ragAdmin.getChunkInclusionProof> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getChunkInclusionProof(this.ctx, ...args);
+  }
+  issueGroundingCertificate(...args: Parameters<typeof ragAdmin.issueGroundingCertificate> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.issueGroundingCertificate(this.ctx, ...args);
+  }
+  verifyGroundingCertificate(...args: Parameters<typeof ragAdmin.verifyGroundingCertificate> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.verifyGroundingCertificate(this.ctx, ...args);
+  }
+  listGroundingCertificates(...args: Parameters<typeof ragAdmin.listGroundingCertificates> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listGroundingCertificates(this.ctx, ...args);
+  }
+  getSamlConfig(...args: Parameters<typeof ragAdmin.getSamlConfig> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getSamlConfig(this.ctx, ...args);
+  }
+  configureSamlIdp(...args: Parameters<typeof ragAdmin.configureSamlIdp> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.configureSamlIdp(this.ctx, ...args);
+  }
+  getSpMetadataXml(...args: Parameters<typeof ragAdmin.getSpMetadataXml> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getSpMetadataXml(this.ctx, ...args);
+  }
+  validateSamlAcs(...args: Parameters<typeof ragAdmin.validateSamlAcs> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.validateSamlAcs(this.ctx, ...args);
+  }
+  generateScimToken(...args: Parameters<typeof ragAdmin.generateScimToken> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.generateScimToken(this.ctx, ...args);
+  }
+  listScimUsers(...args: Parameters<typeof ragAdmin.listScimUsers> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listScimUsers(this.ctx, ...args);
+  }
+  createScimUser(...args: Parameters<typeof ragAdmin.createScimUser> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.createScimUser(this.ctx, ...args);
+  }
+  patchScimUser(...args: Parameters<typeof ragAdmin.patchScimUser> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.patchScimUser(this.ctx, ...args);
+  }
+  deleteScimUser(...args: Parameters<typeof ragAdmin.deleteScimUser> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.deleteScimUser(this.ctx, ...args);
+  }
+  listScimGroups(...args: Parameters<typeof ragAdmin.listScimGroups> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listScimGroups(this.ctx, ...args);
+  }
+  createScimGroup(...args: Parameters<typeof ragAdmin.createScimGroup> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.createScimGroup(this.ctx, ...args);
+  }
+  simulateRbVac(...args: Parameters<typeof ragAdmin.simulateRbVac> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.simulateRbVac(this.ctx, ...args);
+  }
+  createMpcSession(...args: Parameters<typeof ragAdmin.createMpcSession> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.createMpcSession(this.ctx, ...args);
+  }
+  listMpcSessions(...args: Parameters<typeof ragAdmin.listMpcSessions> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.listMpcSessions(this.ctx, ...args);
+  }
+  getMpcSession(...args: Parameters<typeof ragAdmin.getMpcSession> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMpcSession(this.ctx, ...args);
+  }
+  joinMpcSession(...args: Parameters<typeof ragAdmin.joinMpcSession> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.joinMpcSession(this.ctx, ...args);
+  }
+  submitMpcVectorShares(...args: Parameters<typeof ragAdmin.submitMpcVectorShares> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.submitMpcVectorShares(this.ctx, ...args);
+  }
+  executeMpcCompute(...args: Parameters<typeof ragAdmin.executeMpcCompute> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.executeMpcCompute(this.ctx, ...args);
+  }
+  getMpcResults(...args: Parameters<typeof ragAdmin.getMpcResults> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.getMpcResults(this.ctx, ...args);
+  }
+  abortMpcSession(...args: Parameters<typeof ragAdmin.abortMpcSession> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.abortMpcSession(this.ctx, ...args);
+  }
+  simulateMpcMath(...args: Parameters<typeof ragAdmin.simulateMpcMath> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragAdmin.simulateMpcMath(this.ctx, ...args);
+  }
+  getSystemPrompt(...args: Parameters<typeof ragChat.getSystemPrompt> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.getSystemPrompt(this.ctx, ...args);
+  }
+  updateSystemPrompt(...args: Parameters<typeof ragChat.updateSystemPrompt> extends [RagRequestContext, ...infer P] ? P : never) {
+    return ragChat.updateSystemPrompt(this.ctx, ...args);
   }
 }
 
-export interface TenantPromptResponse {
-  name: string;
-  content: string;
-  isSystemPrompt: boolean;
-  isLocked: boolean;
-}
-
-
-export interface GraphCapabilitiesResponse {
-  machine_profile: string;
-  supported_engines: string[];
-  active_engine: string;
-  neo4j_status: string;
-  message: string;
-}
-
-export interface GraphSummaryResponse {
-  tenant_id: string;
-  total_triples: number;
-  unique_entities: number;
-  storage_engine: string;
-  neo4j_status?: string;
-}
-
-export interface EntityTripleItem {
-  triple_id?: string;
-  subject: string;
-  predicate: string;
-  object: string;
-  chunk_id?: string;
-  confidence?: number;
-}
-
-export interface GraphQueryResponse {
-  root_entity: string;
-  max_hops: number;
-  triples: EntityTripleItem[];
-  connected_entities: string[];
-}
-
-function combineAbortSignals(...signals: AbortSignal[]): AbortSignal {
-  const controller = new AbortController();
-  for (const signal of signals) {
-    if (signal.aborted) {
-      controller.abort(signal.reason);
-      return controller.signal;
-    }
-    signal.addEventListener("abort", () => controller.abort(signal.reason), { once: true });
-  }
-  return controller.signal;
-}
-
-export interface ParseIntentRequest {
-  prompt: string;
-  currency?: 'INR' | 'USD';
-  currentContext?: {
-    existingEngineId?: string;
-    existingFeatureIds?: string[];
-  };
-}
-
-export interface ScopingTelemetry {
-  latencyMs: number;
-  semanticCacheHit: boolean;
-  tenantId: string;
-  modelUsed?: string;
-  fallbackMode?: boolean;
-}
-
-export interface ParseIntentResponse {
-  success: boolean;
-  archetypeId: string;
-  baseEngineId: string;
-  featureIds: string[];
-  brandAssetId: string;
-  maintenancePlanId: string;
-  suggestedTimeline: string;
-  confidenceScore: number;
-  summaryRationale: string;
-  retrieverEngineRecommended: boolean;
-  telemetry: ScopingTelemetry;
-  unrecognizedRequirements?: string[];
-}
-
-// --- Zero-Knowledge Proof (ZKP) Vector Attestation Types (M118) ---
-
-export interface ZkpHealthResponse {
-  battery_id: string;
-  status: string;
-  authority_public_key: string;
-  hash_algorithm: string;
-  signature_algorithm: string;
-  merkle_tree_padding: string;
-  zero_knowledge_commitments: boolean;
-  public_verification_endpoint: string;
-}
-
-export interface MerkleProofStep {
-  sibling_hash: string;
-  direction: "left" | "right";
-}
-
-export interface ChunkMerkleProof {
-  chunk_id: string;
-  chunk_index: number;
-  leaf_hash: string;
-  merkle_path: MerkleProofStep[];
-  document_root: string;
-}
-
-export interface ChunkCommitment {
-  chunk_id: string;
-  chunk_index: number;
-  leaf_hash: string;
-  merkle_proof: MerkleProofStep[];
-  similarity_score?: number;
-}
-
-export interface DocumentMerkleRoot {
-  document_id: string;
-  tenant_id: string;
-  root_hash: string;
-  chunk_count: number;
-  tree_depth: number;
-  computed_at: number;
-}
-
-export interface ZkpGroundingCertificate {
-  certificate_id: string;
-  tenant_id: string;
-  document_id: string;
-  document_merkle_root: string;
-  query_hash: string;
-  response_hash: string;
-  similarity_bound: number;
-  chunk_commitments: ChunkCommitment[];
-  issued_at: number;
-  expires_at?: number | null;
-  authority_public_key: string;
-  attestation_signature: string;
-}
-
-export interface GroundingVerificationResult {
-  status:
-    | "verified"
-    | "root_mismatch"
-    | "proof_invalid"
-    | "query_mismatch"
-    | "response_mismatch"
-    | "signature_invalid"
-    | "certificate_expired";
-  is_valid: boolean;
-  details: string;
-  verified_at: number;
-  checked_leaf_count: number;
-  merkle_root_matched: boolean;
-  signature_valid: boolean;
-  query_match: boolean;
-  response_match: boolean;
-  execution_time_ms: number;
-}
-
-export interface IssueCertificatePayload {
-  document_id: string;
-  query: string;
-  response: string;
-  cited_chunks: Record<string, unknown>[];
-  all_document_chunks: Record<string, unknown>[];
-  similarity_bound?: number;
-  ttl_seconds?: number;
-}
-
-export interface VerifyCertificatePayload {
-  certificate: ZkpGroundingCertificate;
-  query?: string;
-  response?: string;
-  expected_document_root?: string;
-}
-
-
+export * from "./rag-types";

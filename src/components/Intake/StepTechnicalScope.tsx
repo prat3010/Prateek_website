@@ -6,7 +6,7 @@ import { formatPricePair, resolveFeatureDependencies, type Currency } from '@/li
 import { FEATURE_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
 import { ArchitectureTopologyMap } from './ArchitectureTopologyMap';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 
 interface StepTechnicalScopeProps {
   engines: BaseEngineItem[];

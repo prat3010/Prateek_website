@@ -39,7 +39,7 @@ import { ScopeCopilotDrawer } from './ScopeCopilotDrawer';
 import { DependencyCascadeModal } from './DependencyCascadeModal';
 import type { CurrentScopeContext } from './InlineScopingChatCard';
 
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 

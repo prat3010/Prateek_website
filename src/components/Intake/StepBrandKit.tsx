@@ -2,7 +2,7 @@ import React from 'react';
 import { Palette, Check } from 'lucide-react';
 import type { BrandAssetOption } from '@/data/resume';
 import { formatPricePair, type Currency } from '@/lib/pricing';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 
 interface StepBrandKitProps {
   brandAssets: BrandAssetOption[];

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layers, Rocket, Sparkles } from 'lucide-react';
 import TiltCard from '@/components/ui/TiltCard';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 
 interface ServiceTypeGateProps {
   onSelectType: (type: 'full' | 'quick') => void;

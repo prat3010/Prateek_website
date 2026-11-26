@@ -3,7 +3,7 @@ import NumberFlow from '@number-flow/react';
 import type { BaseEngineItem } from '@/data/resume';
 import type { Currency, PromoDiscountInfo } from '@/lib/pricing';
 import MagneticButton from '@/components/ui/MagneticButton';
-import styles from './IntakeForm.module.css';
+import styles from './intakeStyles';
 
 interface StickyPriceBarProps {
   selectedEngine: BaseEngineItem;
