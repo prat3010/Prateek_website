@@ -124,15 +124,15 @@ export function ArchitectureComparisonCanvas() {
               <div className={styles.itemRow}>
                 <span className={styles.itemIcon}>✅</span>
                 <div className={styles.itemText}>
-                  <strong className={styles.itemTitle}>Sub-15ms In-Memory Semantic Cache</strong>
-                  <span className={styles.itemDesc}>Pre-indexes query vectors in Redis/Memory, delivering 0.0ms responses and reducing LLM inference costs by 60%.</span>
+                  <strong className={styles.itemTitle}>PostgreSQL Semantic Cache</strong>
+                  <span className={styles.itemDesc}>Caches high-confidence query embeddings in pgvector to skip redundant LLM calls on repeated questions.</span>
                 </div>
               </div>
 
               <div className={styles.itemRow}>
                 <span className={styles.itemIcon}>✅</span>
                 <div className={styles.itemText}>
-                  <strong className={styles.itemTitle}>Native GraphRAG &amp; ColBERT MaxSim</strong>
+                  <strong className={styles.itemTitle}>Native GraphRAG &amp; Lexical MaxSim</strong>
                   <span className={styles.itemDesc}>Built-in entity triples and late-interaction token matching without external third-party reranking services.</span>
                 </div>
               </div>
@@ -144,8 +144,8 @@ export function ArchitectureComparisonCanvas() {
                 <span className={styles.metricValue} style={{ color: "var(--pop-green, #22c55e)" }}>$0 – $79 / mo</span>
               </div>
               <div className={styles.metricCol}>
-                <span className={styles.metricLabel}>Cold-Start Latency</span>
-                <span className={styles.metricValue}>14ms – 45ms</span>
+                <span className={styles.metricLabel}>Measured p50 Latency</span>
+                <span className={styles.metricValue}>~272ms – 2.20s</span>
               </div>
               <div className={styles.metricCol}>
                 <span className={styles.metricLabel}>Data Sovereignty</span>

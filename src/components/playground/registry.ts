@@ -55,10 +55,3 @@ export const PLAYGROUND_COMPONENT_REGISTRY: Record<
     { ssr: false, loading: LoadingSkeleton }
   ) as unknown as ComponentType<PlaygroundComponentProps>,
 };
-
-export function resolvePlaygroundComponent(componentName?: string | null): ComponentType<PlaygroundComponentProps> | null {
-  if (componentName && PLAYGROUND_COMPONENT_REGISTRY[componentName]) {
-    return PLAYGROUND_COMPONENT_REGISTRY[componentName];
-  }
-  return null;
-}

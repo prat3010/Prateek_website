@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import styles from "@/components/rag/rag.module.css";
+import styles from "@/components/rag/ragStyles";
 
 export default function RagLoginPage() {
   const router = useRouter();

@@ -46,14 +46,14 @@ export default function BenchmarksPage() {
               <div className={styles.insightCard}>
                 <h4 className={styles.insightTitle}>1. Concurrency Stability (5–10 VUs)</h4>
                 <p className={styles.insightText}>
-                  Zero failures recorded. PostgreSQL 16 connection pool checked out, executed <code>SELECT 1</code> heartbeat probes, and recycled connections in under 2.3s end-to-end HTTPS round-trip latency from client to VPS.
+                  Zero failures recorded (<code>0.0%</code> error rate across 30 requests at 5 VUs and 60 requests at 10 VUs). Edge ASGI liveness answered in <code>272.43ms</code>–<code>294.22ms</code> p50, and PostgreSQL 16 connection pool readiness (<code>SELECT 1</code>) completed in <code>2203.61ms</code>–<code>2789.13ms</code> p50 end-to-end HTTPS latency from client to VPS.
                 </p>
               </div>
 
               <div className={styles.insightCard}>
-                <h4 className={styles.insightTitle}>2. Production Rate-Limiter Throttling (20 VUs)</h4>
+                <h4 className={styles.insightTitle}>2. Sustained Burst Throughput (20 VUs)</h4>
                 <p className={styles.insightText}>
-                  At 20 concurrent virtual users generating 120 burst requests, the server-side Nginx rate-limiting filter (<code>x-ratelimit-limit: 120</code>) actively throttled overflow requests with <code>HTTP 429 Too Many Requests</code>, safeguarding pgvector and ASGI workers from DDoS degradation.
+                  At 20 concurrent virtual users generating 120 burst requests over 19.18s, 105 requests succeeded with a <code>12.5%</code> error rate under 1-OCPU Oracle VPS saturation (<code>2184.94ms</code> aggregated p50, <code>3722.89ms</code> p95, <code>6.3 req/s</code>), while PostgreSQL readiness probes stayed at <code>0.0%</code> errors (<code>2196.95ms</code> p50).
                 </p>
               </div>
 

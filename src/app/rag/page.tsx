@@ -18,7 +18,7 @@ import { PricingSection } from "@/components/rag/PricingSection";
 import { SegmentedPersonaSection } from "@/components/rag/SegmentedPersonaSection";
 import { FloatingChatWidget } from "@/components/rag/FloatingChatWidget";
 import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
-import styles from "@/components/rag/rag.module.css";
+import styles from "@/components/rag/ragStyles";
 
 export default function RagLandingPage() {
   const lenis = useLenis();
@@ -110,7 +110,7 @@ export default function RagLandingPage() {
 
           {/* Hero Micro-Stats Strip */}
           <div className={styles.heroStatsStrip}>
-            <span className={styles.heroStatItem}>⚡ 14.8ms Median Latency</span>
+            <span className={styles.heroStatItem}>⚡ ~272ms Edge / ~2.20s DB p50</span>
             <span className={styles.heroStatDivider}>•</span>
             <span className={styles.heroStatItem}>🔒 PostgreSQL RLS Multi-Tenancy</span>
             <span className={styles.heroStatDivider}>•</span>
@@ -136,7 +136,7 @@ export default function RagLandingPage() {
         <ArchitectureComparisonCanvas />
       </ScrollSection>
 
-      {/* 3. The 38 Production Batteries Bento Grid */}
+      {/* 3. The Production Batteries Bento Grid */}
       <ScrollSection verticalOffset={120} gap={80} disableFade>
         <BatteriesBentoMatrix />
       </ScrollSection>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import NumberFlow from "@number-flow/react";
 import { useAuth } from "@/context/AuthContext";
 import { RetrieverClient } from "@/lib/rag-client";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface OverviewPanelProps {
   hidden?: boolean;
@@ -126,7 +126,7 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
           <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>
             <NumberFlow value={telemetry.cacheHitRatePct} format={{ maximumFractionDigits: 1 }} />%
           </div>
-          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted, #888)" }}>⚡ Sub-50ms Latency Saved</span>
+          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted, #888)" }}>⚡ Cached Queries Skip LLM</span>
         </div>
 
         <div className={styles.metricCard} style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
@@ -180,15 +180,15 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
           }}
         >
           {[
-            { name: "ColBERT MaxSim Reranker", latency: "~14ms", cat: "Retrieval" },
-            { name: "Sublinear BM25 Keyword Search", latency: "~3ms", cat: "Retrieval" },
-            { name: "pgvector HNSW Dense Vectors", latency: "~8ms", cat: "Vector" },
-            { name: "GraphRAG HDBSCAN Topics", latency: "~35ms", cat: "Graph" },
-            { name: "Docling Layout OCR Parser", latency: "v2.1", cat: "Ingestion" },
-            { name: "RLM Python REPL Sandbox", latency: "~18ms", cat: "Sandbox" },
+            { name: "Lexical MaxSim Reranker", latency: "Active", cat: "Retrieval" },
+            { name: "Sublinear BM25 Keyword Search", latency: "Active", cat: "Retrieval" },
+            { name: "pgvector HNSW Dense Vectors", latency: "768-dim", cat: "Vector" },
+            { name: "GraphRAG HDBSCAN Topics", latency: "Active", cat: "Graph" },
+            { name: "pdfplumber Layout Parser", latency: "Active", cat: "Ingestion" },
+            { name: "RLM Python REPL Sandbox", latency: "Isolated", cat: "Sandbox" },
             { name: "Telemetry Anomaly Sentinel", latency: "Nominal", cat: "Defense" },
             { name: "Edge AI Token Shield", latency: "Active", cat: "Rate-Limit" },
-            { name: "LlamaGuard 3 Safety Rails", latency: "S1–S13", cat: "Moderation" },
+            { name: "Rule-Based Guardrails", latency: "Policy", cat: "Moderation" },
           ].map((b) => (
             <div
               key={b.name}
@@ -250,7 +250,7 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
             style={{ textAlign: "left", background: "none", border: "1px dashed var(--color-border, #444)", borderRadius: "6px", padding: "0.75rem", color: "inherit", cursor: "pointer" }}
           >
             <strong>3. Inspect & Benchmark</strong>
-            <p style={{ margin: "0.25rem 0 0", fontSize: "0.75rem", opacity: 0.7 }}>Debug HNSW vector scores & Ragas ➔</p>
+            <p style={{ margin: "0.25rem 0 0", fontSize: "0.75rem", opacity: 0.7 }}>Debug HNSW vector scores &amp; evals ➔</p>
           </button>
           <button
             onClick={() => onNavigateTab?.("config")}
@@ -264,15 +264,15 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
 
       {/* Model Financial Token Spend */}
       <div>
-        <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>💡 Model Token Financial Spend</h3>
+        <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>💡 Model Catalog &amp; Routing</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0.75rem", background: "var(--color-bg, #111)", borderRadius: "4px", fontSize: "0.85rem" }}>
-            <span><strong>Gemini 3.6 Flash</strong> (Default Inference)</span>
-            <span style={{ color: "#00E676" }}>$0.000 (Included in Trial)</span>
+            <span><strong>Gemini 2.5 Flash</strong> (Default Cloud Inference)</span>
+            <span style={{ color: "var(--color-text-muted, #888)" }}>Gateway Cascade</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0.75rem", background: "var(--color-bg, #111)", borderRadius: "4px", fontSize: "0.85rem" }}>
-            <span><strong>Llama 3.3 70B</strong> (Groq Fast Inference)</span>
-            <span style={{ color: "#00E676" }}>$0.000 (Included in Trial)</span>
+            <span><strong>Ollama qwen2.5:1.5b</strong> (Local Fallback)</span>
+            <span style={{ color: "#00E676" }}>$0.000 (Local)</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0.75rem", background: "var(--color-bg, #111)", borderRadius: "4px", fontSize: "0.85rem" }}>
             <span><strong>GPT-4o</strong> (High-Precision Fallback)</span>

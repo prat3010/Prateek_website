@@ -5,7 +5,6 @@ import type { Persona } from '../lib/skills';
 import type { Currency } from '@/lib/pricing';
 import { ScopingBriefPDF } from '@/components/pdf/ScopingBriefPDF';
 import { ProposalExecutiveBriefPDF } from '@/components/pdf/ProposalExecutiveBriefPDF';
-import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
 import { ServicesAndPricingPDF } from '@/components/pdf/ServicesAndPricingPDF';
 import { InvoicePDF } from '@/components/pdf/InvoicePDF';
@@ -135,36 +134,6 @@ export async function generateExecutiveBriefPDF(resumeData?: ResumeData | null, 
   ensurePdfFonts();
   const fileName = `${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Executive_Pitch_Brief.pdf`;
   const element = React.createElement(ProposalExecutiveBriefPDF, { resumeData, data, isNoir, currency }) as unknown as React.ReactElement<DocumentProps>;
-  await renderAndOpenPDF(element, fileName);
-}
-
-export async function generateExecutiveBriefPDFBase64(
-  resumeData?: ResumeData | null,
-  data?: QuestionnaireData,
-  isNoir = false,
-  currency: Currency = 'INR'
-): Promise<{ fileName: string; base64: string }> {
-  ensurePdfFonts();
-  const fileName = `${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Executive_Pitch_Brief.pdf`;
-  const element = React.createElement(ProposalExecutiveBriefPDF, { resumeData, data, isNoir, currency }) as unknown as React.ReactElement<DocumentProps>;
-  const blob = await pdf(element).toBlob();
-  const base64 = await blobToBase64(blob);
-  return { fileName, base64 };
-}
-
-export async function generateMiddlemanAgreementPDF(resumeData?: ResumeData | null, isNoir = false) {
-  ensurePdfFonts();
-  const mm = resumeData?.intake?.middlemanAgreement;
-  const partnerName = mm?.partnerName || 'Partner';
-  const fileName = `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement.pdf`;
-  const element = React.createElement(MiddlemanAgreementPDF, { resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
-  await renderAndOpenPDF(element, fileName);
-}
-
-export async function generateQuotationPDF(resumeData?: ResumeData | null, isNoir = false) {
-  ensurePdfFonts();
-  const fileName = `${(resumeData?.name || 'Prateeq').replace(/\s+/g, '_')}_Service_Quotation.pdf`;
-  const element = React.createElement(ScopingBriefPDF, { resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }
 

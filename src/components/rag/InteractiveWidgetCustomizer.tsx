@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import MagneticButton from "@/components/ui/MagneticButton";
 import { useAuth } from "@/context/AuthContext";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface ChatMsg {
   role: "bot" | "user";
@@ -256,18 +256,19 @@ export function InteractiveWidgetCustomizer() {
                       });
                       if (res.ok) {
                         const data = await res.json();
-                        const answer = data.results?.[0]?.content || "Verified knowledge retrieved from cognitive engine.";
+                        const answer = data.results?.[0]?.content || "No matching knowledge chunks found for this query.";
                         setChatMessages((prev) => [...prev, { role: "bot", text: answer }]);
                       } else {
+                        const errData = await res.json().catch(() => ({}));
                         setChatMessages((prev) => [
                           ...prev,
-                          { role: "bot", text: "Verified response: Retriever utilizes PostgreSQL pgvector with zero hallucinations." },
+                          { role: "bot", text: `Error (${res.status}): ${errData.error || "Cognitive engine request failed."}` },
                         ]);
                       }
-                    } catch {
+                    } catch (err: unknown) {
                       setChatMessages((prev) => [
                         ...prev,
-                        { role: "bot", text: "Retriever operates on local-first embeddings ($0 cost) with hybrid fusion and instant citation generation." },
+                        { role: "bot", text: `Error: ${err instanceof Error ? err.message : "Network request failed."}` },
                       ]);
                     } finally {
                       setChatLoading(false);

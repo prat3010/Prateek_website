@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { type RetrieverClient, type RetrieverConfig } from "@/lib/rag-client";
 import { useAuth } from "@/context/AuthContext";
 import { isValidUrl } from "./utils";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 const EMPTY_CONFIG: RetrieverConfig = {
   apiUrl: "https://rag.prateeq.in",
@@ -105,17 +105,6 @@ export function ConfigPanel({
   const [welcomeMessage, setWelcomeMessage] = useState<string>(() =>
     getSavedWidgetConfig(form.tenantId, "welcomeMessage", "Hi there! How can I help answer questions from our documentation today?")
   );
-  const [corsDomain, setCorsDomain] = useState<string>(() =>
-    getSavedWidgetConfig(form.tenantId, "corsDomain", "https://mysite.com")
-  );
-  const [contextualHeader, setContextualHeader] = useState<string>(() =>
-    getSavedWidgetConfig(form.tenantId, "contextualHeader", "Document Title & Section Scope")
-  );
-  const [searchFusionStrategy, setSearchFusionStrategy] = useState<string>(() =>
-    getSavedWidgetConfig(form.tenantId, "searchFusionStrategy", "normalized_hybrid")
-  );
-
-
 
   useEffect(() => {
     if (!client) return;
@@ -133,11 +122,12 @@ export function ConfigPanel({
         setActivePresetId(matchingPreset ? matchingPreset.id : null);
         setPromptLoading(false);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!isMounted) return;
-        const fallback = PERSONA_PRESETS[1].prompt;
-        setMasterPrompt(fallback);
-        setActivePresetId(PERSONA_PRESETS[1].id);
+        setPromptStatus({
+          text: err instanceof Error ? err.message : "Failed to load AI Persona.",
+          isError: true,
+        });
         setPromptLoading(false);
       });
 
@@ -197,9 +187,6 @@ export function ConfigPanel({
           launcherPosition,
           botTitle,
           welcomeMessage,
-          corsDomain,
-          contextualHeader,
-          searchFusionStrategy,
         }));
       }
 
@@ -400,16 +387,6 @@ export function ConfigPanel({
                 <option value="bottom-left">Bottom Left</option>
               </select>
             </div>
-            <div>
-              <label className={styles.label}>CORS Whitelist Origin</label>
-              <input
-                className={styles.input}
-                aria-label="CORS Whitelist Origin"
-                value={corsDomain}
-                onChange={(e) => setCorsDomain(e.target.value)}
-                placeholder="https://mysite.com"
-              />
-            </div>
           </div>
         </div>
 
@@ -498,32 +475,6 @@ export function ConfigPanel({
               </select>
             </div>
           </div>
-
-          <div className={styles.row} style={{ marginTop: "0.75rem" }}>
-            <div>
-              <label className={styles.label}>🏷️ Anthropic Contextual Prepending Header</label>
-              <input
-                className={styles.input}
-                aria-label="Anthropic Contextual Prepending Header"
-                value={contextualHeader}
-                onChange={(e) => setContextualHeader(e.target.value)}
-                placeholder="Prefix attached to chunk text before vector embedding..."
-              />
-            </div>
-            <div>
-              <label className={styles.label}>⚡ Search Fusion Strategy</label>
-              <select
-                className={styles.input}
-                aria-label="Search Fusion Strategy"
-                value={searchFusionStrategy}
-                onChange={(e) => setSearchFusionStrategy(e.target.value)}
-              >
-                <option value="normalized_hybrid">Normalized Min-Max Hybrid Score Fusion</option>
-                <option value="hybrid_rrf">Standard Reciprocal Rank Fusion (RRF)</option>
-              </select>
-            </div>
-          </div>
-
         </>
       )}
 

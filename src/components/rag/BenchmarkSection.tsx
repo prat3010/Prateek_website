@@ -65,13 +65,14 @@ export function BenchmarkSection() {
   const activeTierData: TierData | undefined = sweeps[selectedTier] || Object.values(sweeps)[0];
 
   const highestQps = Math.max(...Object.values(sweeps).map((s) => s.qps || 0), 1);
-  const lowestP50 = Math.min(...Object.values(sweeps).map((s) => s.p50_ms || 9999), 10);
+  const p50Values = Object.values(sweeps).map((s) => s.p50_ms).filter((v): v is number => typeof v === "number" && v > 0);
+  const lowestP50 = p50Values.length > 0 ? Math.min(...p50Values) : 0;
   const avgErrorRate = (
     Object.values(sweeps).reduce((acc, s) => acc + (s.error_rate_pct || 0), 0) / Math.max(Object.keys(sweeps).length, 1)
   ).toFixed(2);
 
   const copySnippet = () => {
-    navigator.clipboard.writeText("python3 scripts/run_load_benchmark.py --target https://rag.prateeq.in");
+    navigator.clipboard.writeText("cd retriever && python3 scripts/run_load_benchmark.py --target https://rag.prateeq.in");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -255,7 +256,7 @@ export function BenchmarkSection() {
       {/* 5. CLI Reproduction Box */}
       <div className={styles.cliBox}>
         <div className={styles.cliCode}>
-          $ python3 scripts/run_load_benchmark.py --target https://rag.prateeq.in
+          $ cd retriever && python3 scripts/run_load_benchmark.py --target https://rag.prateeq.in
         </div>
         <MagneticButton strength={0.25}>
           <button className={styles.copyBtn} onClick={copySnippet}>

@@ -15,7 +15,7 @@ import {
   VirtualTenantBudget,
   WarmBootMetrics,
 } from "@/lib/rag-types";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface GatewayPanelProps {
   client: RetrieverClient | null;
@@ -96,117 +96,10 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
         if (bg.free_fallback_model) setFreeFallbackModel(bg.free_fallback_model);
         if (bg.currency) setCurrency(bg.currency);
       }
-    } catch {
-      // Fallback offline state for demo / zero-network resilience
-      setModels([
-        {
-          model_id: "gemini-2.5-flash",
-          provider: "gemini",
-          name: "Google Gemini 2.5 Flash",
-          input_cost_per_1k: 0.075,
-          output_cost_per_1k: 0.30,
-          capabilities: ["chat", "vision", "tools"],
-          is_local: false,
-          health_status: "healthy",
-          description: "Fast multimodal baseline with sub-second TTFT.",
-        },
-        {
-          model_id: "openai/gpt-4o-mini",
-          provider: "openai",
-          name: "OpenAI GPT-4o Mini",
-          input_cost_per_1k: 0.15,
-          output_cost_per_1k: 0.60,
-          capabilities: ["chat", "tools", "json"],
-          is_local: false,
-          health_status: "healthy",
-          description: "Cost-efficient secondary fallback.",
-        },
-        {
-          model_id: "anthropic/claude-3-5-sonnet-20240620",
-          provider: "anthropic",
-          name: "Claude 3.5 Sonnet",
-          input_cost_per_1k: 3.00,
-          output_cost_per_1k: 15.00,
-          capabilities: ["chat", "vision", "tools"],
-          is_local: false,
-          health_status: "healthy",
-          description: "High-reasoning tier for complex queries.",
-        },
-        {
-          model_id: "ollama/qwen2.5:14b",
-          provider: "ollama",
-          name: "Ollama Qwen 2.5 14B (Local)",
-          input_cost_per_1k: 0.0,
-          output_cost_per_1k: 0.0,
-          capabilities: ["chat", "tools"],
-          is_local: true,
-          health_status: "healthy",
-          description: "Local offline emergency fallback.",
-        },
-      ]);
-      setBudget({
-        daily_budget: 5.0,
-        monthly_budget: 50.0,
-        hard_limit_action: "downgrade_free_model",
-        free_fallback_model: "ollama/qwen2.5:14b",
-        currency: "USD",
-        current_daily_spend: 1.45,
-        current_monthly_spend: 14.80,
-        is_budget_exceeded: false,
-        cost_by_model: {
-          "gemini-2.5-flash": 11.20,
-          "openai/gpt-4o-mini": 3.60,
-        },
-      });
-      setServerlessStatus({
-        provider: "modal",
-        gpu_tier: "A10G",
-        active_containers: 0,
-        min_containers: 0,
-        max_containers: 5,
-        scaledown_window_seconds: 300,
-        is_warm: false,
-        endpoint_url: "https://prateeq--vllm-llama-serve.modal.run",
-        current_active_model: "meta-llama/Meta-Llama-3.1-8B-Instruct",
-        active_lora_adapters: ["lora_arch_v1"],
-      });
-      setServerlessCost({
-        active_hours: 15.0,
-        gpu_tier: "A10G",
-        hourly_gpu_rate_usd: 1.0,
-        serverless_monthly_cost_usd: 15.0,
-        dedicated_monthly_cost_usd: 720.0,
-        monthly_savings_usd: 705.0,
-        savings_percentage: 97.92,
-      });
-      setLoraAdapters([
-        {
-          adapter_id: "lora_arch_v1",
-          tenant_id: "tn_demo",
-          name: "Architecture Copilot LoRA",
-          base_model: "meta-llama/Meta-Llama-3.1-8B-Instruct",
-          artifact_uri: "s3://vault/adapters/arch_lora_v1",
-          rank: 16,
-          alpha: 32.0,
-          target_modules: ["q_proj", "v_proj"],
-          adapter_type: "llm",
-          description: "Enterprise software architecture fine-tuning",
-          is_active: true,
-        },
-        {
-          adapter_id: "lora_legal_v2",
-          tenant_id: "tn_demo",
-          name: "Legal Contract SOW LoRA",
-          base_model: "meta-llama/Meta-Llama-3.1-8B-Instruct",
-          artifact_uri: "s3://vault/adapters/legal_lora_v2",
-          rank: 8,
-          alpha: 16.0,
-          target_modules: ["q_proj", "k_proj", "v_proj"],
-          adapter_type: "llm",
-          description: "MSA and statement of work compliance",
-          is_active: false,
-        },
-      ]);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load gateway configuration."
+      );
     } finally {
       setLoading(false);
     }
@@ -227,14 +120,8 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
       const results = await client.probeGateway();
       setProbes(results);
       setSuccessMessage("Latency probes completed across upstream providers.");
-    } catch {
-      setProbes([
-        { provider: "gemini", target_model: "gemini-2.5-flash", reachable: true, latency_ms: 115 },
-        { provider: "openai", target_model: "gpt-4o-mini", reachable: true, latency_ms: 220 },
-        { provider: "anthropic", target_model: "claude-3-haiku", reachable: true, latency_ms: 295 },
-        { provider: "ollama", target_model: "qwen2.5:14b", reachable: true, latency_ms: 38 },
-      ]);
-      setSuccessMessage("Simulated latency probes (offline fallback).");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Latency probe failed.");
     } finally {
       setProbing(false);
     }
@@ -252,17 +139,12 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
       } else {
         throw new Error("Probe method unavailable");
       }
-    } catch {
-      const fallbackMetrics: WarmBootMetrics = {
-        container_init_time_ms: 1850,
-        model_weights_load_time_ms: 620,
-        first_token_latency_ms: 142,
-        total_cold_start_time_ms: 2612,
-        is_cold_start: true,
-        probed_at: new Date().toISOString(),
-      };
-      setServerlessMetrics(fallbackMetrics);
-      setSuccessMessage("Probed serverless GPU container (simulated benchmark).");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Serverless GPU probe failed (endpoint not configured)."
+      );
     } finally {
       setServerlessProbing(false);
     }
@@ -932,15 +814,17 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
               Warm-Boot / Cold-Start TTFT
             </div>
             <div style={{ fontSize: "1.25rem", fontWeight: 700, margin: "0.4rem 0", color: "var(--color-text)" }}>
-              {serverlessMetrics ? `${serverlessMetrics.first_token_latency_ms}ms TTFT` : "142ms TTFT"}
+              {serverlessMetrics ? `${serverlessMetrics.first_token_latency_ms}ms TTFT` : "Not probed"}
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
               {serverlessMetrics
                 ? `Container Init: ${serverlessMetrics.container_init_time_ms}ms • Weights: ${serverlessMetrics.model_weights_load_time_ms}ms`
-                : "Container Init: 1850ms • Weights: 620ms"}
+                : "Run probe to measure container & weights latency"}
             </div>
             <div style={{ fontSize: "0.6875rem", color: "var(--color-text-muted)", marginTop: "0.4rem" }}>
-              Total cold-start benchmark: {serverlessMetrics?.total_cold_start_time_ms ?? 2612}ms
+              {serverlessMetrics
+                ? `Total cold-start benchmark: ${serverlessMetrics.total_cold_start_time_ms}ms`
+                : "Serverless endpoint telemetry not yet probed"}
             </div>
           </div>
 

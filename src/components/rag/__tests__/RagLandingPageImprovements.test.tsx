@@ -139,7 +139,7 @@ describe("RAG Landing Page Improvements", () => {
         // Top score rendered from real result
         expect(screen.getByText(/Top Score: 6.528/)).toBeInTheDocument();
         // Server telemetry strategy
-        expect(screen.getByText(/EXACT REDIS CACHE HIT/)).toBeInTheDocument();
+        expect(screen.getByText(/EXACT CACHE HIT/)).toBeInTheDocument();
       });
     });
 
@@ -199,7 +199,7 @@ describe("RAG Landing Page Improvements", () => {
       render(<RagLandingPage />);
       await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
-      expect(screen.getByText("⚡ 14.8ms Median Latency")).toBeInTheDocument();
+      expect(screen.getByText("⚡ ~272ms Edge / ~2.20s DB p50")).toBeInTheDocument();
       expect(screen.getByText("🔒 PostgreSQL RLS Multi-Tenancy")).toBeInTheDocument();
       expect(screen.getByText("💰 $0 Local Embedding Cost")).toBeInTheDocument();
       expect(screen.getByText("📦 1-Line Drop-In Script")).toBeInTheDocument();

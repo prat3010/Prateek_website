@@ -43,11 +43,11 @@ const PERSONAS: PersonaConfig[] = [
     tag: "Developer-First Core",
     title: "Headless Vector & REST API",
     description:
-      "Direct programmatic access with scoped API keys (ret_live_...). Full parity across TypeScript and Python SDKs, SSE streaming chat, and hybrid BM25 + HNSW + ColBERT MaxSim fusion.",
+      "Direct programmatic access with scoped API keys (ret_live_...). Full parity across TypeScript and Python SDKs, SSE streaming chat, and hybrid BM25 + pgvector HNSW fusion.",
     highlights: [
       { strong: "REST & SSE Streaming:", text: "Clean /v1/tenants/{id}/search and /chat" },
       { strong: "$0 Embedding Cost:", text: "Built-in local Ollama nomic-embed-text engine" },
-      { strong: "38 Production Batteries:", text: "Ebbinghaus memory, Graph-of-Thought, DSPy" },
+      { strong: "Modular Engine Batteries:", text: "Ebbinghaus memory, GraphRAG, Rule Guardrails" },
       { strong: "Universal SDKs:", text: "Native TypeScript and Python client packages" },
     ],
     ctaText: "View API Keys & SDKs →",
@@ -64,7 +64,7 @@ const PERSONAS: PersonaConfig[] = [
     highlights: [
       { strong: "Strict DB Multi-Tenancy:", text: "PostgreSQL RLS prevents cross-tenant data leaks" },
       { strong: "Zero Data Retention:", text: "Your documents are never retained or trained on" },
-      { strong: "Privacy Batteries:", text: "MPC enclave execution & ZKP proof attestation" },
+      { strong: "Privacy & Provenance:", text: "Postgres FORCE RLS & Signed Merkle Attestation" },
       { strong: "Audit Posture:", text: "HIPAA, GDPR, and SOC2 aligned architecture" },
     ],
     ctaText: "Build Enterprise Scope →",

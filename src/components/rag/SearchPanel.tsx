@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
 import type { SearchResponse, OnlineEvaluationSummaryResponse } from "@/lib/rag-types";
 import { highlightText } from "./utils";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 type SearchSubTab = "search" | "benchmarks" | "pipeline";
 
@@ -32,8 +32,10 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
         try {
           const summary = await client.getOnlineEvaluationSummary();
           if (isMounted) setOnlineEval(summary);
-        } catch {
-          // ignore
+        } catch (err: unknown) {
+          if (isMounted) {
+            setError(err instanceof Error ? err.message : "Failed to load evaluation summary.");
+          }
         } finally {
           if (isMounted) setLoadingEval(false);
         }
@@ -48,11 +50,12 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
 
     if (!client) return;
     setLoadingEval(true);
+    setError("");
     try {
       const summary = await client.getOnlineEvaluationSummary();
       setOnlineEval(summary);
-    } catch {
-      // ignore
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to refresh evaluation summary.");
     } finally {
       setLoadingEval(false);
     }
@@ -101,7 +104,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
           onClick={() => setSubTab("benchmarks")}
           className={`${styles.subTabBtn} ${subTab === "benchmarks" ? styles.subTabBtnActive : ""}`}
         >
-          📊 Online Evaluator & Ragas
+          📊 Online Evaluator
         </button>
         <button
           onClick={() => setSubTab("pipeline")}
@@ -162,10 +165,6 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                 />
                 <label htmlFor="lora-toggle">🧠 LoRA Domain Adapter</label>
               </span>
-              <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                <input type="checkbox" id="mq-toggle" defaultChecked />
-                <label htmlFor="mq-toggle">🔀 Multi-Query Expansion</label>
-              </span>
               <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginLeft: "auto" }}>
                 <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Reranker:</span>
                 <button
@@ -182,7 +181,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                     fontWeight: rerankerEngine === "colbert" ? 600 : 400,
                   }}
                 >
-                  ⚡ ColBERT MaxSim
+                  ⚡ Lexical MaxSim
                 </button>
                 <button
                   type="button"
@@ -232,7 +231,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                   {results.searchMeta?.durationMs && ` in ${results.searchMeta.durationMs}ms`}
                 </p>
                 <span className={styles.tag} style={{ background: "var(--badge-active-bg, rgba(0,230,118,0.15))", color: "var(--badge-active-color, #00E676)", fontSize: "0.75rem" }}>
-                  {results.searchMeta?.strategy?.includes("colbert_maxsim") ? "⚡ ColBERT MaxSim Reranked" : `⚡ Strategy: ${results.searchMeta?.strategy || "normalized_hybrid"}`}
+                  {results.searchMeta?.strategy?.includes("colbert_maxsim") ? "⚡ Lexical MaxSim Reranked" : `⚡ Strategy: ${results.searchMeta?.strategy || "normalized_hybrid"}`}
                 </span>
               </div>
 
@@ -272,7 +271,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
       )}
 
 
-      {/* Sub-Tab 2: Online Evaluations & Ragas Telemetry */}
+      {/* Sub-Tab 2: Online Evaluations Telemetry */}
       {subTab === "benchmarks" && (
         <div>
           <div style={{ marginBottom: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
@@ -332,8 +331,8 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
           </div>
 
           <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem", background: "var(--surface-card, rgba(255,255,255,0.02))" }}>
-            <span style={{ fontSize: "0.75rem", color: "#00E676", fontWeight: 700, textTransform: "uppercase" }}>Cross-Encoder Reranking</span>
-            <h4 style={{ margin: "0.5rem 0 0.25rem" }}>{rerankerEngine === "colbert" ? "ColBERT MaxSim Late-Interaction" : rerankerEngine === "cohere" ? "Cohere Rerank v3" : "Dense-Only (No Rerank)"}</h4>
+            <span style={{ fontSize: "0.75rem", color: "#00E676", fontWeight: 700, textTransform: "uppercase" }}>Late-Interaction &amp; API Reranking</span>
+            <h4 style={{ margin: "0.5rem 0 0.25rem" }}>{rerankerEngine === "colbert" ? "Lexical MaxSim Late-Interaction" : rerankerEngine === "cohere" ? "Cohere Rerank v3" : "Dense-Only (No Rerank)"}</h4>
             <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 0.75rem" }}>Token-level multi-vector late interaction scoring over top candidate chunks.</p>
             <div style={{ background: "var(--surface-elevated, #111)", padding: "0.5rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem" }}>
               LoRA Adapter: <strong>{enableLora ? "Active" : "Disabled (Base Model)"}</strong>

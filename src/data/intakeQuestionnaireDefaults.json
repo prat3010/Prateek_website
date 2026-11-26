@@ -213,7 +213,7 @@
       "priceINR": 75000,
       "priceUSD": 1000,
       "laymanDescription": "Automated document, receipt, invoice, and image scanner powered by multimodal AI that extracts structured JSON data and populates your database.",
-      "techSpecs": "Gemini 1.5 / Claude Vision API, Schema Validation, PDF/Image OCR Extraction Pipeline, Supabase Storage Sync",
+      "techSpecs": "Gemini Vision API / Claude Vision API, Schema Validation, PDF/Image OCR Extraction Pipeline, Supabase Storage Sync",
       "recommendedMaintenanceId": "standard"
     }
   ],
@@ -510,7 +510,7 @@
     {
       "id": "chatbot",
       "label": "\ud83d\udcac AI Chatbot Widget",
-      "laymanDescription": "24/7 3rd-party AI chatbot widget (Voiceflow/Tidio) embedded on your website to answer FAQs, capture leads, and reduce support workload.",
+      "laymanDescription": "24/7 AI chatbot widget (Retriever / Custom RAG) embedded on your website to answer FAQs, capture leads, and reduce support workload.",
       "techSpecs": "Script Loader, Shadow DOM Isolation, System Prompt Configuration, Fallback Routing, Webhook Messaging",
       "priceINR": 20000,
       "priceUSD": 250,

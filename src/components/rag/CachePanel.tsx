@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface CachePanelProps {
   hidden?: boolean;
@@ -10,8 +10,8 @@ interface CachePanelProps {
 }
 
 export function CachePanel({ hidden, client }: CachePanelProps) {
-  const [similarityThreshold, setSimilarityThreshold] = useState<number>(0.95);
   const [cachedVectors, setCachedVectors] = useState<number | null>(null);
+  const [cacheError, setCacheError] = useState<string | null>(null);
   const [purging, setPurging] = useState<boolean>(false);
   const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
 
@@ -21,9 +21,16 @@ export function CachePanel({ hidden, client }: CachePanelProps) {
       client
         .getCacheStats()
         .then((stats) => {
-          if (isMounted) setCachedVectors(stats.total_vectors);
+          if (isMounted) {
+            setCachedVectors(stats.total_vectors);
+            setCacheError(null);
+          }
         })
-        .catch(() => {});
+        .catch((err: unknown) => {
+          if (isMounted) {
+            setCacheError(err instanceof Error ? err.message : "Failed to load cache telemetry.");
+          }
+        });
     }
     return () => {
       isMounted = false;
@@ -51,7 +58,7 @@ export function CachePanel({ hidden, client }: CachePanelProps) {
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeaderGroup}>
-        <h2 className={styles.panelTitle}>⚡ Sub-50ms Semantic Cache Management</h2>
+        <h2 className={styles.panelTitle}>⚡ Semantic Cache Management</h2>
         <p className={styles.panelDesc}>
           Save query latency and token financial costs by caching high-confidence query embeddings in PostgreSQL pgvector.
         </p>
@@ -74,33 +81,11 @@ export function CachePanel({ hidden, client }: CachePanelProps) {
               <span>Cache TTL:</span>
               <strong>24 Hours (Rolling Expiry)</strong>
             </div>
-          </div>
-        </div>
-
-        {/* Sensitivity Tuning Card */}
-        <div style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
-          <h3 style={{ fontSize: "1rem", margin: "0 0 0.5rem" }}>🎯 Similarity Hit Threshold</h3>
-          <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 1rem" }}>
-            Controls the minimum vector similarity required to return an instantaneous cached answer before invoking the LLM.
-          </p>
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-              <span>Threshold Cosine Value:</span>
-              <strong>{similarityThreshold.toFixed(2)}</strong>
-            </div>
-            <input
-              type="range"
-              min={0.90}
-              max={0.99}
-              step={0.01}
-              value={similarityThreshold}
-              onChange={(e) => setSimilarityThreshold(parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: "var(--color-link, #5A8EB6)" }}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", opacity: 0.6 }}>
-              <span>0.90 (Relaxed match)</span>
-              <span>0.99 (Exact match)</span>
-            </div>
+            {cacheError && (
+              <div style={{ color: "#FF1744", fontSize: "0.8rem", marginTop: "0.25rem" }}>
+                ⚠️ {cacheError}
+              </div>
+            )}
           </div>
         </div>
       </div>

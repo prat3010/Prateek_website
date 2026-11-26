@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 export function ComparisonSection() {
   const comparisonData = [
@@ -18,13 +18,13 @@ export function ComparisonSection() {
     },
     {
       feature: "Source Verification",
-      retriever: "Presigned PDF Downloads with Exact Page Numbers",
+      retriever: "Presigned PDF Downloads with Source Chunk Metadata",
       others: "Plain Text / No Verifiable Citations",
       highlight: true,
     },
     {
       feature: "Latency & API Costs",
-      retriever: "Sub-50ms Semantic Cache (Saves up to 60% Token Costs)",
+      retriever: "pgvector Semantic Cache (Configurable Similarity Threshold)",
       others: "Full LLM Inference & High Cost Every Query",
       highlight: false,
     },
@@ -36,7 +36,7 @@ export function ComparisonSection() {
     },
     {
       feature: "LLM Provider Flexibility",
-      retriever: "Multi-Model BYOK (OpenAI, Gemini 3.6, Llama 3.3 70B, Claude 3.5, DeepSeek)",
+      retriever: "Multi-Model BYOK (Gemini 2.5/3.8, OpenAI, Claude, Local Ollama)",
       others: "Locked to single vendor / hardcoded model",
       highlight: true,
     },
@@ -48,7 +48,7 @@ export function ComparisonSection() {
     },
     {
       feature: "Multi-Modal Document Parsing",
-      retriever: "Baidu PP-OCRv4 Deep Learning + LLM Vision Engine",
+      retriever: "pdfplumber Layout Parser + Optional Vision LLM OCR",
       others: "Plain Text Extraction / Fails on Scanned PDFs & Charts",
       highlight: true,
     },

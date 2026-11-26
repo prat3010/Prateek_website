@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MagneticButton from "@/components/ui/MagneticButton";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface ApiKeysPanelProps {
   hidden?: boolean;
@@ -17,15 +16,15 @@ export function ApiKeysPanel({ hidden, tenantId, apiKey, planTier = "starter" }:
   const [copiedPython, setCopiedPython] = useState(false);
   const [copiedTs, setCopiedTs] = useState(false);
   const [keyVisible, setKeyVisible] = useState(false);
-  const [allowedOrigins, setAllowedOrigins] = useState("");
-  const [originsSaved, setOriginsSaved] = useState(false);
 
   if (hidden) return null;
 
-  const displayKey = apiKey || "ret_live_sample_key_configured";
-  const maskedKey = keyVisible
-    ? displayKey
-    : `${displayKey.slice(0, 12)}••••••••••••••••••••••••••••`;
+  const displayKey = apiKey || "";
+  const maskedKey = displayKey
+    ? keyVisible
+      ? displayKey
+      : `${displayKey.slice(0, 12)}••••••••••••••••••••••••••••`
+    : "No API key configured for this workspace";
 
   const curlSnippet = `curl -X POST https://rag.prateeq.in/v1/tenants/${tenantId || "YOUR_TENANT_ID"}/search \\
   -H "Authorization: Bearer ${displayKey}" \\
@@ -66,17 +65,11 @@ const data = await res.json();
 console.log(data);`;
 
   const handleCopy = (text: string, setFn: (v: boolean) => void) => {
-    if (typeof navigator !== "undefined") {
+    if (typeof navigator !== "undefined" && text) {
       navigator.clipboard.writeText(text);
       setFn(true);
       setTimeout(() => setFn(false), 2000);
     }
-  };
-
-  const handleSaveOrigins = (e: React.FormEvent) => {
-    e.preventDefault();
-    setOriginsSaved(true);
-    setTimeout(() => setOriginsSaved(false), 2500);
   };
 
   return (
@@ -141,39 +134,6 @@ console.log(data);`;
             {copiedKey ? "✓ Copied!" : "Copy Key"}
           </button>
         </div>
-      </div>
-
-      {/* Domain Whitelist for Public Widget */}
-      <div className={styles.metricCard} style={{ marginBottom: "1.5rem", padding: "1.25rem" }}>
-        <h3 style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: "0.5rem" }}>
-          🛡️ Embed Widget Allowed Domains (CORS)
-        </h3>
-        <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginBottom: "0.75rem" }}>
-          Lock the public 1-line chat widget to your official domains. The widget script will only answer requests originating from these hostnames.
-        </p>
-        <form onSubmit={handleSaveOrigins} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-          <input
-            type="text"
-            value={allowedOrigins}
-            onChange={(e) => setAllowedOrigins(e.target.value)}
-            placeholder="e.g. https://mycompany.com, https://app.mycompany.com"
-            style={{
-              flex: 1,
-              minWidth: "240px",
-              padding: "0.55rem 0.75rem",
-              background: "var(--surface-elevated)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "6px",
-              color: "var(--color-text)",
-              fontSize: "0.85rem",
-            }}
-          />
-          <MagneticButton strength={0.25}>
-            <button type="submit" className="comic-btn comic-btn-blue" style={{ padding: "0.5rem 0.85rem", fontSize: "0.8rem" }}>
-              {originsSaved ? "✓ Saved!" : "Save Allowed Domains"}
-            </button>
-          </MagneticButton>
-        </form>
       </div>
 
       {/* Developer SDK Quickstarts */}

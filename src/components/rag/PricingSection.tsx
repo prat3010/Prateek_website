@@ -8,7 +8,7 @@ import NumberFlow from "@number-flow/react";
 import { useAuth } from "@/context/AuthContext";
 import { resolveDefaultCurrency } from "@/lib/pricing";
 import MagneticButton from "@/components/ui/MagneticButton";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface PlanItem {
   id: string;
@@ -49,7 +49,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "1 Workspace / Tenant",
           "20 Documents (~50MB)",
           "1,000 Chat Queries / mo",
-          "Llama 3.3 70B & Gemini 2.5",
+          "Gemini 2.5 Flash & Local Ollama",
           "Standard Support",
         ],
         cta: "Launch Free Sandbox (No CC)",
@@ -108,7 +108,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "1 Workspace / Tenant",
           "20 Documents (~50MB)",
           "1,000 Chat Queries / mo",
-          "Llama 3.3 70B & Gemini 2.5",
+          "Gemini 2.5 Flash & Local Ollama",
           "Standard Support",
         ],
         cta: "Launch Free Sandbox (No CC)",
@@ -182,7 +182,13 @@ export function PricingSection() {
           });
         }
       })
-      .catch(() => {});
+      .catch((err: unknown) => {
+        if (active) {
+          toast.error(
+            err instanceof Error ? err.message : "Failed to load live pricing catalog."
+          );
+        }
+      });
 
     return () => {
       active = false;
@@ -239,29 +245,6 @@ export function PricingSection() {
       const data = await res.json();
       if (!res.ok || data.error) {
         toast.error(data.error || "Failed to initialize subscription.");
-        setLoadingPlanId(null);
-        return;
-      }
-
-      if (data.isMock) {
-        if (token) {
-          try {
-            await fetch("/api/client/verify-razorpay-subscription", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                razorpaySubscriptionId: data.subscriptionId,
-                razorpayPaymentId: "pay_mock",
-                razorpaySignature: "test_sub_signature_mock",
-                planId: plan.planId || plan.id,
-              }),
-            });
-          } catch {}
-        }
-        router.push("/rag/app?upgraded=true");
         setLoadingPlanId(null);
         return;
       }

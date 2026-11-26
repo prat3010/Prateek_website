@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { m } from "framer-motion";
-import TiltCard from "@/components/ui/TiltCard";
-import styles from "./BatteriesBentoMatrix.module.css";
+import styles from "./ragStyles";
 
 type CategoryKey = "all" | "retrieval" | "reasoning" | "memory" | "multimodal" | "security";
 
@@ -11,363 +10,246 @@ interface BatteryItem {
   id: number;
   icon: string;
   title: string;
-  category: "retrieval" | "reasoning" | "memory" | "multimodal" | "security";
+  category: Exclude<CategoryKey, "all">;
   categoryLabel: string;
   badge: string;
   description: string;
 }
 
 const BATTERIES: BatteryItem[] = [
-  // 1. Core Retrieval (1-8)
+  // 1. Core Retrieval (4)
   {
     id: 1,
     icon: "⚡",
-    title: "Dense pgvector HNSW",
+    title: "Sublinear BM25 Keyword Search",
     category: "retrieval",
     categoryLabel: "Core Retrieval",
-    badge: "Sub-5ms",
-    description: "Hierarchical Navigable Small World graph indexing directly in PostgreSQL for ultra-fast approximate nearest neighbor vector search.",
+    badge: "Exact Match",
+    description: "In-memory BM25 inverted index delivering sub-millisecond keyword matching for SKUs, error codes, and proper nouns.",
   },
   {
     id: 2,
     icon: "🔍",
-    title: "BM25 Okapi Sparse Search",
+    title: "pgvector HNSW Dense Embeddings",
     category: "retrieval",
     categoryLabel: "Core Retrieval",
-    badge: "Lexical Match",
-    description: "Exact term frequency and inverse document frequency scoring for precise acronyms, code identifiers, and SKU matching.",
+    badge: "768-dim Cosine",
+    description: "Approximate nearest-neighbor HNSW index in PostgreSQL with Row-Level Security tenant isolation.",
   },
   {
     id: 3,
     icon: "🎯",
-    title: "ColBERT MaxSim Multi-Vector",
+    title: "Lexical MaxSim Late-Interaction Reranker",
     category: "retrieval",
     categoryLabel: "Core Retrieval",
     badge: "Token-Level",
-    description: "Fine-grained token-level late interaction computing maximum cosine similarity across all query tokens.",
+    description: "Fine-grained token-level late interaction computing maximum bigram similarity across query tokens.",
   },
   {
     id: 4,
-    icon: "⚖️",
-    title: "Reciprocal Rank Fusion (RRF)",
+    icon: "📄",
+    title: "pdfplumber Layout Parser & Optional RapidOCR",
     category: "retrieval",
     categoryLabel: "Core Retrieval",
-    badge: "k=60 Constant",
-    description: "Rank-based score normalization combining sparse and dense candidate lists without arbitrary score-scale distortion.",
+    badge: "Layout Parser",
+    description: "Parses multi-column PDFs and structured tables with optional RapidOCR for scanned document text.",
   },
+
+  // 2. Cognitive Reasoning, Graph & ML (8)
   {
     id: 5,
-    icon: "📊",
-    title: "Cross-Encoder Re-ranking",
-    category: "retrieval",
-    categoryLabel: "Core Retrieval",
-    badge: "High Precision",
-    description: "Deep transformer cross-attention scoring between query and top retrieved chunks for optimal context ranking.",
+    icon: "🐍",
+    title: "RLM Python REPL Execution Sandbox",
+    category: "reasoning",
+    categoryLabel: "Cognitive & Graph",
+    badge: "Isolated Subprocess",
+    description: "Subprocess-isolated Python execution with CPU/memory rlimits for programmatic data verification.",
   },
   {
     id: 6,
-    icon: "📂",
-    title: "Parent-Child Chunk Expansion",
-    category: "retrieval",
-    categoryLabel: "Core Retrieval",
-    badge: "Context Window",
-    description: "Indexes granular child chunks for precise vector hits while restoring full parent document context during generation.",
-  },
-  {
-    id: 7,
-    icon: "🚀",
-    title: "Sub-15ms Semantic Vector Cache",
-    category: "retrieval",
-    categoryLabel: "Core Retrieval",
-    badge: "60% Token Savings",
-    description: "Pre-indexes query vector embeddings with cosine similarity gating to instantly serve cached responses at zero LLM cost.",
-  },
-  {
-    id: 8,
-    icon: "🔀",
-    title: "Hybrid Dense-Sparse Fusion",
-    category: "retrieval",
-    categoryLabel: "Core Retrieval",
-    badge: "Alpha Weighting",
-    description: "Dynamically balances semantic vector embeddings and exact keyword tokens based on query intent classification.",
-  },
-
-  // 2. Cognitive Reasoning & Planning (9-15)
-  {
-    id: 9,
     icon: "🕸️",
-    title: "GraphRAG Leiden Clustering",
+    title: "GraphRAG HDBSCAN Community Clustering",
     category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
+    categoryLabel: "Cognitive & Graph",
     badge: "Unsupervised",
     description: "Extracts entity-relation triples and clusters global knowledge communities for multi-hop analytical reasoning.",
   },
   {
-    id: 10,
-    icon: "🧠",
-    title: "Graph-of-Thought (GoT) Planning",
+    id: 7,
+    icon: "🔗",
+    title: "Neo4j Cypher Labeled Property Graph",
     category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
-    badge: "Backtrackable",
-    description: "Generates non-linear reasoning graphs allowing thoughts to branch, merge, and backtrack when dead ends are hit.",
+    categoryLabel: "Cognitive & Graph",
+    badge: "Multi-Hop",
+    description: "Optional Neo4j Cypher backend for deep relationship traversal alongside PostgreSQL graph storage.",
+  },
+  {
+    id: 8,
+    icon: "🛡️",
+    title: "Telemetry Anomaly Sentinel",
+    category: "reasoning",
+    categoryLabel: "Cognitive & Graph",
+    badge: "Isolation Forest",
+    description: "Monitors query latency, cache hit drops, and error spikes to surface tenant operational anomalies.",
+  },
+  {
+    id: 9,
+    icon: "🚀",
+    title: "Serverless GPU & Dynamic vLLM / LoRA",
+    category: "reasoning",
+    categoryLabel: "Cognitive & Graph",
+    badge: "LoRA Adapters",
+    description: "Tenant-scoped LoRA embedding weight loading and serverless GPU cluster health orchestration.",
+  },
+  {
+    id: 10,
+    icon: "🤖",
+    title: "Autonomous Multi-Turn ReAct Engine",
+    category: "reasoning",
+    categoryLabel: "Cognitive & Graph",
+    badge: "Tool Calling",
+    description: "Iterative Reason-Act-Observe agent loop executing registered domain tools with bounded step budgets.",
   },
   {
     id: 11,
-    icon: "🐍",
-    title: "Recursive Language Modeling (RLM)",
+    icon: "🗳️",
+    title: "Multi-Agent Consensus & Reflection Loop",
     category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
-    badge: "Python REPL",
-    description: "Sandboxed Python execution environment allowing LLMs to run code, verify mathematical calculations, and iterate autonomously.",
+    categoryLabel: "Cognitive & Graph",
+    badge: "Arbitration",
+    description: "Multi-model critique and consensus synthesis with automated faithfulness reflection.",
   },
   {
     id: 12,
-    icon: "🗳️",
-    title: "Multi-Agent Consensus Arbitration",
+    icon: "⚡",
+    title: "System 1 Fast-Path Decision Plane",
     category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
-    badge: "Debate & Vote",
-    description: "Orchestrates multi-model debate between heterogeneous LLMs with automated majority voting and referee arbitration.",
-  },
-  {
-    id: 13,
-    icon: "✨",
-    title: "DSPy Automated Prompt Optimization",
-    category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
-    badge: "Self-Compiling",
-    description: "Algorithmic prompt compilation and bootstrap few-shot optimization maximizing downstream assertion metrics.",
-  },
-  {
-    id: 14,
-    icon: "🛡️",
-    title: "Self-Aware Corrective RAG (CRAG)",
-    category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
-    badge: "Zero Hallucination",
-    description: "Evaluates document retrieval confidence before generation; rejects unbacked prompts instead of inventing answers.",
-  },
-  {
-    id: 15,
-    icon: "🔄",
-    title: "Agentic Workflow DAG Orchestration",
-    category: "reasoning",
-    categoryLabel: "Cognitive Reasoning",
-    badge: "State Machine",
-    description: "Directed acyclic graphs for complex multi-step enterprise workflows with deterministic state transitions and checkpoints.",
+    categoryLabel: "Cognitive & Graph",
+    badge: "Jev Engine",
+    description: "Low-latency intent classification and corrective retrieval routing before full LLM synthesis.",
   },
 
-  // 3. Long-Horizon Memory & State (16-20)
+  // 3. Long-Horizon Memory (1)
+  {
+    id: 13,
+    icon: "🧬",
+    title: "Cognitive Agent Memory Consolidation",
+    category: "memory",
+    categoryLabel: "Agent Memory",
+    badge: "768-dim + Ebbinghaus",
+    description: "Ebbinghaus retention decay and 768-dim pgvector semantic consolidation across multi-session histories.",
+  },
+
+  // 4. Multimodal Vision (1)
+  {
+    id: 14,
+    icon: "👁️",
+    title: "Multimodal Vision GraphRAG & Schematics",
+    category: "multimodal",
+    categoryLabel: "Multimodal Vision",
+    badge: "Vision LLM",
+    description: "Extracts architectural diagrams and schematic entities via configured Vision LLMs with fail-closed HTTP 415/503 guards.",
+  },
+
+  // 5. Security, Edge & Platform Extensibility (11)
+  {
+    id: 15,
+    icon: "🚦",
+    title: "Edge AI Token Shield & Rate Limiter",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Rate-Limit",
+    description: "Sliding-window token and request quotas enforced at both the edge proxy and FastAPI router layer.",
+  },
   {
     id: 16,
-    icon: "📈",
-    title: "Ebbinghaus Spacing Memory",
-    category: "memory",
-    categoryLabel: "Long-Horizon Memory",
-    badge: "Exponential Decay",
-    description: "Mathematically models human memory retention curves, prioritizing reinforced knowledge while gradually decaying stale state.",
+    icon: "🔒",
+    title: "Structured Safety & Moderation Rails",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Fail-Closed",
+    description: "Structured input/output safety guard with configurable fail-closed policy enforcement.",
   },
   {
     id: 17,
-    icon: "🪟",
-    title: "Dynamic Working Context Window",
-    category: "memory",
-    categoryLabel: "Long-Horizon Memory",
-    badge: "Adaptive Token Budget",
-    description: "Dynamically allocates prompt token budgets between system constraints, active chat turns, and retrieved knowledge.",
+    icon: "🗜️",
+    title: "Heuristic Context Window Compression",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Token Budget",
+    description: "Deterministic token-budget pruning to fit high-density retrieved chunks within model context limits.",
   },
   {
     id: 18,
-    icon: "📦",
-    title: "Episodic Memory Buffers",
-    category: "memory",
-    categoryLabel: "Long-Horizon Memory",
-    badge: "Session Replay",
-    description: "Stores key user preferences, historical outcomes, and resolved edge cases across asynchronous conversation threads.",
+    icon: "⚖️",
+    title: "Programmable Rule & Policy Guardrails",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Postgres RLS",
+    description: "Tenant-persisted regex and policy guardrail rules enforcing PII redaction and topic boundaries.",
   },
   {
     id: 19,
-    icon: "💾",
-    title: "Cross-Session Context Persistence",
-    category: "memory",
-    categoryLabel: "Long-Horizon Memory",
-    badge: "Encrypted RLS",
-    description: "Preserves user agent memory across browser restarts and device transitions with strict tenant database isolation.",
+    icon: "📡",
+    title: "Sovereign Edge SQLite & Vector Sync",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Delta Sync",
+    description: "Offline-capable edge node delta synchronization and local bundle manifest generation.",
   },
   {
     id: 20,
-    icon: "🧹",
-    title: "Semantic Vector State Eviction",
-    category: "memory",
-    categoryLabel: "Long-Horizon Memory",
-    badge: "LRU + Relevance",
-    description: "Automatically cleans outdated and superseded document embeddings to maintain high index hygiene and low latency.",
+    icon: "🔌",
+    title: "Universal MCP Tool Server",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "JSON-RPC 2.0",
+    description: "Exposes tenant search, chat, and active platform tools to Cursor, Claude Desktop, and IDE agents.",
   },
-
-  // 4. Multimodal Ingestion & Vision (21-26)
   {
     id: 21,
-    icon: "📄",
-    title: "Docling Layout-Aware OCR",
-    category: "multimodal",
-    categoryLabel: "Multimodal & Ingestion",
-    badge: "SOTA Parser",
-    description: "Parses complex multi-column PDFs, extracting bounding boxes, headings, and semantic hierarchy.",
+    icon: "🔄",
+    title: "Enterprise CDC & Community Connectors",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "8 Connectors",
+    description: "Live API connectors for GitHub, Slack, Notion, Confluence, Jira, Google Drive, S3, and PostgreSQL.",
   },
   {
     id: 22,
-    icon: "👁️",
-    title: "Baidu PP-OCRv4 Vision Pipeline",
-    category: "multimodal",
-    categoryLabel: "Multimodal & Ingestion",
-    badge: "Deep Learning",
-    description: "High-accuracy text and character recognition on low-resolution scanned documents and photographic inputs.",
+    icon: "🔐",
+    title: "Signed Merkle Vector Attestation",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Ed25519 + SHA-256",
+    description: "Ed25519-signed SHA-256 Merkle document roots and grounding certificates persisted in PostgreSQL RLS.",
   },
   {
     id: 23,
-    icon: "📊",
-    title: "Structured Table & Markdown Extraction",
-    category: "multimodal",
-    categoryLabel: "Multimodal & Ingestion",
-    badge: "Cell-Level Precision",
-    description: "Converts tabular data into structured Markdown and JSON representations, preserving column relationships.",
+    icon: "🪪",
+    title: "Enterprise Identity Federation & RB-VAC",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "SAML 2.0 / SCIM",
+    description: "SAML 2.0 assertion validation, SHA-256 SCIM bearer provisioning, and role-based vector access control.",
   },
   {
     id: 24,
-    icon: "📥",
-    title: "Presigned Source PDF Citations",
-    category: "multimodal",
-    categoryLabel: "Multimodal & Ingestion",
-    badge: "1-Click Download",
-    description: "Generates secure, expiring download URLs allowing users to audit exact source documents directly from answers.",
+    icon: "📑",
+    title: "Enterprise SaaS Connectors with ACLs",
+    category: "security",
+    categoryLabel: "Security & Platform",
+    badge: "Document ACL",
+    description: "Inherits source document permissions so users only retrieve chunks they are authorized to read.",
   },
   {
     id: 25,
-    icon: "🔌",
-    title: "Cloud Data Ingestion Connectors",
-    category: "multimodal",
-    categoryLabel: "Multimodal & Ingestion",
-    badge: "Drive / Notion",
-    description: "Background synchronization pipelines for Google Drive, Notion, REST endpoints, and custom event webhooks.",
-  },
-  {
-    id: 26,
-    icon: "🌐",
-    title: "Live Web Grounding Fallback",
-    category: "multimodal",
-    categoryLabel: "Multimodal & Ingestion",
-    badge: "Tavily / Brave",
-    description: "Automatically queries real-time web search APIs when internal tenant knowledge is silent on breaking topics.",
-  },
-
-  // 5. Enterprise Scale, Security & Sovereignty (27-38)
-  {
-    id: 27,
-    icon: "🔒",
-    title: "PostgreSQL RLS Multi-Tenancy",
+    icon: "🧩",
+    title: "Visual DAG Workflow Canvas & Composer",
     category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "Database-Level",
-    description: "Enforces PostgreSQL Row-Level Security on every query; vectors and documents never leak across tenant boundaries.",
-  },
-  {
-    id: 28,
-    icon: "🛡️",
-    title: "Deterministic Grounding & Citations",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "Page-Level Match",
-    description: "Extracts exact character ranges and page coordinates so every answer can be audited against original source text.",
-  },
-  {
-    id: 29,
-    icon: "📜",
-    title: "SHA-256 Merkle Audit Verification",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "Tamper-Evident",
-    description: "Builds cryptographic hash trees across document chunks to verify dataset integrity and detect unauthorized document edits.",
-  },
-  {
-    id: 30,
-    icon: "☁️",
-    title: "Resilient Circuit Breaker & Failover",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "High Availability",
-    description: "Monitors upstream LLM and embedding latency, automatically failing over to backup providers when thresholds exceed SLA.",
-  },
-  {
-    id: 31,
-    icon: "🐇",
-    title: "Celery & RabbitMQ Task Swarm",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "Distributed Queue",
-    description: "Processes massive document ingestion batches concurrently without blocking synchronous chat API requests.",
-  },
-  {
-    id: 32,
-    icon: "🆓",
-    title: "Local-First Ollama ($0 Embeddings)",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "100% Free",
-    description: "Generates high-dimensional vector embeddings locally using nomic-embed-text with zero external API fees or token limits.",
-  },
-  {
-    id: 33,
-    icon: "🔐",
-    title: "SHA-256 Tamper-Evident Audit Chains",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "HIPAA / GDPR",
-    description: "Cryptographic hash-linked audit logging with automated 90-day retention pruning for enterprise compliance.",
-  },
-  {
-    id: 34,
-    icon: "📡",
-    title: "Real-Time SSE Streaming API",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "Sub-100ms TTFT",
-    description: "Streams tokens immediately via Server-Sent Events with structured citation events emitted dynamically during generation.",
-  },
-  {
-    id: 35,
-    icon: "💻",
-    title: "1-Line Embeddable Script Widget",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "widget.js",
-    description: "Drop a single script tag onto any website, Shopify store, or web portal to deploy a production AI concierge in seconds.",
-  },
-  {
-    id: 36,
-    icon: "⏱️",
-    title: "Microsecond Structured Telemetry",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "W3C Traceparent",
-    description: "Distributed trace IDs and microsecond latency tracking logged for every retrieval step and LLM token generation.",
-  },
-  {
-    id: 37,
-    icon: "🧪",
-    title: "Automated Regression Benchmark",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "NDCG / Recall",
-    description: "Statistical regression test suite asserting retrieval quality and relevance thresholds before releases.",
-  },
-  {
-    id: 38,
-    icon: "🏷️",
-    title: "Self-Querying JSONB Metadata Filters",
-    category: "security",
-    categoryLabel: "Enterprise & Security",
-    badge: "Natural Language -> SQL",
-    description: "Automatically translates conversational constraints into PostgreSQL JSONB queries for precise filtered retrieval.",
+    categoryLabel: "Security & Platform",
+    badge: "Kahn Topo-Sort",
+    description: "Declarative multi-step RAG pipeline compiler and executor wired to live hybrid search and LLM ports.",
   },
 ];
 
@@ -383,25 +265,25 @@ export function BatteriesBentoMatrix() {
       {/* Header */}
       <div className={styles.matrixHeader}>
         <div className={styles.matrixBadge}>
-          ⚡ Unified Architecture • High-Performance Core
+          ⚡ Unified Architecture • {BATTERIES.length} Verified Engine Batteries
         </div>
         <h2 className={styles.matrixTitle}>
           Engineered Without Bloat or Multi-Vendor Glue
         </h2>
         <p className={styles.matrixSubtitle}>
-          Retriever integrates core production RAG capabilities into a single high-performance engine—eliminating brittle multi-vendor dependencies.
+          Retriever integrates {BATTERIES.length} core production RAG capabilities into a single high-performance engine—eliminating brittle multi-vendor dependencies.
         </p>
       </div>
 
       {/* Category Filter Tabs */}
       <div className={styles.filterTabs}>
         {[
-          { key: "all", label: "All Capabilities (38)" },
-          { key: "retrieval", label: "Core Retrieval (8)" },
-          { key: "reasoning", label: "Cognitive Reasoning (7)" },
-          { key: "memory", label: "Long-Horizon Memory (5)" },
-          { key: "multimodal", label: "Multimodal & Vision (6)" },
-          { key: "security", label: "Enterprise Scale & Security (12)" },
+          { key: "all", label: `All Capabilities (${BATTERIES.length})` },
+          { key: "retrieval", label: "Core Retrieval (4)" },
+          { key: "reasoning", label: "Cognitive & Graph (8)" },
+          { key: "memory", label: "Agent Memory (1)" },
+          { key: "multimodal", label: "Multimodal Vision (1)" },
+          { key: "security", label: "Security & Platform (11)" },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -423,23 +305,18 @@ export function BatteriesBentoMatrix() {
       {/* Bento Grid */}
       <div className={styles.bentoGrid}>
         {filteredBatteries.map((battery) => (
-          <TiltCard key={battery.id} maxAngle={2} glare={false}>
-            <div className={styles.batteryCard}>
-              <div>
-                <div className={styles.cardTop}>
-                  <span className={styles.batteryIcon}>{battery.icon}</span>
-                  <span className={styles.batteryNum}>#{String(battery.id).padStart(2, "0")}</span>
-                </div>
-                <h3 className={styles.batteryTitle}>{battery.title}</h3>
-                <p className={styles.batteryDesc}>{battery.description}</p>
-              </div>
-
-              <div className={styles.cardBottom}>
-                <span className={styles.categoryTag}>{battery.categoryLabel}</span>
-                <span className={styles.badgeHighlight}>{battery.badge}</span>
-              </div>
+          <div key={battery.id} className={styles.bentoCard}>
+            <div className={styles.bentoCardTop}>
+              <span className={styles.bentoIcon}>{battery.icon}</span>
+              <span className={styles.bentoBadge}>{battery.badge}</span>
             </div>
-          </TiltCard>
+            <h3 className={styles.bentoTitle}>{battery.title}</h3>
+            <p className={styles.bentoDesc}>{battery.description}</p>
+            <div className={styles.bentoFooter}>
+              <span className={styles.bentoCategory}>{battery.categoryLabel}</span>
+              <span className={styles.bentoId}>#{String(battery.id).padStart(2, "0")}</span>
+            </div>
+          </div>
         ))}
       </div>
     </section>

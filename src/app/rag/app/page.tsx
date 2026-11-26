@@ -17,12 +17,11 @@ import { IntegrationsPanel } from "@/components/rag/IntegrationsPanel";
 import { GatewayPanel } from "@/components/rag/GatewayPanel";
 import { GuardrailsPanel } from "@/components/rag/GuardrailsPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
-import { WorkflowsPanel } from "@/components/rag/WorkflowsPanel";
 import { ApiKeysPanel } from "@/components/rag/ApiKeysPanel";
 import { QuickLaunchWizardModal } from "@/components/rag/QuickLaunchWizardModal";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import { WorkspaceSwitcher } from "@/components/ui/WorkspaceSwitcher";
-import styles from "@/components/rag/rag.module.css";
+import styles from "@/components/rag/ragStyles";
 
 type SubViewTab =
   | "overview"
@@ -34,7 +33,6 @@ type SubViewTab =
   | "keys"
   | "team"
   | "visualizer"
-  | "workflows"
   | "integrations"
   | "gateway"
   | "guardrails";
@@ -159,7 +157,6 @@ export default function RagAppStudioPage() {
 
   const advancedNavItems: { id: SubViewTab; label: string; icon: string }[] = [
     { id: "visualizer", label: "Vector Space Visualizer", icon: "🪐" },
-    { id: "workflows", label: "Durable Workflows", icon: "⚡" },
     { id: "integrations", label: "Connectors & Ingestion", icon: "🔌" },
     { id: "gateway", label: "Model Router & Fallback", icon: "🔀" },
     { id: "guardrails", label: "Safety & Guardrails", icon: "🛡️" },
@@ -469,7 +466,6 @@ export default function RagAppStudioPage() {
               isExpired={isExpired}
             />
             <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
-            <WorkflowsPanel client={client} hidden={activeTab !== "workflows"} />
             <IntegrationsPanel hidden={activeTab !== "integrations"} tenantId={tenantId} />
             <GatewayPanel client={client} hidden={activeTab !== "gateway"} />
             <GuardrailsPanel client={client} hidden={activeTab !== "guardrails"} />

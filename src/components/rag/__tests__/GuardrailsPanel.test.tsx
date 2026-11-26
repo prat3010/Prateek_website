@@ -88,7 +88,7 @@ describe('GuardrailsPanel Component', () => {
   it('renders correctly and displays Battery #13 active badge', async () => {
     render(<GuardrailsPanel client={mockClient} />);
 
-    expect(screen.getByText(/NVIDIA NeMo Guardrails & Safety Rails/i)).toBeDefined();
+    expect(screen.getByText(/Programmable Rule & Colang-Style Guardrails/i)).toBeDefined();
     expect(screen.getByText(/Battery #13 Active/i)).toBeDefined();
 
     await waitFor(() => {

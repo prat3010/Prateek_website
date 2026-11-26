@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface IntegrationsPanelProps {
   hidden?: boolean;
@@ -54,7 +54,7 @@ export function IntegrationsPanel({ hidden, tenantId }: IntegrationsPanelProps) 
               <span style={{ fontSize: "20px" }}>💬</span>
               <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700 }}>Slack Workspace Bot</h3>
             </div>
-            <span className={styles.badgeSuccess}>Active & Ready</span>
+            <span className={styles.badgeSuccess}>Webhook Endpoint</span>
           </div>
           <p style={{ fontSize: "12px", color: "var(--color-text-muted)", lineHeight: 1.5, margin: "0 0 16px 0" }}>
             Ask questions with <code className={styles.codeSnippet}>/ask-retriever</code> in any channel to get instant citations and feedback buttons.
@@ -187,7 +187,7 @@ export function IntegrationsPanel({ hidden, tenantId }: IntegrationsPanelProps) 
             <span className={styles.badgeSuccess}>MCP 2024-11-05</span>
           </div>
           <p style={{ fontSize: "12px", color: "var(--color-text-muted)", lineHeight: 1.5, margin: "0 0 16px 0" }}>
-            Expose all 20 platform batteries and vector indexes as native tools to Cursor, Claude Desktop, and VS Code Cline over JSON-RPC 2.0 &amp; SSE.
+            Expose tenant search, chat, and active platform batteries as native tools to Cursor, Claude Desktop, and VS Code Cline over JSON-RPC 2.0 &amp; SSE.
           </p>
           <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginBottom: "12px" }}>
             <div>• SSE Transport: <code>/v1/mcp/sse</code></div>

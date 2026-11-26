@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { RetrieverClient } from "@/lib/rag-client";
 import type { DocumentMeta, GraphQueryResponse, GraphSummaryResponse, EntityTripleItem } from "@/lib/rag-types";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 type DocSubTab = "library" | "graph" | "schema" | "connectors";
 

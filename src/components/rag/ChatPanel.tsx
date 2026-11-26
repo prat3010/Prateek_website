@@ -5,7 +5,7 @@ import { RetrieverClient } from "@/lib/rag-client";
 import { GroundingDiffResponse, ClaimClassification, ReActTraceStep } from "@/lib/rag-types";
 import Portal from "@/components/ui/Portal";
 import { useLenis } from "lenis/react";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface ChatMessageItem {
   id: number;

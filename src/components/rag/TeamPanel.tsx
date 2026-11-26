@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 interface TeamPanelProps {
   hidden?: boolean;
@@ -130,20 +130,32 @@ export function TeamPanel({
   };
 
 
-  const handleExportAudit = () => {
-    const auditRecord = {
+  const handleExportAudit = async () => {
+    const payload = {
       tenant_id: tenantId || "active_tenant",
       exported_at: new Date().toISOString(),
       account_email: user?.email,
       members_count: members.length,
       members: members.map((m) => ({ email: m.email, role: m.role, joined_at: m.created_at })),
-      compliance_standard: "ISO/IEC 27001 & SOC-2 Type II Tenancy Isolation",
+      export_scope: "workspace_member_directory_snapshot",
     };
+    const canonical = JSON.stringify(payload);
+    let sha256Checksum = "unavailable";
+    if (typeof crypto !== "undefined" && crypto.subtle) {
+      const digest = await crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode(canonical)
+      );
+      sha256Checksum = Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+    const auditRecord = { ...payload, sha256_checksum: sha256Checksum };
     const blob = new Blob([JSON.stringify(auditRecord, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `tenant_compliance_audit_${Date.now()}.json`;
+    a.download = `tenant_member_audit_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

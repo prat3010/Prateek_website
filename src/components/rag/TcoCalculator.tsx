@@ -13,7 +13,7 @@ export function TcoCalculator() {
   // Transparent calculation rates (Industry standards vs Retriever):
   // 1. Vector Storage: Pinecone $70 base + $0.096 per GB vs PostgreSQL pgvector $0 base
   // 2. Embeddings: OpenAI text-embedding-3-small $0.02 / 1M tokens (avg 800 tokens/query+doc) vs Local Ollama $0
-  // 3. Reranking: Cohere Rerank $1.00 / 1k queries vs Local ColBERT/Cross-Encoder $0
+  // 3. Reranking: Cohere Rerank $1.00 / 1k queries vs Local lexical MaxSim $0
   // 4. Semantic Cache: 45% cache hit rate eliminates 45% of LLM queries
 
   const avgTokensPerQuery = 600;
@@ -25,12 +25,12 @@ export function TcoCalculator() {
 
   const tradMonthlyTotal = Math.round(pineconeCost + embeddingCostTrad + cohereRerankCost + llmCostTrad);
 
-  // Retriever cost:
+  // Retriever cost ($40 base VPS compute + uncached LLM inference + optional cloud embeddings):
   const retrieverBaseCompute = 40; // Self-hosted VPS or Cloud Starter
   const cacheHitDiscount = enableSemanticCache ? 0.45 : 0.0;
   const retrieverLlmCost = Math.round(llmCostTrad * (1 - cacheHitDiscount));
   const retrieverEmbeddingCost = useLocalOllama ? 0 : embeddingCostTrad;
-  const retrieverMonthlyTotal = Math.round(retrieverBaseCompute + retrieverEmbeddingCost + (retrieverLlmCost * 0.4));
+  const retrieverMonthlyTotal = Math.round(retrieverBaseCompute + retrieverEmbeddingCost + retrieverLlmCost);
 
   const monthlySavings = Math.max(tradMonthlyTotal - retrieverMonthlyTotal, 0);
   const annualSavings = monthlySavings * 12;
@@ -108,7 +108,7 @@ export function TcoCalculator() {
                 checked={enableSemanticCache}
                 onChange={(e) => setEnableSemanticCache(e.target.checked)}
               />
-              <span>Enable Sub-15ms Semantic Cache (45% Hit Rate Savings)</span>
+              <span>Enable Semantic Cache (45% Hit Rate Assumption)</span>
             </label>
           </div>
         </div>

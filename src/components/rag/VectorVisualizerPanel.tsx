@@ -8,7 +8,7 @@ import {
   ProjectedPoint,
 } from "@/lib/rag-types";
 
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 // Distinctive palette for clusters in Azure & Noir themes
 const CLUSTER_COLORS = [
@@ -38,7 +38,7 @@ export function VectorVisualizerPanel({ client, hidden }: VectorVisualizerPanelP
   const [error, setError] = useState<string | null>(null);
 
   // Projection configuration state
-  const [method, setMethod] = useState<"pca" | "tsne" | "umap">("pca");
+  const [method, setMethod] = useState<"pca" | "tsne">("pca");
   const [dimensions, setDimensions] = useState<2 | 3>(3);
   const [normalize, setNormalize] = useState<boolean>(true);
   const [selectedClusterId, setSelectedClusterId] = useState<number | null>(null);
@@ -72,33 +72,6 @@ export function VectorVisualizerPanel({ client, hidden }: VectorVisualizerPanelP
     phi: Math.PI / 4,
     radius: 240,
   });
-
-  // Fetch projection from Retriever API
-  const fetchProjection = useCallback(
-    async (overrideQueryVector?: number[]) => {
-      if (!client) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await client.projectEmbeddings({
-          method,
-          dimensions,
-          normalize,
-          query_vector: overrideQueryVector,
-        });
-        setData(res);
-        if (res.query_point) {
-          setActiveQueryPoint(res.query_point);
-        }
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Failed to project embeddings";
-        setError(msg);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [client, method, dimensions, normalize]
-  );
 
   useEffect(() => {
     let isMounted = true;
@@ -143,11 +116,16 @@ export function VectorVisualizerPanel({ client, hidden }: VectorVisualizerPanelP
     setProjectingQuery(true);
     setError(null);
     try {
-      // Execute hybrid search to get query representation or candidate chunks
       const searchRes = await client.search(searchQuery.trim(), { limit: 5 });
-      if (searchRes && searchRes.results && searchRes.results.length > 0) {
-        // Re-fetch projection with active query
-        await fetchProjection();
+      if (searchRes?.results?.length && data?.points?.length) {
+        const topChunkId = searchRes.results[0].chunkId;
+        const matched = data.points.find((p) => p.chunk_id === topChunkId);
+        if (matched) {
+          setSelectedPoint(matched);
+          setActiveQueryPoint(matched);
+        } else {
+          setError("Top matching chunk is outside the current projection sample.");
+        }
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Query projection search failed";
@@ -542,12 +520,11 @@ export function VectorVisualizerPanel({ client, hidden }: VectorVisualizerPanelP
             <span style={{ opacity: 0.7 }}>Algorithm:</span>
             <select
               value={method}
-              onChange={(e) => setMethod(e.target.value as "pca" | "tsne" | "umap")}
+              onChange={(e) => setMethod(e.target.value as "pca" | "tsne")}
               style={{ background: "var(--color-bg)", color: "var(--color-text)", border: "1px solid var(--color-border)", borderRadius: "4px", padding: "0.25rem 0.5rem", fontSize: "0.8rem" }}
             >
               <option value="pca">PCA (Deterministic)</option>
               <option value="tsne">t-SNE (Non-Linear)</option>
-              <option value="umap">UMAP (Topological)</option>
             </select>
           </label>
 

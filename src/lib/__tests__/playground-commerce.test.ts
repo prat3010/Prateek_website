@@ -429,5 +429,46 @@ describe('Playground Commerce & Settlement Engine', () => {
       expect(gatewayUrl).not.toContain('undefined');
     });
   });
+
+  describe('Checkout create-order validation & production fail-closed checks', () => {
+    it('rejects whitespace-only productSlug or customerName with 400 and fails closed in production when supabase is unavailable', async () => {
+      vi.doMock('@/data/supabase', () => ({ supabase: null }));
+      vi.resetModules();
+      const { POST: createOrderPOST } = await import('@/app/api/playground/checkout/create-order/route');
+
+      const badReq = new Request('http://localhost/api/playground/checkout/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productSlug: '   ',
+          customerName: '   ',
+          customerEmail: 'buyer@example.com',
+          currency: 'INR',
+        }),
+      });
+      const badRes = await createOrderPOST(badReq);
+      expect(badRes.status).toBe(400);
+
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('NEXT_PUBLIC_RAZORPAY_KEY_ID', 'rzp_live_test');
+      vi.stubEnv('RAZORPAY_KEY_SECRET', 'secret_live_test');
+      const prodReq = new Request('http://localhost/api/playground/checkout/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productSlug: 'retriever',
+          tierId: 'pro-starter',
+          customerName: 'Buyer Name',
+          customerEmail: 'buyer@example.com',
+          currency: 'INR',
+        }),
+      });
+      const prodRes = await createOrderPOST(prodReq);
+      expect(prodRes.status).toBe(503);
+
+      vi.unstubAllEnvs();
+      vi.doUnmock('@/data/supabase');
+    });
+  });
 });
 

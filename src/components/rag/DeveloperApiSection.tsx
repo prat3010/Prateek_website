@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { m } from "framer-motion";
-import styles from "./rag.module.css";
+import styles from "./ragStyles";
 
 export function DeveloperApiSection() {
   const [activeTab, setActiveTab] = useState<"curl" | "python" | "typescript" | "docker">("curl");

@@ -46,9 +46,9 @@ interface SandboxTelemetry {
 
 const PRESET_QUERIES = [
   "What are the payment terms, milestone split, and deliverable standards for a SaaS build?",
-  "What is the difference between ColBERT MaxSim token search and dense HNSW?",
+  "How does hybrid HNSW + BM25 search rank technical documentation?",
   "How does Ebbinghaus memory prevent catastrophic forgetting in long-horizon sessions?",
-  "Explain the active-active multi-cloud vector replication guarantee.",
+  "How does PostgreSQL Row-Level Security (RLS) isolate tenant vector data?",
 ];
 
 const GUEST_SEARCH_ENDPOINT = "/api/rag/guest/search";
@@ -56,13 +56,13 @@ const GUEST_SEARCH_ENDPOINT = "/api/rag/guest/search";
 function formatStrategy(strategy: string): string {
   switch (strategy) {
     case "exact_cache_hit":
-      return "EXACT REDIS CACHE HIT";
+      return "EXACT CACHE HIT";
     case "semantic_cache_hit":
       return "SEMANTIC CACHE HIT";
     case "hybrid_fusion_rrf":
       return "HYBRID HNSW + BM25 FUSION";
     case "vector_only_degraded_reranked":
-      return "VECTOR HNSW + COLBERT RERANK";
+      return "VECTOR HNSW + MAXSIM RERANK";
     case "vector_only_degraded":
       return "VECTOR DEGRADED (FALLBACK)";
     default:
@@ -95,7 +95,7 @@ function parseChunkSourceAndContent(
 
 export function HeroCognitiveSandbox() {
   const [query, setQuery] = useState(PRESET_QUERIES[0]);
-  const [mode, setMode] = useState<"hybrid" | "cache" | "graph" | "crag">("hybrid");
+  const [mode, setMode] = useState<"hybrid" | "cache" | "graph">("hybrid");
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [telemetry, setTelemetry] = useState<SandboxTelemetry | null>(null);
@@ -104,7 +104,7 @@ export function HeroCognitiveSandbox() {
   const handleExecuteSearch = useCallback(
     async (
       targetQuery: string,
-      targetMode: "hybrid" | "cache" | "graph" | "crag" = mode
+      targetMode: "hybrid" | "cache" | "graph" = mode
     ) => {
       setLoading(true);
       setErrorMessage(null);
@@ -119,8 +119,8 @@ export function HeroCognitiveSandbox() {
           body: JSON.stringify({
             query: targetQuery,
             limit: 2,
-            enable_hybrid: targetMode === "hybrid" || targetMode === "crag",
-            enable_colbert_rerank: targetMode === "graph",
+            enable_hybrid: targetMode === "hybrid",
+            enable_graph_search: targetMode === "graph",
           }),
         });
 
@@ -140,11 +140,7 @@ export function HeroCognitiveSandbox() {
         if (data.results && data.results.length > 0) {
           setResults(data.results);
           setTelemetry({
-            strategy:
-              data.searchMeta?.strategy ||
-              (targetMode === "cache"
-                ? "exact_cache_hit"
-                : "hybrid_fusion_rrf"),
+            strategy: data.searchMeta?.strategy || "hybrid_fusion_rrf",
             serverDurationMs: Math.round(serverDuration * 10) / 10,
             clientTransitMs: transitMs,
             totalDurationMs: elapsed,
@@ -261,7 +257,7 @@ export function HeroCognitiveSandbox() {
   };
 
   const handleSelectMode = (
-    newMode: "hybrid" | "cache" | "graph" | "crag"
+    newMode: "hybrid" | "cache" | "graph"
   ) => {
     setMode(newMode);
     handleExecuteSearch(query, newMode);
@@ -320,20 +316,7 @@ export function HeroCognitiveSandbox() {
                 transition={{ type: "spring", stiffness: 400, damping: 32 }}
               />
             )}
-            🕸️ ColBERT / Graph
-          </button>
-          <button
-            className={`${styles.modeTab} ${mode === "crag" ? styles.modeTabActive : ""}`}
-            onClick={() => handleSelectMode("crag")}
-          >
-            {mode === "crag" && (
-              <m.span
-                layoutId="sandboxModeTab"
-                className={styles.tabPill}
-                transition={{ type: "spring", stiffness: 400, damping: 32 }}
-              />
-            )}
-            🛡️ Self-Aware CRAG
+            🕸️ GraphRAG
           </button>
         </div>
       </div>

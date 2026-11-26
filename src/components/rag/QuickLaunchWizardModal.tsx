@@ -115,10 +115,7 @@ export function QuickLaunchWizardModal({
       setUploadedDocName(file.name);
       setStep(2);
     } catch (err) {
-      console.warn("Upload in quick wizard error:", err);
-      // If server upload throws in dev, gracefully record document title for preview
-      setUploadedDocName(file.name);
-      setStep(2);
+      setUploadError(err instanceof Error ? err.message : "Document upload failed.");
     } finally {
       setIsUploading(false);
     }
@@ -137,9 +134,7 @@ export function QuickLaunchWizardModal({
       setUploadedDocName(`${docTitle}.txt`);
       setStep(2);
     } catch (err) {
-      console.warn("Text ingest error in quick wizard:", err);
-      setUploadedDocName(ingestTitle || "quickstart-note.txt");
-      setStep(2);
+      setUploadError(err instanceof Error ? err.message : "Text ingestion failed.");
     } finally {
       setIsUploading(false);
     }
@@ -155,13 +150,11 @@ export function QuickLaunchWizardModal({
       if (searchRes?.results && searchRes.results.length > 0) {
         setChatResponse(searchRes.results[0].content);
       } else {
-        setChatResponse(
-          `✓ Grounded response verified from "${uploadedDocName}". Knowledge chunks have been indexed into your sovereign PostgreSQL pgvector partition.`
-        );
+        setChatResponse("No matching chunks found yet for this query.");
       }
-    } catch {
+    } catch (err) {
       setChatResponse(
-        `✓ Grounded response verified from "${uploadedDocName}". Knowledge chunks have been indexed into your sovereign PostgreSQL pgvector partition.`
+        `Error: ${err instanceof Error ? err.message : "Search request failed."}`
       );
     } finally {
       setChatLoading(false);
