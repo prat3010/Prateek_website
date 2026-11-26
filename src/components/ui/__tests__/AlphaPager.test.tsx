@@ -79,6 +79,7 @@ describe('AlphaPager Component', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    window.localStorage?.clear?.();
     mockLenisScrollTo.mockClear();
     mockAudioMuted = false;
 
