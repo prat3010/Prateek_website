@@ -4,12 +4,15 @@ export const metadata: Metadata = {
   title: "Retriever AI — Enterprise Hybrid RAG Engine | 1-Line Embed Chatbot",
   description:
     "Turn your documents and website into a self-aware, hallucination-free AI assistant in 60 seconds. Powered by Gemini, local Ollama, pgvector HNSW, and BM25 hybrid search.",
+  alternates: {
+    canonical: "/rag",
+  },
   openGraph: {
     title: "Retriever AI — Enterprise Hybrid RAG Engine",
     description:
       "Embed a self-aware AI chatbot onto any website with 1 line of script. Features presigned citation downloads, semantic caching, and rule-based guardrails.",
     url: "https://prateeq.in/rag",
-    siteName: "Prateek Sharma Portfolio & SaaS",
+    siteName: "Prateeq Sharma Portfolio & SaaS",
     images: [
       {
         url: "https://prateeq.in/images/gremlin-head.png",

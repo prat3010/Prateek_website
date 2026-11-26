@@ -6,9 +6,12 @@ import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./benchmarks.module.css";
 
 export const metadata: Metadata = {
-  title: "Retriever AI — Empirical Load & Latency Benchmarks | Prateek Sharma",
+  title: "Retriever AI — Empirical Load & Latency Benchmarks | Prateeq Sharma",
   description:
     "Verified empirical load testing and latency benchmarks for Retriever. 100% genuine network telemetry, microsecond timers, and Zero-Toy static AST compliance.",
+  alternates: {
+    canonical: "/rag/benchmarks",
+  },
 };
 
 export default function BenchmarksPage() {

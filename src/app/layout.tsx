@@ -67,21 +67,12 @@ export const metadata: Metadata = {
     url: "https://prateeq.in",
     siteName: "Prateeq Sharma Portfolio",
     locale: "en_US",
-    images: [
-      {
-        url: "/opengraph-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Prateeq Sharma Portfolio",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Prateeq Sharma | Portfolio",
     description: "Crafting Digital Worlds, One Panel at a Time",
     creator: "@3010prateek",
-    images: ["/opengraph-image.png"],
   },
 };
 export default async function RootLayout({
