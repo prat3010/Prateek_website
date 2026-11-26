@@ -49,7 +49,7 @@ def save_defaults(config):
 def call_gemini_with_fallback(prompt, preferred_model="gemini-2.5-flash", api_key=""):
     if not api_key:
         return None
-    models = [preferred_model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"]
+    models = [preferred_model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-flash-lite"]
     seen = set()
     ordered = [m for m in models if not (m in seen or seen.add(m))]
 
@@ -131,7 +131,7 @@ class SemanticProfileMatcher:
                 "Forward Deployed Engineer AI Solutions Architect Retriever AI SaaS ColBERT MaxSim einsum token reranker",
                 "pgvector HNSW hybrid search BM25 Next.js 16 React 19 FastAPI Python Celery RabbitMQ OpenTelemetry",
                 "HDBSCAN topic clustering c-TF-IDF 3D PCA UMAP embedding space projection Three.js WebGL particle cloud",
-                "Semantic NLI DeBERTa judge hallucination evaluation RLM Python REPL sandbox Docling Layout OCR LlamaGuard 3",
+                "Deterministic Claim-Context NLI evaluator RLM Python REPL sandbox pdfplumber Layout Parser Rule Guardrails",
                 "Digital SOW SHA-256 cryptographic freezing 50% deposit escrow HMAC timing-safe webhooks Razorpay"
             ]
 
@@ -1282,7 +1282,7 @@ def render_outreach_tab():
                     st.error("No GEMINI_API_KEY found in .env.local!")
                 else:
                     st.markdown("#### 🩺 Live Gemini API Health Report")
-                    for m in ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash"]:
+                    for m in ["gemini-3.6-flash", "gemini-2.5-flash"]:
                         try:
                             start = datetime.now()
                             url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={GEMINI_API_KEY}"

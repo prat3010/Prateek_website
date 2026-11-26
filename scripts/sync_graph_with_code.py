@@ -46,6 +46,7 @@ def main():
     
     # Regenerate nodes, canvas & enrich links
     os.system(f"python3 {WEBSITE_DIR}/scripts/generate_architecture_nodes.py")
+    os.system(f"python3 {WEBSITE_DIR}/scripts/upgrade_architecture_nodes.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/enrich_docs_links.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/create_architecture_canvas.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/create_subsystem_canvases.py")

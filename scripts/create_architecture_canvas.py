@@ -132,10 +132,10 @@ def generate_nodes():
         "Retriever_API_v1_workflow.md", "Retriever_API_v1_health.md", "Retriever_API_v1_auth.md", "Retriever_API_v1_consensus.md",
         "Retriever_API_v1_payments.md", "Retriever_API_v1_pricing.md", "Retriever_API_v1_agentic.md", "Retriever_API_v1_rlm.md",
         "Retriever_API_v1_tenant.md", "Retriever_API_v1_security_compression.md",
-        "Retriever_API_v1_edge.md", "Retriever_API_v1_voice.md", "Retriever_API_v1_serverless_gpu.md",
-        "Engine_Docling_Layout_OCR.md", "Engine_LlamaGuard_Guardrails.md",
-        "Engine_MultiAgent_Consensus.md", "Engine_LongLLMLingua_Compression.md", "Engine_RLM_Python_REPL.md", "Engine_GraphRAG_Topology.md",
-        "Engine_Sovereign_Edge_Sync.md", "Engine_Sovereign_Edge_Voice.md", "Engine_Serverless_GPU_vLLM_Serving.md"
+        "Retriever_API_v1_edge.md", "Retriever_API_v1_serverless_gpu.md",
+        "Engine_pdfplumber_Layout_Parser.md", "Engine_LlamaGuard_Guardrails.md",
+        "Engine_MultiAgent_Consensus.md", "Engine_Heuristic_Context_Compression.md", "Engine_RLM_Python_REPL.md", "Engine_GraphRAG_Topology.md",
+        "Engine_Sovereign_Edge_Sync.md", "Engine_Serverless_GPU_vLLM_Serving.md"
     ]
     g6_nodes, col3_y = layout_group("grp-retriever", "6. RETRIEVER COGNITIVE CORE: Guardrails, Edge Swarm & FastAPI Routers", "4", g6_files, col3_x, col3_y, 2)
     nodes.extend(g6_nodes)
@@ -251,7 +251,7 @@ edges = [
         "toNode": "node-retriever-api-v1-chat",
         "toSide": "left",
         "color": "4",
-        "label": "SSE Stream /v1/chat"
+        "label": "SSE Stream /v1/tenants/{id}/chat/completions"
     },
     {
         "id": "e-rag-client-to-search",
@@ -260,7 +260,7 @@ edges = [
         "toNode": "node-retriever-api-v1-search",
         "toSide": "left",
         "color": "4",
-        "label": "Hybrid /v1/search"
+        "label": "Hybrid /v1/tenants/{id}/search"
     },
     {
         "id": "e-chat-to-guard",

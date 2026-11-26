@@ -8,7 +8,7 @@ Generates atomic, high-fidelity architecture nodes covering the ENTIRE stack:
 - 4. UI Systems & Interactive Components (NoirSkyline, Cart Drawer, Terminal, Scoping Lab, RAG Playground)
 - 5. Database Schemas (Supabase Postgres + pgvector + Telemetry + CRM + Logs)
 - 6. Retriever FastAPI Routers (Chat, Search, Documents, Admin, Auth, Tenant, Workflow, Consensus, etc.)
-- 7. Retriever Cognitive Engines & Agentic Systems (RLM, GraphRAG, Docling OCR, LlamaGuard, LongLLMLingua)
+- 7. Retriever Cognitive Engines & Agentic Systems (RLM, GraphRAG, pdfplumber Parser, Rule Guardrails, Heuristic Compression)
 - 8. Async Infrastructure, Message Brokers & Security Envelopes (Celery, RabbitMQ, S3, KMS)
 """
 
@@ -131,7 +131,7 @@ NODES = {
 
 - **Paths:** `src/app/rag/page.tsx` & `src/app/rag/app/page.tsx`
 - **Key Features:**
-  - Mini-RAG live interactive sandbox (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`)
+  - Mini-RAG live interactive sandbox (`ChatPanel.tsx`, `DocumentsPanel.tsx`, `SearchPanel.tsx`)
   - Geo-IP pricing calculator (INR/USD)
   - 1-line script embed configurator (`<script src=".../widget.js">`)
   - SaaS Studio sub-views: Chat Studio, Document Library, Search Inspector, Embed Configurator
@@ -191,7 +191,7 @@ NODES = {
 - [ADR 45: Playground & Arcade Cabinet Architecture](../99_DECISIONS.md#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 - [SOP Runbook: Adding an Item to Playground](../runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md)
 - [UI: PlaygroundSuite](UI_PlaygroundSuite.md)
-- [Route: api/playground/chat](Route_api_playground_chat.md)
+- [API: playground/chat](API_playground_chat.md)
 - [Route: terminal](Route_terminal.md)
 """,
 
@@ -233,7 +233,7 @@ NODES = {
 
 ## 🔗 Related Architecture & Cross-References
 - [09_Section_Specifications/11_Blog](../09_Section_Specifications/11_Blog.md)
-- [BLOG_DEEP_LINKING_MAP](../BLOG_DEEP_LINKING_MAP.md)
+- [BLOG_DEEP_LINKING_MAP](../playbooks/BLOG_DEEP_LINKING_MAP.md)
 - [AUTOMATED_AI_BLOGGING_ROADMAP](../AUTOMATED_AI_BLOGGING_ROADMAP.md)
 - [UI: BlogEngine](UI_BlogEngine.md)
 - [Lib: markdown.ts](Lib_markdown.md)
@@ -295,7 +295,7 @@ NODES = {
 
 - **Endpoint:** `POST /api/scoping/parse-intent`
 - **Gateway:** Next.js 16 App Router Route Handler (`src/app/api/scoping/parse-intent/route.ts`)
-- **Backend Target:** FastAPI `https://rag.prateeq.in/v1/chat` (Tenant: `prateeq_scoping`)
+- **Backend Target:** FastAPI `https://rag.prateeq.in/v1/tenants/{tenantId}/intent/classify` (Tenant: `prateeq_scoping`)
 - **Payload:** `{ prompt: string, currency: "INR" | "USD" }`
 - **Output:** `{ engineId, selectedFeatures: string[], suggestedAddons: string[], confidence: number, mathVerification: string }`
 
@@ -313,11 +313,11 @@ NODES = {
 
 #api #multimodal #ocr #pdf #phase_g
 
-> **Multimodal RFP & Wireframe Ingestion Stream using Docling Layout OCR (M42).**
+> **Multimodal RFP & Wireframe Ingestion Stream using pdfplumber Layout Parser (M42).**
 
 - **Endpoint:** `POST /api/scoping/parse-rfp`
 - **Gateway:** Next.js 16 Route Handler with `multipart/form-data`
-- **Processing Engine:** Docling Layout OCR + PyMuPDF AST Chunker
+- **Processing Engine:** pdfplumber Layout Parser + PyMuPDF AST Chunker
 - **Payload:** `FormData` containing `.pdf`, `.docx`, or image wireframes
 - **Output:** Extracted functional specifications, automatically checked cart features, and estimate matrix.
 
@@ -325,7 +325,7 @@ NODES = {
 
 ## 🔗 Related Architecture & Cross-References
 - [25_SOTA_Scoping_Engine_PRD](../25_SOTA_Scoping_Engine_PRD.md)
-- [Engine: Docling Layout OCR](Engine_Docling_Layout_OCR.md)
+- [Engine: pdfplumber Layout Parser](Engine_pdfplumber_Layout_Parser.md)
 - [UI: ScopingLab](UI_ScopingLab.md)
 - [UI: ArchitectureCartDrawer](UI_ArchitectureCartDrawer.md)
 """,
@@ -896,14 +896,14 @@ NODES = {
 > **Single Source of Truth for Middleman Sales Partner Commission Calculations.**
 
 - **Path:** `src/lib/commission.ts` & `src/data/commissionConfig.json`
-- **Tiers:** Band A (10% on < ₹1.5L / $2k), Band B (12.5% on ₹1.5L–₹3L / $2k–$4k), Band C (15% on > ₹3L / $4k), Recurring Retainer (10%).
+- **Tiers:** Band A (10% up to ₹75,000 / $1,000), Band B (12% on ₹75,001–₹2,49,999 / $1,001–$3,299), Band C (15% on ₹2,50,000+ / $3,300+), Recurring Retainer (10%).
 
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 - [UI: MiddlemanAgreement](UI_MiddlemanAgreement.md)
-- [REVENUE_EXECUTION_PLAN](../REVENUE_EXECUTION_PLAN.md)
+- [REVENUE_EXECUTION_PLAN](../commercial/REVENUE_EXECUTION_PLAN.md)
 """,
 
     "Lib_sessionVerify.md": """# Lib: `sessionVerify.ts` (Universal PKCE Session Guard)
@@ -1230,7 +1230,7 @@ NODES = {
 
 > **Interactive Client Chat Studio, Document Library & Search Inspector Panels.**
 
-- **Path:** `src/components/rag/` (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`)
+- **Path:** `src/components/rag/` (`ChatPanel.tsx`, `DocumentsPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`, plus 9 studio panels)
 
 ---
 
@@ -1290,7 +1290,7 @@ NODES = {
 ## 🔗 Related Architecture & Cross-References
 - [11_Content_Management_System](../11_Content_Management_System.md)
 - [API: revalidate](API_revalidate.md)
-- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 """,
 
     # -------------------------------------------------------------
@@ -1553,7 +1553,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
     # -------------------------------------------------------------
     # 6. RETRIEVER FASTAPI ROUTERS (11 Nodes)
     # -------------------------------------------------------------
-    "Retriever_API_v1_chat.md": """# Retriever API: `POST /v1/chat`
+    "Retriever_API_v1_chat.md": """# Retriever API: `POST /v1/tenants/{tenantId}/chat/completions`
 
 #retriever #api #rag #fastapi #stream
 
@@ -1574,7 +1574,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [Lib: rag-client.ts](Lib_rag_client.md)
 """,
 
-    "Retriever_API_v1_search.md": """# Retriever API: `POST /v1/search`
+    "Retriever_API_v1_search.md": """# Retriever API: `POST /v1/tenants/{tenantId}/search`
 
 #retriever #api #search #hybrid #fastapi
 
@@ -1590,7 +1590,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [Schema: pgvector_embeddings](Schema_pgvector_store.md)
 """,
 
-    "Retriever_API_v1_documents.md": """# Retriever API: `POST /v1/documents`
+    "Retriever_API_v1_documents.md": """# Retriever API: `POST /v1/tenants/{tenantId}/documents`
 
 #retriever #api #ingestion #storage
 
@@ -1617,7 +1617,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: Admin Dashboard Roadmap](../../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)
+- [Retriever: Admin Dashboard Guide](../../../retriever/docs/guides/ADMIN_DASHBOARD_GUIDE.md)
 - [Retriever: Architecture](../../../retriever/docs/architecture.md)
 """,
 
@@ -1754,14 +1754,14 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 > **Context Window Token Compression & Zero-Trust Field Envelope Encryption Router (Milestone 49).**
 
 - **Endpoints:**
-  - `POST /v1/tenants/{tenantId}/context/compress` — LongLLMLingua prompt token compression
+  - `POST /v1/tenants/{tenantId}/context/compress` — Heuristic prompt token compression
   - `POST /v1/tenants/{tenantId}/security/encrypt` — AES-256-GCM field encryption
   - `POST /v1/tenants/{tenantId}/security/decrypt` — AES-256-GCM field decryption
 
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Engine: LongLLMLingua Compression](Engine_LongLLMLingua_Compression.md)
+- [Engine: Heuristic Context Compression](Engine_Heuristic_Context_Compression.md)
 - [Engine: Envelope Encryption](Engine_Envelope_Encryption.md)
 """,
 
@@ -1782,24 +1782,6 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: REST API edge.md](../../../retriever/docs/api/edge.md)
 - [Engine: Sovereign Edge Sync](Engine_Sovereign_Edge_Sync.md)
-""",
-
-    "Retriever_API_v1_voice.md": """# Retriever API: `apps/api/src/routers/voice.py`
-
-#retriever #api #voice #webrtc #whisper #cartesia #m100
-
-> **Sovereign Edge Voice Streaming & Whisper WebRTC Router (Milestone 100).**
-
-- **Endpoints:**
-  - `POST /v1/voice/session` — WebRTC session negotiation & SDP exchange
-  - `POST /v1/voice/transcribe` — Whisper edge audio transcription
-  - `POST /v1/voice/synthesize` — Cartesia neural low-latency TTS stream
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API voice.md](../../../retriever/docs/api/voice.md)
-- [Engine: Sovereign Edge Voice](Engine_Sovereign_Edge_Voice.md)
 """,
 
     "Retriever_API_v1_serverless_gpu.md": """# Retriever API: `apps/api/src/routers/serverless_gpu.py`
@@ -1836,7 +1818,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: RAG 2026 Roadmap](../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md)
+- [Retriever: RAG 2026 Roadmap (Archived)](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 - [API: scoping/parse-intent](API_scoping_parse_intent.md)
 - [25_SOTA_Scoping_Engine_PRD](../25_SOTA_Scoping_Engine_PRD.md)
 """,
@@ -1853,12 +1835,12 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: RAG 2026 Roadmap](../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md)
+- [Retriever: RAG 2026 Roadmap (Archived)](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 - [UI: TopologyMap](UI_TopologyMap.md)
 - [25_SOTA_Scoping_Engine_PRD](../25_SOTA_Scoping_Engine_PRD.md)
 """,
 
-    "Engine_Docling_Layout_OCR.md": """# Engine: Docling Layout OCR & Multimodal Ingestion (Milestone 42)
+    "Engine_pdfplumber_Layout_Parser.md": """# Engine: pdfplumber Layout Parser & Multimodal Ingestion (Milestone 42)
 
 #engine #ocr #multimodal #pdf #retriever #m42
 
@@ -1888,18 +1870,18 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [Retriever: Constitution](../../../retriever/docs/constitution/master-vision.md)
 """,
 
-    "Engine_LongLLMLingua_Compression.md": """# Engine: LongLLMLingua Context Compression (Milestone 49)
+    "Engine_Heuristic_Context_Compression.md": """# Engine: Heuristic Context Compression (Milestone 49)
 
 #engine #compression #tokens #retriever #m49
 
-> **Dynamic Context Compression saving up to 60% Token Costs while preserving RAG recall.**
+> **Deterministic Context Compression saving token costs while preserving RAG recall.**
 
 - **Role:** Compresses massive multi-document prompt contexts before invoking generation models.
 
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: RAG 2026 Roadmap](../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md)
+- [Retriever: RAG 2026 Roadmap (Archived)](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 """,
 
     "Engine_MultiAgent_Consensus.md": """# Engine: Multi-Agent Consensus & Reflection Loops (Milestone 48)
@@ -1914,7 +1896,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 
 ## 🔗 Related Architecture & Cross-References
 - [Retriever_API: v1/consensus](Retriever_API_v1_consensus.md)
-- [Retriever: RAG 2026 Roadmap](../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md)
+- [Retriever: RAG 2026 Roadmap (Archived)](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 """,
 
     # -------------------------------------------------------------
@@ -2004,24 +1986,6 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [Retriever: REST API edge.md](../../../retriever/docs/api/edge.md)
 - [Retriever_API: v1/edge](Retriever_API_v1_edge.md)
 - [99_DECISIONS (ADR 35)](../99_DECISIONS.md#adr-35-sovereign-edge-vector-synchronization-offline-first-sqlite-crdt-swarms)
-""",
-
-    "Engine_Sovereign_Edge_Voice.md": """# Engine: Sovereign Edge Voice Streaming & WebRTC (Milestone 100)
-
-#engine #voice #webrtc #whisper #cartesia #vad #m100
-
-> **Sub-300ms Real-Time Voice Assistant Pipeline with On-Device Whisper & Neural TTS.**
-
-- **Domain Core:** `apps/api/src/domain/abstractions/voice.py` (`AudioStreamFrame`, `VoiceSessionConfig`, `VadState`)
-- **Adapters:** `apps/api/src/adapters/voice/webrtc_stream_adapter.py`
-- **Role:** Orchestrates WebRTC peer-to-peer audio channels, local Silero VAD, Whisper edge transcription, and streaming Cartesia voice synthesis.
-
----
-
-## 🔗 Related Architecture & Cross-References
-- [Retriever: REST API voice.md](../../../retriever/docs/api/voice.md)
-- [Retriever_API: v1/voice](Retriever_API_v1_voice.md)
-- [99_DECISIONS (ADR 37)](../99_DECISIONS.md#adr-37-sovereign-edge-voice-streaming-sub-300ms-webrtc-audio-pipelines)
 """
 }
 

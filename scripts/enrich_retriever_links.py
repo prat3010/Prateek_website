@@ -5,6 +5,7 @@ Standardizes all internal links across retriever/ to relative vault paths,
 creates root README.md, and enriches cross-references for a dense Knowledge Graph.
 """
 
+import argparse
 import os
 import re
 from pathlib import Path
@@ -17,7 +18,7 @@ README_CONTENT = """# Retriever — Enterprise Multi-Tenant RAG Cognitive Platfo
 > **High-Performance Hybrid Vector Search, GraphRAG, Context Compression & Recursive Agentic Cognition.**
 > 
 > 📌 **Master Cross-Platform Roadmap (SSoT):** [`../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md`](../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md)  
-> 📌 **Admin Dashboard Guide:** [`ADMIN_DASHBOARD_GUIDE.md`](ADMIN_DASHBOARD_GUIDE.md)  
+> 📌 **Admin Dashboard Guide:** [`docs/guides/ADMIN_DASHBOARD_GUIDE.md`](docs/guides/ADMIN_DASHBOARD_GUIDE.md)  
 > 📌 **Frontend Client Studio:** [`../Prateek_website/docs/24_RAG_App_Studio_PRD.md`](../Prateek_website/docs/24_RAG_App_Studio_PRD.md)
 
 ---
@@ -36,7 +37,7 @@ Retriever is designed as an enterprise-grade, highly modular Retrieval-Augmented
                                             ▼
  ┌────────────────────────────────────────────────────────────────────────────────────────┐
  │ FASTAPI APPLICATION GATEWAY (`apps/api`)                                               │
- │ • Routers: /v1/chat, /v1/search, /v1/documents, /v1/admin, /v1/auth                   │
+ │ • Routers: /v1/tenants/{id}/chat, /search, /documents, /v1/admin, /v1/auth             │
  │ • Guardrails: Llama Guard 3 Injection Filter & PII Redactor                           │
  └──────────────────────────────────────────┬─────────────────────────────────────────────┘
                                             │
@@ -47,7 +48,7 @@ Retriever is designed as an enterprise-grade, highly modular Retrieval-Augmented
  │ • GraphRAG Knowledge Graph Indexing & Neo4j/Pg Triples                                 │
  │ • Recursive Language Model (RLM) & Python REPL Sandbox (M47)                           │
  │ • Multi-Agent Generator-Critic Reflection Loops (M48)                                  │
- │ • LongLLMLingua Context Compression (M49) & Zero-Trust Envelope Encryption             │
+ │ • Heuristic Context Compression (M49) & Zero-Trust Envelope Encryption                 │
  └──────────────────────────────────────────┬─────────────────────────────────────────────┘
                                             │
                                             ▼
@@ -66,16 +67,15 @@ Retriever is designed as an enterprise-grade, highly modular Retrieval-Augmented
 
 | Document | Description |
 |:---|:---|
-| [`ROADMAP.md`](ROADMAP.md) | Backend engineering milestones (M1–M53) & implementation history |
-| [`PROJECT_STATUS.md`](PROJECT_STATUS.md) | Platform health indicators, test baselines & active milestone status |
-| [`docs/RAG_2026_PRODUCT_ROADMAP.md`](docs/RAG_2026_PRODUCT_ROADMAP.md) | 2026 Architecture & cognitive engine specification |
-| [`docs/ADMIN_DASHBOARD_ROADMAP.md`](docs/ADMIN_DASHBOARD_ROADMAP.md) | Admin dashboard control panel architecture (`admin.rag.prateeq.in`) |
-| [`ADMIN_DASHBOARD_GUIDE.md`](ADMIN_DASHBOARD_GUIDE.md) | Operator guide for tenant management, API keys, and prompt presets |
-| [`DEPLOYMENT.md`](DEPLOYMENT.md) & [`ORACLE_DEPLOYMENT_REFERENCE.md`](ORACLE_DEPLOYMENT_REFERENCE.md) | Production Oracle VPS deployment, Nginx SSL & systemd service setup |
+| [`ROADMAP.md`](ROADMAP.md) | Backend engineering milestones & implementation history |
+| [`docs/operations/PROJECT_STATUS.md`](docs/operations/PROJECT_STATUS.md) | Platform health indicators, test baselines & active milestone status |
+| [`../Prateek_website/docs/24_RAG_App_Studio_PRD.md`](../Prateek_website/docs/24_RAG_App_Studio_PRD.md) | Frontend RAG App Studio architecture & multi-tenant spec |
+| [`docs/guides/ADMIN_DASHBOARD_GUIDE.md`](docs/guides/ADMIN_DASHBOARD_GUIDE.md) | Operator guide for tenant management, API keys, and prompt presets |
+| [`docs/infrastructure/DEPLOYMENT.md`](docs/infrastructure/DEPLOYMENT.md) & [`docs/infrastructure/ORACLE_DEPLOYMENT_REFERENCE.md`](docs/infrastructure/ORACLE_DEPLOYMENT_REFERENCE.md) | Production Oracle VPS deployment, Nginx SSL & systemd service setup |
 | [`docs/constitution/master-vision.md`](docs/constitution/master-vision.md) | Engineering Constitution & non-negotiable coding rules |
 | [`docs/architecture.md`](docs/architecture.md) | Detailed logical architecture blueprint |
 | [`docs/implementation/system-design.md`](docs/implementation/system-design.md) | Physical system design, DB schemas & API contracts |
-| [`TECH_DEBT.md`](TECH_DEBT.md) | Resolved & deferred technical debt ledger |
+| [`docs/operations/TECH_DEBT.md`](docs/operations/TECH_DEBT.md) | Resolved & deferred technical debt ledger |
 
 ---
 
@@ -102,7 +102,7 @@ uvicorn apps.api.src.main:app --reload --port 8000
 ## 🧪 Automated Testing Baselines
 
 ```bash
-# Run complete test suite (500+ unit tests)
+# Run complete test suite (unit tests)
 pytest apps/api/tests/ -v
 
 # Run linting & Hexagonal import boundaries verification
@@ -137,59 +137,45 @@ def clean_file_urls(content: str, current_dir: Path) -> str:
 RETRIEVER_CROSS_REFS = {
     "ROADMAP.md": [
         ("../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md", "Master Cross-Platform Roadmap (SSoT)"),
-        ("PROJECT_STATUS.md", "Project Health & Test Status"),
-        ("docs/RAG_2026_PRODUCT_ROADMAP.md", "2026 RAG Engine Architecture Blueprint"),
-        ("docs/ADMIN_DASHBOARD_ROADMAP.md", "Admin Dashboard Operational Roadmap"),
+        ("docs/operations/PROJECT_STATUS.md", "Project Health & Test Status"),
+        ("../Prateek_website/docs/24_RAG_App_Studio_PRD.md", "RAG App Studio PRD"),
         ("../Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md", "Client Dashboard & SaaS Studio Roadmap"),
-        ("TECH_DEBT.md", "Technical Debt Ledger"),
+        ("docs/operations/TECH_DEBT.md", "Technical Debt Ledger"),
     ],
-    "PROJECT_STATUS.md": [
-        ("ROADMAP.md", "Backend Engineering Roadmap"),
-        ("../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap (Phase G)"),
-        ("docs/RAG_2026_PRODUCT_ROADMAP.md", "RAG Engine Architecture Specification"),
+    "docs/operations/PROJECT_STATUS.md": [
+        ("../../ROADMAP.md", "Backend Engineering Roadmap"),
+        ("../../../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap (Phase G)"),
+        ("../../../Prateek_website/docs/24_RAG_App_Studio_PRD.md", "RAG App Studio PRD"),
         ("TECH_DEBT.md", "Technical Debt & Deferred Items"),
-        ("DEPLOYMENT.md", "Production Deployment Reference"),
+        ("../infrastructure/DEPLOYMENT.md", "Production Deployment Reference"),
     ],
-    "ADMIN_DASHBOARD_GUIDE.md": [
-        ("docs/ADMIN_DASHBOARD_ROADMAP.md", "Admin Dashboard Architecture Roadmap"),
+    "docs/guides/ADMIN_DASHBOARD_GUIDE.md": [
+        ("../features/admin-dashboard.md", "Admin Dashboard Feature Spec"),
         ("ONBOARDING_WORKFLOW.md", "Tenant Onboarding Workflow"),
-        ("../Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md", "Client SaaS Studio Specification"),
-        ("ROADMAP.md", "Backend Engine Roadmap"),
+        ("../../../Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md", "Client SaaS Studio Specification"),
+        ("../../ROADMAP.md", "Backend Engine Roadmap"),
     ],
-    "DEPLOYMENT.md": [
+    "docs/infrastructure/DEPLOYMENT.md": [
         ("ORACLE_DEPLOYMENT_REFERENCE.md", "Oracle Ampere Deployment Reference"),
         ("ORACLE_AMPERE_CLAIM_GUIDE.md", "Oracle Ampere VM Provisioning Guide"),
-        ("PROJECT_STATUS.md", "System Status & Production Hardening"),
+        ("../operations/PROJECT_STATUS.md", "System Status & Production Hardening"),
     ],
-    "SELF_AWARE_RAG_PLAN.md": [
-        ("docs/RAG_2026_PRODUCT_ROADMAP.md", "2026 Cognitive Engine Roadmap"),
-        ("docs/architecture.md", "System Architecture Blueprint"),
-        ("TECH_DEBT.md", "Technical Debt Profiling"),
-    ],
-    "docs/ADMIN_DASHBOARD_ROADMAP.md": [
-        ("ADMIN_DASHBOARD_GUIDE.md", "Admin Dashboard User Guide"),
-        ("../../Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md", "Client Dashboard Specification"),
-        ("../ROADMAP.md", "Retriever Backend Roadmap"),
-        ("../../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap (SSoT)"),
-    ],
-    "docs/RAG_2026_PRODUCT_ROADMAP.md": [
-        ("../../Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap (SSoT)"),
-        ("../../Prateek_website/docs/24_RAG_App_Studio_PRD.md", "RAG App Studio PRD"),
-        ("../../Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md", "Scoping Dogfooding Tenant (`prateeq_scoping`)"),
-        ("architecture.md", "Logical Architecture Blueprint"),
-        ("implementation/system-design.md", "Physical System Design"),
+    "docs/engineering/SELF_AWARE_RAG_PLAN.md": [
+        ("../../../Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md", "SOTA Scoping Engine PRD"),
+        ("../architecture.md", "System Architecture Blueprint"),
+        ("../operations/TECH_DEBT.md", "Technical Debt Profiling"),
     ],
     "docs/architecture.md": [
         ("constitution/master-vision.md", "Engineering Constitution"),
         ("implementation/system-design.md", "Physical System Design & Endpoints"),
         ("engineering/engineering-playbook.md", "Engineering Standards & Boundaries"),
-        ("RAG_2026_PRODUCT_ROADMAP.md", "2026 Architecture Blueprint"),
+        ("../ROADMAP.md", "Engineering Milestones Roadmap"),
     ],
     "docs/implementation/system-design.md": [
-        ("architecture.md", "System Architecture Blueprint"),
-        ("constitution/master-vision.md", "Engineering Constitution"),
-        ("features/core-platform.md", "Core Platform Features"),
-        ("engineering/rag-audit-report.md", "RAG Audit Report"),
+        ("../architecture.md", "System Architecture Blueprint"),
+        ("../constitution/master-vision.md", "Engineering Constitution"),
+        ("../features/core-platform.md", "Core Platform Features"),
+        ("../engineering/rag-audit-report.md", "RAG Audit Report"),
         ("../infrastructure/database_and_schemas.md", "Database Schemas & Partitions"),
     ],
     "docs/features/core-platform.md": [
@@ -253,7 +239,7 @@ RETRIEVER_CROSS_REFS = {
     "docs/infrastructure/async_workers_and_queues.md": [
         ("../api/document.md", "Document Management API"),
         ("../cognitive/evaluation_and_hallucinations.md", "Evaluation & Hallucinations"),
-        ("../../DEPLOYMENT.md", "Deployment Guide"),
+        ("DEPLOYMENT.md", "Deployment Guide"),
     ],
     "docs/integrations/typescript_sdk.md": [
         ("../api/chat.md", "Chat API Specification"),
@@ -296,12 +282,21 @@ def enrich_document(file_path: Path, cross_refs: list):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Normalize links and cross-references across retriever docs.")
+    parser.add_argument(
+        "--write-readme",
+        action="store_true",
+        help="Also overwrite retriever/README.md from README_CONTENT template (disabled by default).",
+    )
+    args = parser.parse_args()
+
     print("🚀 Starting Retriever Docs & Links Deep Audit...")
-    
-    # 1. Create root README.md in retriever
-    readme_path = RETRIEVER_DIR / "README.md"
-    readme_path.write_text(README_CONTENT.strip() + "\n", encoding="utf-8")
-    print("✓ Created comprehensive root README.md in retriever.")
+
+    # 1. Optionally write root README.md in retriever (opt-in so curated README is not clobbered)
+    if args.write_readme:
+        readme_path = RETRIEVER_DIR / "README.md"
+        readme_path.write_text(README_CONTENT.strip() + "\n", encoding="utf-8")
+        print("✓ Wrote root README.md in retriever.")
     
     # 2. Enrich specified docs
     for filename, refs in RETRIEVER_CROSS_REFS.items():

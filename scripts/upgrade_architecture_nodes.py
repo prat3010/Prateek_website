@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 upgrade_architecture_nodes.py (Master Ultra SOTA Edition - Invariants & Blast Radius)
-Enriches all 97 architecture nodes in docs/architecture_nodes/ with:
+Enriches all architecture nodes in docs/architecture_nodes/ with:
 1. Standardized YAML Frontmatter (id, tier, platform, status, auth_level, blast_radius, invariants, test_suites, runbook, file_path, ide_cursor_uri, ide_vscode_uri, tags, downstream)
 2. Prominent Click-to-Code Action Badges ([Open in Cursor] | [Open in VS Code])
 3. Non-Negotiable Domain Invariants & Blast Radius Safety Constraints
@@ -55,10 +55,8 @@ PATH_OVERRIDES = {
     "Route_rag_app": "src/app/rag/app/page.tsx",
     "UI_Terminal": "src/components/ui/SiteInfoConsole.tsx",
     "Retriever_API_v1_edge": "apps/api/src/routers/edge.py",
-    "Retriever_API_v1_voice": "apps/api/src/routers/voice.py",
     "Retriever_API_v1_serverless_gpu": "apps/api/src/routers/serverless_gpu.py",
     "Engine_Sovereign_Edge_Sync": "apps/api/src/domain/abstractions/edge.py",
-    "Engine_Sovereign_Edge_Voice": "apps/api/src/domain/abstractions/voice.py",
     "Schema_client_change_orders": "src/app/api/client/change-orders/route.ts"
 }
 
@@ -219,7 +217,7 @@ def extract_metadata(filename: str, body: str) -> dict:
         domain = "general"
 
     # Status
-    status = "planned" if stem in ["API_scoping_parse_intent", "API_scoping_parse_rfp"] else "production"
+    status = "production"
 
     # Auth Level
     lower_body = body.lower()
@@ -253,7 +251,7 @@ def extract_metadata(filename: str, body: str) -> dict:
                 l_name = stem.replace("Lib_", "")
                 rel_path = f"src/lib/{l_name}.ts"
             else:
-                rel_path = "src/"
+                rel_path = "apps/api/src/" if platform == "Retriever" else "src/"
 
     abs_path = (RETRIEVER_ROOT + "/" + rel_path) if platform == "Retriever" else (WEBSITE_ROOT + "/" + rel_path)
     cursor_uri = f"cursor://file{abs_path}"
@@ -339,7 +337,8 @@ def enrich_node(filename: str, content: str) -> str:
     yaml_block = "\n".join(yaml_lines)
     action_badge = f"> [!NOTE] Quick IDE Jump\n> ⚡ **[Open in Cursor]({meta['ide_cursor_uri']})** &nbsp;|&nbsp; 💻 **[Open in VS Code]({meta['ide_vscode_uri']})**\n\n"
 
-    invariants_md = f"\n\n## 🛡️ Non-Negotiable Invariants & Safety Constraints\n> **Blast Radius:** `{meta['blast_radius'].upper()}` &nbsp;|&nbsp; 📖 **Runbook:** [{Path(meta['runbook']).stem}]({meta['runbook']})\n\n"
+    runbook_rel = f"../runbooks/{Path(meta['runbook']).name}"
+    invariants_md = f"\n\n## 🛡️ Non-Negotiable Invariants & Safety Constraints\n> **Blast Radius:** `{meta['blast_radius'].upper()}` &nbsp;|&nbsp; 📖 **Runbook:** [{Path(meta['runbook']).stem}]({runbook_rel})\n\n"
     for idx, inv in enumerate(meta["invariants"], 1):
         invariants_md += f"{idx}. **{inv}**\n"
 

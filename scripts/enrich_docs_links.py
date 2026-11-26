@@ -26,7 +26,7 @@ CROSS_REFS = {
         ("01_Vision_and_Philosophy.md", "Vision & Philosophy"),
         ("13_Telemetry_and_Analytics.md", "Telemetry & Performance Metrics"),
         ("15_Performance_and_Accessibility.md", "Core Web Vitals Standards"),
-        ("REVENUE_EXECUTION_PLAN.md", "Revenue Execution Plan"),
+        ("commercial/REVENUE_EXECUTION_PLAN.md", "Revenue Execution Plan"),
         ("UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap"),
         ("architecture_nodes/Route_analytics.md", "Architecture Node: Analytics Route"),
     ],
@@ -57,8 +57,8 @@ CROSS_REFS = {
     "07_Content_Strategy.md": [
         ("01_Vision_and_Philosophy.md", "Vision & Philosophy"),
         ("06_Adaptive_Identity_System.md", "Adaptive Identity System"),
-        ("BRAND_TONE_GUIDELINES.md", "Brand Tone & Copywriting Guidelines"),
-        ("BLOG_DEEP_LINKING_MAP.md", "SEO Project Deep Linking Taxonomy"),
+        ("playbooks/BRAND_TONE_GUIDELINES.md", "Brand Tone & Copywriting Guidelines"),
+        ("playbooks/BLOG_DEEP_LINKING_MAP.md", "SEO Project Deep Linking Taxonomy"),
         ("AUTOMATED_AI_BLOGGING_ROADMAP.md", "Automated AI Content Engine"),
         ("architecture_nodes/Route_blog.md", "Architecture Node: Blog Publication Engine"),
     ],
@@ -83,7 +83,7 @@ CROSS_REFS = {
     "11_Content_Management_System.md": [
         ("10_Content_Platform_Architecture.md", "Content Platform Architecture"),
         ("12_AI_Integration_Strategy.md", "Gemini AI Synchronizer Integration"),
-        ("MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Middleman Agreement Tab"),
+        ("commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Middleman Agreement Tab"),
         ("09_Section_Specifications/12_Scoping_Lab.md", "Scoping Questionnaire Editor"),
         ("architecture_nodes/Tool_Synchronizer.md", "Architecture Node: Streamlit CMS Dashboard"),
     ],
@@ -128,19 +128,19 @@ CROSS_REFS = {
     ],
     "17_SEO_Strategy.md": [
         ("07_Content_Strategy.md", "Content Strategy & Copywriting"),
-        ("BLOG_DEEP_LINKING_MAP.md", "Blog & Project Cross-Linking"),
+        ("playbooks/BLOG_DEEP_LINKING_MAP.md", "Blog & Project Cross-Linking"),
         ("AUTOMATED_AI_BLOGGING_ROADMAP.md", "Automated AI Content Engine"),
         ("09_Section_Specifications/11_Blog.md", "Blog Section Specification"),
         ("architecture_nodes/Route_blog.md", "Architecture Node: Blog Engine"),
     ],
     "18_Codebase_Modernization_and_Refactoring.md": [
-        ("MASTER_CODEBASE_AUDIT_CHECKLIST.md", "Master Codebase Audit Checklist"),
+        ("playbooks/MASTER_CODEBASE_AUDIT_CHECKLIST.md", "Master Codebase Audit Checklist"),
         ("ARCHITECTURE_DEPENDENCY_MAP.md", "Architecture Dependency Map"),
         ("99_DECISIONS.md", "Architecture Decision Records"),
         ("19_Testing_and_Quality_Assurance.md", "Automated Test Baselines"),
     ],
     "19_Testing_and_Quality_Assurance.md": [
-        ("MASTER_CODEBASE_AUDIT_CHECKLIST.md", "Audit Checklist & Test Baselines"),
+        ("playbooks/MASTER_CODEBASE_AUDIT_CHECKLIST.md", "Audit Checklist & Test Baselines"),
         ("18_Codebase_Modernization_and_Refactoring.md", "Codebase Modernization Rules"),
         ("20_Deployment_Strategy.md", "CI/CD & Deployment Verification"),
     ],
@@ -156,7 +156,7 @@ CROSS_REFS = {
         ("CLIENT_DASHBOARD_ROADMAP.md", "Client Workspace Specification"),
     ],
     "24_RAG_App_Studio_PRD.md": [
-        ("rag-lab.md", "RAG Lab Showcase Overview"),
+        ("playbooks/rag-lab.md", "RAG Lab Showcase Overview"),
         ("25_SOTA_Scoping_Engine_PRD.md", "Scoping Lab Dogfooding Tenant (`prateeq_scoping`)"),
         ("CLIENT_DASHBOARD_ROADMAP.md", "Client Workspace & RAG Studio Auth"),
         ("14_Razorpay_Payments_and_Invoicing.md", "SaaS Plan Subscriptions"),
@@ -164,7 +164,7 @@ CROSS_REFS = {
         ("UNIFIED_MASTER_ROADMAP.md", "Master Roadmap (Phases B, D, G)"),
         ("architecture_nodes/Route_rag_app.md", "Architecture Node: SaaS Studio"),
         ("architecture_nodes/Lib_rag_client.md", "Architecture Node: RAG Client SDK"),
-        ("architecture_nodes/Retriever_API_v1_chat.md", "Architecture Node: /v1/chat"),
+        ("architecture_nodes/Retriever_API_v1_chat.md", "Architecture Node: /v1/tenants/{tenantId}/chat/completions"),
         ("architecture_nodes/Schema_rag_tenants.md", "Architecture Node: Tenants Schema"),
     ],
     "25_SOTA_Scoping_Engine_PRD.md": [
@@ -174,8 +174,8 @@ CROSS_REFS = {
         ("14_Razorpay_Payments_and_Invoicing.md", "50% Deposit Lock & Invoicing Ledger"),
         ("24_RAG_App_Studio_PRD.md", "RAG SaaS Studio & `prateeq_scoping` Tenant"),
         ("CLIENT_DASHBOARD_ROADMAP.md", "Client Workspace Architecture Spec"),
-        ("MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Partner Commission Engine"),
-        ("REVENUE_EXECUTION_PLAN.md", "Revenue Strategy & Client Conversion"),
+        ("commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Partner Commission Engine"),
+        ("commercial/REVENUE_EXECUTION_PLAN.md", "Revenue Strategy & Client Conversion"),
         ("architecture_nodes/Route_scoping.md", "Architecture Node: Route /scoping"),
         ("architecture_nodes/UI_ScopingLab.md", "Architecture Node: Scoping Lab Wizard"),
         ("architecture_nodes/UI_ArchitectureCartDrawer.md", "Architecture Node: Cart Drawer"),
@@ -196,7 +196,7 @@ CROSS_REFS = {
         ("12_AI_Integration_Strategy.md", "Gemini 2.5 Flash Integration"),
         ("16_Security_and_Privacy.md", "OAuth2 & Anti-Ban Rate Limiting"),
         ("09_Section_Specifications/13_Client_Workspace_Dashboard.md", "Admin Control Center (`/admin`)"),
-        ("REVENUE_EXECUTION_PLAN.md", "Cold Outreach Conversion Scripts"),
+        ("commercial/REVENUE_EXECUTION_PLAN.md", "Cold Outreach Conversion Scripts"),
         ("architecture_nodes/Route_admin.md", "Architecture Node: Route /admin"),
         ("architecture_nodes/UI_AdminPortal.md", "Architecture Node: Admin Portal"),
         ("architecture_nodes/API_outreach_dispatch.md", "Architecture Node: Outreach Dispatch API"),
@@ -205,20 +205,20 @@ CROSS_REFS = {
     "AUTOMATED_AI_BLOGGING_ROADMAP.md": [
         ("UNIFIED_MASTER_ROADMAP.md", "Master Roadmap (Milestone 59)"),
         ("07_Content_Strategy.md", "Brand Voice & Writing Style"),
-        ("BLOG_DEEP_LINKING_MAP.md", "Deep-Linking Taxonomy"),
+        ("playbooks/BLOG_DEEP_LINKING_MAP.md", "Deep-Linking Taxonomy"),
         ("17_SEO_Strategy.md", "Zero-Penalty SEO Safeguards"),
         ("09_Section_Specifications/11_Blog.md", "Blog Section Specification"),
         ("architecture_nodes/API_blog_publish.md", "Architecture Node: Publish API"),
         ("architecture_nodes/Schema_blog_posts.md", "Architecture Node: Blog Posts Schema"),
     ],
-    "BLOG_DEEP_LINKING_MAP.md": [
+    "playbooks/BLOG_DEEP_LINKING_MAP.md": [
         ("AUTOMATED_AI_BLOGGING_ROADMAP.md", "Automated AI Content Engine"),
         ("07_Content_Strategy.md", "Content Strategy"),
         ("17_SEO_Strategy.md", "SEO Strategy"),
         ("09_Section_Specifications/04_Projects.md", "Projects Showcase"),
         ("architecture_nodes/Schema_projects.md", "Architecture Node: Projects Schema"),
     ],
-    "BRAND_TONE_GUIDELINES.md": [
+    "playbooks/BRAND_TONE_GUIDELINES.md": [
         ("07_Content_Strategy.md", "Content Strategy"),
         ("01_Vision_and_Philosophy.md", "Vision & Philosophy"),
         ("06_Adaptive_Identity_System.md", "Adaptive Identity System"),
@@ -236,29 +236,29 @@ CROSS_REFS = {
         ("architecture_nodes/API_client_copilot.md", "Architecture Node: Copilot API"),
         ("architecture_nodes/Schema_client_scopes.md", "Architecture Node: Client Scopes Schema"),
     ],
-    "DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md": [
+    "playbooks/DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md": [
         ("24_RAG_App_Studio_PRD.md", "RAG SaaS Studio Demo Script"),
         ("25_SOTA_Scoping_Engine_PRD.md", "Scoping Lab Live Walkthrough"),
-        ("REVENUE_EXECUTION_PLAN.md", "High-Ticket Client Conversion"),
+        ("commercial/REVENUE_EXECUTION_PLAN.md", "High-Ticket Client Conversion"),
     ],
-    "MASTER_CODEBASE_AUDIT_CHECKLIST.md": [
+    "playbooks/MASTER_CODEBASE_AUDIT_CHECKLIST.md": [
         ("18_Codebase_Modernization_and_Refactoring.md", "Codebase Modernization Rules"),
         ("19_Testing_and_Quality_Assurance.md", "Testing & Verification"),
         ("ARCHITECTURE_DEPENDENCY_MAP.md", "Architecture Dependency Map"),
         ("UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap"),
     ],
-    "MIDDLEMAN_PARTNERSHIP_AGREEMENT.md": [
+    "commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md": [
         ("25_SOTA_Scoping_Engine_PRD.md", "Sales Partner Promo Validation & Attribution"),
         ("11_Content_Management_System.md", "Synchronizer Middleman Agreement Tab"),
-        ("REVENUE_EXECUTION_PLAN.md", "Affiliate Partner Strategy"),
+        ("commercial/REVENUE_EXECUTION_PLAN.md", "Affiliate Partner Strategy"),
         ("architecture_nodes/Lib_commission.md", "Architecture Node: Commission SSoT"),
     ],
-    "REVENUE_EXECUTION_PLAN.md": [
+    "commercial/REVENUE_EXECUTION_PLAN.md": [
         ("03_Product_Goals_Objectives_and_Success_Metrics.md", "Product Goals & Metrics"),
         ("25_SOTA_Scoping_Engine_PRD.md", "High-Ticket Scoping Lab"),
         ("24_RAG_App_Studio_PRD.md", "Retriever SaaS Revenue"),
-        ("MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Affiliate Program"),
-        ("DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md", "Client Demo Showcase"),
+        ("commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Affiliate Program"),
+        ("playbooks/DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md", "Client Demo Showcase"),
     ],
     "archive/SCOPING_AUDIT_ROADMAP_COMPLETED.md": [
         ("25_SOTA_Scoping_Engine_PRD.md", "Active SOTA Scoping Engine PRD"),
@@ -275,7 +275,7 @@ CROSS_REFS = {
         ("10_Content_Platform_Architecture.md", "Content Platform Architecture"),
         ("09_Section_Specifications/README.md", "All Section Specifications"),
     ],
-    "rag-lab.md": [
+    "playbooks/rag-lab.md": [
         ("24_RAG_App_Studio_PRD.md", "RAG SaaS Studio Workspace PRD"),
         ("25_SOTA_Scoping_Engine_PRD.md", "Scoping Dogfooding Tenant"),
         ("13_Telemetry_and_Analytics.md", "Telemetry & Semantic Cache Tracking"),
@@ -307,7 +307,7 @@ SECTION_CROSS_REFS = {
     ],
     "04_Projects.md": [
         ("03_Skills_and_Services.md", "Previous Section: Skills"),
-        ("../BLOG_DEEP_LINKING_MAP.md", "Project Case Studies & Deep Links"),
+        ("../playbooks/BLOG_DEEP_LINKING_MAP.md", "Project Case Studies & Deep Links"),
         ("05_Playground.md", "Next Section: Playground"),
         ("../architecture_nodes/Schema_projects.md", "Architecture Node: Projects Schema"),
     ],
@@ -319,7 +319,7 @@ SECTION_CROSS_REFS = {
     "06_Resume_and_Quotations.md": [
         ("05_Playground.md", "Previous Section: Playground"),
         ("12_Scoping_Lab.md", "Interactive Scoping Lab"),
-        ("../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Partner Agreement"),
+        ("../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Partner Agreement"),
         ("08_Contact.md", "Next Section: Contact"),
         ("../architecture_nodes/UI_CommercialPDFSuite.md", "Architecture Node: Commercial PDF Suite"),
     ],
@@ -350,7 +350,7 @@ SECTION_CROSS_REFS = {
         ("../07_Content_Strategy.md", "Content Strategy & Tone"),
         ("../17_SEO_Strategy.md", "SEO Strategy"),
         ("../AUTOMATED_AI_BLOGGING_ROADMAP.md", "Automated AI Content Engine"),
-        ("../BLOG_DEEP_LINKING_MAP.md", "Blog Deep-Linking Map"),
+        ("../playbooks/BLOG_DEEP_LINKING_MAP.md", "Blog Deep-Linking Map"),
         ("../architecture_nodes/Route_blog.md", "Architecture Node: Blog Route"),
     ],
     "12_Scoping_Lab.md": [
@@ -408,7 +408,7 @@ def clean_file_urls(content: str, current_dir: Path) -> str:
     return re.sub(direct_pattern, replacer, content)
 
 
-def enrich_document(file_path: Path, cross_refs: list):
+def enrich_document(file_path: Path, cross_refs: list, docs_root_relative: bool = False):
     content = file_path.read_text(encoding="utf-8")
     
     # 1. Clean file:/// URLs & broken routes
@@ -418,23 +418,31 @@ def enrich_document(file_path: Path, cross_refs: list):
     # 2. Check if Cross-References section already exists
     section_header = "## **Related Architecture & Cross-References**"
     alt_header = "## Related Architecture & Cross-References"
+
+    resolved_refs = []
+    for target, label in cross_refs:
+        if docs_root_relative and not target.startswith(("../", "http://", "https://")):
+            rel_target = os.path.relpath(DOCS_DIR / target, file_path.parent)
+        else:
+            rel_target = target
+        resolved_refs.append((rel_target, label))
     
     cross_links_md = "\n\n---\n\n" + section_header + "\n\n"
-    for target, label in cross_refs:
+    for target, label in resolved_refs:
         cross_links_md += f"- [{label}]({target})\n"
     
     if section_header in content:
         # Replace existing section
         content = re.sub(
             rf"{re.escape(section_header)}.*$",
-            f"{section_header}\n\n" + "\n".join(f"- [{label}]({target})" for target, label in cross_refs),
+            f"{section_header}\n\n" + "\n".join(f"- [{label}]({target})" for target, label in resolved_refs),
             content,
             flags=re.DOTALL,
         )
     elif alt_header in content:
         content = re.sub(
             rf"{re.escape(alt_header)}.*$",
-            f"{section_header}\n\n" + "\n".join(f"- [{label}]({target})" for target, label in cross_refs),
+            f"{section_header}\n\n" + "\n".join(f"- [{label}]({target})" for target, label in resolved_refs),
             content,
             flags=re.DOTALL,
         )
@@ -443,7 +451,7 @@ def enrich_document(file_path: Path, cross_refs: list):
         content = content.rstrip() + cross_links_md
     
     file_path.write_text(content, encoding="utf-8")
-    print(f"✓ Enriched {file_path.relative_to(DOCS_DIR)} with {len(cross_refs)} cross-references.")
+    print(f"✓ Enriched {file_path.relative_to(DOCS_DIR)} with {len(resolved_refs)} cross-references.")
 
 
 def main():
@@ -457,7 +465,7 @@ def main():
             if matches:
                 doc_path = matches[0]
         if doc_path.exists():
-            enrich_document(doc_path, refs)
+            enrich_document(doc_path, refs, docs_root_relative=True)
         else:
             print(f"⚠️ Missing: {filename}")
             

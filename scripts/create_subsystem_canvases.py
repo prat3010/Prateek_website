@@ -197,7 +197,7 @@ def generate_rag_canvas():
         },
         {
             "id": "node-docling",
-            "type": "file", "file": "architecture_nodes/Engine_Docling_Layout_OCR.md",
+            "type": "file", "file": "architecture_nodes/Engine_pdfplumber_Layout_Parser.md",
             "x": -480, "y": 890, "width": 480, "height": 400, "color": "4"
         },
 
@@ -243,7 +243,7 @@ def generate_rag_canvas():
         },
         {
             "id": "node-compress",
-            "type": "file", "file": "architecture_nodes/Engine_LongLLMLingua_Compression.md",
+            "type": "file", "file": "architecture_nodes/Engine_Heuristic_Context_Compression.md",
             "x": 840, "y": 890, "width": 480, "height": 400, "color": "4"
         },
 
@@ -273,7 +273,7 @@ def generate_rag_canvas():
 
     edges = [
         {"id": "er1", "fromNode": "node-rag-playground", "fromSide": "bottom", "toNode": "node-rag-client", "toSide": "top", "color": "3", "label": "Client State"},
-        {"id": "er2", "fromNode": "node-rag-client", "fromSide": "right", "toNode": "node-chat", "toSide": "left", "color": "4", "label": "POST /v1/chat (SSE)"},
+        {"id": "er2", "fromNode": "node-rag-client", "fromSide": "right", "toNode": "node-chat", "toSide": "left", "color": "4", "label": "POST /v1/tenants/{id}/chat/completions (SSE)"},
         {"id": "er3", "fromNode": "node-rfp", "fromSide": "bottom", "toNode": "node-docling", "toSide": "top", "color": "4", "label": "Layout OCR Chunking"},
         {"id": "er4", "fromNode": "node-chat", "fromSide": "bottom", "toNode": "node-guard", "toSide": "top", "color": "4", "label": "LlamaGuard 3 Filter"},
         {"id": "er5", "fromNode": "node-chat", "fromSide": "bottom", "toNode": "node-search", "toSide": "top", "color": "4", "label": "Hybrid Query"},

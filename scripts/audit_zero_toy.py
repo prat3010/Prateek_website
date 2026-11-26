@@ -23,6 +23,7 @@ FORBIDDEN_PATTERNS = [
     (re.compile(r'fakeData\s*='), "Fake data assignment in production code"),
     (re.compile(r'return\s+\[\s*\{\s*id:\s*["\']mock-'), "Returning mock object array in production code"),
     (re.compile(r'Math\.random\(\)\s*<\s*0\.05.*fake', re.IGNORECASE), "Simulated failure/success injection"),
+    (re.compile(r'\b(?:isMock|isMockBypass|order_mock_|sub_mock_|inv_mock_|sub_fake_|test_sub_signature_mock)\b'), "Mock payment/auth bypass token in production code"),
 ]
 
 
@@ -32,13 +33,20 @@ def check_file(path: Path) -> None:
         return
 
     text = path.read_text(encoding="utf-8", errors="ignore")
+    rel = str(path.relative_to(SRC_DIR))
 
     for pattern, reason in FORBIDDEN_PATTERNS:
         match = pattern.search(text)
         if match:
             start = match.start()
             line_no = text.count("\n", 0, start) + 1
-            VIOLATIONS.append(f"{path.relative_to(SRC_DIR)}:{line_no} - {reason}")
+            VIOLATIONS.append(f"{rel}:{line_no} - {reason}")
+
+    if rel.startswith("components/rag/"):
+        m = re.search(r"catch\s*(?:\([^)]*\))?\s*\{[^}]*?\b(?:setConfig|setModels|setServerlessStatus)\(\s*(?:\{|\[)", text, re.DOTALL)
+        if m:
+            line_no = text.count("\n", 0, m.start()) + 1
+            VIOLATIONS.append(f"{rel}:{line_no} - Hardcoded demo/fallback state inside catch block")
 
 
 def main() -> int:

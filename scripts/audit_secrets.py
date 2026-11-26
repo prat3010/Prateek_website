@@ -20,6 +20,7 @@ SECRET_PATTERNS = [
     (r"(?:sk-proj-[0-9a-zA-Z_-]{40,})", "OpenAI Project Secret Key"),
     (r"(?:AIzaSy[0-9a-zA-Z_-]{33})", "Google Cloud / Gemini API Key"),
     (r"(?:ret_live_[0-9a-zA-Z_.-]{24,})", "Retriever Production API Key"),
+    (r"(?:hf_[0-9a-zA-Z]{24,})", "HuggingFace API Token"),
     (r"(?:sk-or-v1-[0-9a-fA-F]{64})", "OpenRouter API Key"),
     (r"(?:postgres(?:ql)?(?:\+[a-z0-9]+)?://[^:\s]+:[^@\s]+@[^/\s]+/\w+)", "Database Connection String with Credentials"),
 ]
@@ -74,9 +75,9 @@ def scan_file(file_path: Path) -> list[tuple[int, str, str]]:
                 if any(
                     ph in matched_str.lower()
                     for ph in (
-                        "placeholder", "sample", "example", "your_", "guest", "demo",
+                        "placeholder", "sample", "example", "your_", "guest:guest", "demo",
                         "postgres:postgres", "retriever:retriever", "user:pass", "<password>",
-                        "postgres:password", "retriever:secret"
+                        "postgres:password", "retriever:secret", "redacted"
                     )
                 ):
                     continue
