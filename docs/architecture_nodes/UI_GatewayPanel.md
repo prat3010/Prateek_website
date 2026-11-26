@@ -48,7 +48,7 @@ test_suites:
 - **Backend API:** `/v1/gateway/*` & `/v1/tenants/{tenantId}/gateway/*` (`Retriever_API_v1_gateway`)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

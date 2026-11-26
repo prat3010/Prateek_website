@@ -24,7 +24,7 @@ downstream:
   - ../99_DECISIONS
   - ../runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM
   - UI_PlaygroundSuite
-  - Route_api_playground_chat
+  - API_playground_chat
   - Route_terminal
 ---
 
@@ -53,11 +53,11 @@ downstream:
 - [ADR 45: Playground & Arcade Cabinet Architecture](../99_DECISIONS.md#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 - [SOP Runbook: Adding an Item to Playground](../runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md)
 - [UI: PlaygroundSuite](UI_PlaygroundSuite.md)
-- [Route: api/playground/chat](Route_api_playground_chat.md)
+- [API: playground/chat](API_playground_chat.md)
 - [Route: terminal](Route_terminal.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

@@ -18,13 +18,13 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Missing scopeCode parameter' }, { status: 400 });
     }
 
-    if (!supabase) {
-      return NextResponse.json({ changeOrders: [] });
-    }
-
     const clientEmail = await getVerifiedSessionEmail(req);
     if (!clientEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     // Verify scope ownership
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
     if (scopeErr) {
       return NextResponse.json({ error: scopeErr.message }, { status: 500 });
     }
-    if (!scope || scope.client_email !== clientEmail) {
+    if (!scope || !scope.client_email || scope.client_email.toLowerCase() !== clientEmail.toLowerCase()) {
       return NextResponse.json({ error: 'Scope not found or unauthorized' }, { status: 404 });
     }
 
@@ -75,21 +75,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing scopeCode' }, { status: 400 });
     }
 
-    if (!supabase) {
-      return NextResponse.json({
-        success: true,
-        message: 'Change Order created (degraded mode).',
-        changeOrder: {
-          id: 'mock-co-id',
-          change_order_number: `CO-${scopeCode}-01`,
-          status: 'pending',
-        },
-      });
-    }
-
     const clientEmail = await getVerifiedSessionEmail(req);
     if (!clientEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     // 1. Verify Scope Existence and Ownership
@@ -102,7 +94,7 @@ export async function POST(req: Request) {
     if (scopeErr) {
       return NextResponse.json({ error: scopeErr.message }, { status: 500 });
     }
-    if (!scope || scope.client_email !== clientEmail) {
+    if (!scope || !scope.client_email || scope.client_email.toLowerCase() !== clientEmail.toLowerCase()) {
       return NextResponse.json({ error: 'Scope not found or unauthorized' }, { status: 404 });
     }
 
@@ -211,13 +203,13 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    if (!supabase) {
-      return NextResponse.json({ success: true, message: 'Change order action simulated (degraded mode).' });
-    }
-
     const sessionEmail = await getVerifiedSessionEmail(req);
     if (!sessionEmail || !isAdminEmail(sessionEmail)) {
       return NextResponse.json({ error: 'Unauthorized: admin access required.' }, { status: 403 });
+    }
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     let body: { changeOrderId?: string; action?: string } = {};

@@ -35,22 +35,14 @@ export async function POST(req: Request) {
 
     const { scopeCode, invoiceId, invoiceNumber, paymentStructure } = parseResult.data;
 
-    const clientEmail = await getVerifiedSessionEmail(req);
-    if (!clientEmail) {
+    const verifiedEmail = await getVerifiedSessionEmail(req);
+    if (!verifiedEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
-
-    const isDev = process.env.NODE_ENV === 'development';
+    const clientEmail = verifiedEmail.toLowerCase();
 
     if (!supabase) {
-      // CI / degraded mode
-      return NextResponse.json({
-        isMock: true,
-        orderId: `order_mock_${Date.now()}`,
-        amount: 8750000,
-        currency: 'INR',
-        keyId: KEY_ID || 'rzp_test_mock',
-      });
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     // Direct invoice payment flow
@@ -96,24 +88,6 @@ export async function POST(req: Request) {
         : Math.max(100, Math.round((isUSD ? rawTotal * USD_TO_INR_RATE : rawTotal) * 100));
 
       if (!KEY_ID || !KEY_SECRET) {
-        if (isDev) {
-          const mockOrderId = `order_mock_${Date.now()}`;
-          try {
-            await supabase.from('invoices').update({ razorpay_order_id: mockOrderId }).eq('id', invoice.id);
-          } catch (e) {
-            console.warn('Failed to attach mock order id to invoice:', e);
-          }
-          return NextResponse.json({
-            isMock: true,
-            orderId: mockOrderId,
-            amount: amountInSubunits,
-            currency: targetCurrency,
-            keyId: 'rzp_test_mock',
-            convertedFromUSD: isUSD && targetCurrency === 'INR',
-            exchangeRate: isUSD && targetCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
-            internationalPayment: getInternationalPaymentPayload(isUSD),
-          });
-        }
         return NextResponse.json({ error: 'Razorpay API credentials not configured on server.' }, { status: 500 });
       }
 
@@ -157,40 +131,12 @@ export async function POST(req: Request) {
         }
       } catch (fetchErr) {
         console.warn('Razorpay server fetch offline:', fetchErr);
-        if (isDev) {
-          const mockOrderId = `order_mock_${Date.now()}`;
-          await supabase.from('invoices').update({ razorpay_order_id: mockOrderId }).eq('id', invoice.id);
-          return NextResponse.json({
-            isMock: true,
-            orderId: mockOrderId,
-            amount: amountInSubunits,
-            currency: finalCurrency,
-            keyId: KEY_ID,
-            convertedFromUSD: isUSD && finalCurrency === 'INR',
-            exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
-            internationalPayment: getInternationalPaymentPayload(isUSD),
-          });
-        }
         return NextResponse.json({ error: 'Unable to reach Razorpay servers.' }, { status: 502 });
       }
 
       if (!razorpayRes || !razorpayRes.ok) {
         const errText = razorpayRes ? await razorpayRes.text() : 'No response';
         console.error('Razorpay create order API error for invoice:', errText);
-        if (isDev) {
-          const mockOrderId = `order_mock_${Date.now()}`;
-          await supabase.from('invoices').update({ razorpay_order_id: mockOrderId }).eq('id', invoice.id);
-          return NextResponse.json({
-            isMock: true,
-            orderId: mockOrderId,
-            amount: amountInSubunits,
-            currency: finalCurrency,
-            keyId: KEY_ID,
-            convertedFromUSD: isUSD && finalCurrency === 'INR',
-            exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
-            internationalPayment: getInternationalPaymentPayload(isUSD),
-          });
-        }
         return NextResponse.json({ error: 'Failed to initialize Razorpay order.' }, { status: 500 });
       }
 
@@ -198,7 +144,6 @@ export async function POST(req: Request) {
       await supabase.from('invoices').update({ razorpay_order_id: orderData.id }).eq('id', invoice.id);
 
       return NextResponse.json({
-        isMock: false,
         orderId: orderData.id,
         amount: orderData.amount,
         currency: orderData.currency || finalCurrency,
@@ -437,20 +382,6 @@ export async function POST(req: Request) {
     };
 
     if (!KEY_ID || !KEY_SECRET) {
-      if (isDev) {
-        const mockOrderId = `order_mock_${Date.now()}`;
-        await createInvoiceRecord(mockOrderId);
-        return NextResponse.json({
-          isMock: true,
-          orderId: mockOrderId,
-          amount: amountInSubunits,
-          currency: finalCurrency,
-          keyId: 'rzp_test_mock',
-          convertedFromUSD: isUSD && finalCurrency === 'INR',
-          exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
-          internationalPayment: getInternationalPaymentPayload(isUSD),
-        });
-      }
       return NextResponse.json({ error: 'Razorpay API credentials not configured on server.' }, { status: 500 });
     }
 
@@ -494,40 +425,12 @@ export async function POST(req: Request) {
       }
     } catch (fetchErr) {
       console.warn('Razorpay server fetch offline:', fetchErr);
-      if (isDev) {
-        const mockOrderId = `order_mock_${Date.now()}`;
-        await createInvoiceRecord(mockOrderId);
-        return NextResponse.json({
-          isMock: true,
-          orderId: mockOrderId,
-          amount: amountInSubunits,
-          currency: finalCurrency,
-          keyId: KEY_ID,
-          convertedFromUSD: isUSD && finalCurrency === 'INR',
-          exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
-          internationalPayment: getInternationalPaymentPayload(isUSD),
-        });
-      }
       return NextResponse.json({ error: 'Unable to reach Razorpay servers.' }, { status: 502 });
     }
 
     if (!razorpayRes || !razorpayRes.ok) {
       const errText = razorpayRes ? await razorpayRes.text() : 'No response';
       console.error('Razorpay create order API error:', errText);
-      if (isDev) {
-        const mockOrderId = `order_mock_${Date.now()}`;
-        await createInvoiceRecord(mockOrderId);
-        return NextResponse.json({
-          isMock: true,
-          orderId: mockOrderId,
-          amount: amountInSubunits,
-          currency: finalCurrency,
-          keyId: KEY_ID,
-          convertedFromUSD: isUSD && finalCurrency === 'INR',
-          exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
-          internationalPayment: getInternationalPaymentPayload(isUSD),
-        });
-      }
       return NextResponse.json({ error: 'Failed to initialize Razorpay order.' }, { status: 500 });
     }
 
@@ -535,7 +438,6 @@ export async function POST(req: Request) {
     await createInvoiceRecord(orderData.id);
 
     return NextResponse.json({
-      isMock: false,
       orderId: orderData.id,
       amount: orderData.amount,
       currency: orderData.currency || finalCurrency,

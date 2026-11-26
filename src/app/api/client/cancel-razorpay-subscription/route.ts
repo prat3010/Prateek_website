@@ -27,10 +27,7 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      return NextResponse.json({
-        success: true,
-        message: 'Subscription marked for cancellation (degraded dev mode).',
-      });
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     let resolvedSubId = subscriptionId;
@@ -73,7 +70,7 @@ export async function POST(req: Request) {
         .eq('scope_code', scopeCode)
         .maybeSingle();
 
-      if (!isAdmin && scope?.client_email !== sessionEmail) {
+      if (!isAdmin && (!scope?.client_email || scope.client_email.toLowerCase() !== sessionEmail.toLowerCase())) {
         return NextResponse.json(
           { error: 'Forbidden: scope belongs to another client account.' },
           { status: 403 }
@@ -91,7 +88,7 @@ export async function POST(req: Request) {
     const KEY_ID = process.env.RAZORPAY_KEY_ID?.trim();
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET?.trim();
 
-    if (KEY_ID && KEY_SECRET && resolvedSubId && !resolvedSubId.startsWith('sub_fake_')) {
+    if (KEY_ID && KEY_SECRET && resolvedSubId) {
       const authHeader = `Basic ${Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64')}`;
       try {
         const rzRes = await fetch(

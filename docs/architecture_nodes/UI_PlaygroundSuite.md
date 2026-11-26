@@ -51,7 +51,7 @@ downstream:
 - [ADR 45: Playground & Arcade Cabinet Architecture](../99_DECISIONS.md#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

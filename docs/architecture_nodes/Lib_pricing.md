@@ -53,7 +53,7 @@ downstream:
 - [API: client/create-razorpay-order](API_client_create_razorpay_order.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE](docs/runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE](../runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md)
 
 1. **All pricing figures MUST source strictly from intakeQuestionnaireDefaults.json via calcQuote().**
 2. **Feature dependencies (dependsOn) MUST be transitively resolved before calculating final quote.**

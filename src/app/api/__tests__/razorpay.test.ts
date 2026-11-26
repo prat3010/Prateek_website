@@ -316,7 +316,7 @@ import { POST as createSubPOST } from '@/app/api/client/create-razorpay-subscrip
 import { POST as verifySubPOST } from '@/app/api/client/verify-razorpay-subscription/route';
 
 describe('POST /api/client/create-razorpay-subscription', () => {
-  it('creates mock subscription when credentials are missing or in dev', async () => {
+  it('returns 500 when Razorpay credentials are missing', async () => {
     delete process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
     delete process.env.RAZORPAY_KEY_SECRET;
 
@@ -330,10 +330,7 @@ describe('POST /api/client/create-razorpay-subscription', () => {
     });
 
     const res = await createSubPOST(req);
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.isMock).toBe(true);
-    expect(json.subscriptionId).toContain('sub_mock_');
+    expect(res.status).toBe(500);
   });
 });
 

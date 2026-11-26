@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS invoices (
 - [Engine: Digital SOW Escrow Freeze](Engine_Digital_SOW_Escrow_Freeze.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `CRITICAL` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `CRITICAL` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Client email MUST be extracted from verified JWT session, NEVER accepted from request parameters.**
 2. **Order amounts MUST match exact pricing rules (50% milestone deposit) computed server-side.**

@@ -25,7 +25,7 @@ downstream:
   - Engine_Celery_RabbitMQ
 ---
 
-# Retriever API: `POST /v1/documents`
+# Retriever API: `POST /v1/tenants/{tenantId}/documents`
 
 > [!NOTE] Quick IDE Jump
 > ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/routers/document.py)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/routers/document.py)**
@@ -44,7 +44,7 @@ downstream:
 - [Engine: Celery RabbitMQ](Engine_Celery_RabbitMQ.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

@@ -172,6 +172,13 @@ describe('POST /api/client/create-razorpay-invoice', () => {
   });
 
   it('successfully creates and returns issued invoice', async () => {
+    vi.stubEnv('NEXT_PUBLIC_RAZORPAY_KEY_ID', 'rzp_test_123');
+    vi.stubEnv('RAZORPAY_KEY_ID', 'rzp_test_123');
+    vi.stubEnv('RAZORPAY_KEY_SECRET', 'test_secret_mock_key');
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ id: 'inv_rzp_123', short_url: 'https://rzp.io/i/rzp_123' }), { status: 200 })
+    );
+
     const req = new Request('http://localhost/api/client/create-razorpay-invoice', {
       method: 'POST',
       headers: authorizedHeaders,
@@ -198,5 +205,8 @@ describe('POST /api/client/create-razorpay-invoice', () => {
     expect(json.success).toBe(true);
     expect(json.invoice.invoice_number).toContain('INV-');
     expect(json.invoice.amount).toBe(59000);
+
+    fetchSpy.mockRestore();
+    vi.unstubAllEnvs();
   });
 });

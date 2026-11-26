@@ -1,19 +1,65 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
 import { getPlaygroundItemBySlug, type PlaygroundItem } from '@/data/playgroundItems';
 import { calculatePlaygroundPrice, generateOrderNumber } from '@/lib/playgroundCommerce';
 
-const createOrderSchema = z.object({
-  productSlug: z.string().min(1, 'Product slug is required'),
-  tierId: z.string().optional().default('standard'),
-  customerName: z.string().min(1, 'Full name is required'),
-  customerEmail: z.string().email('Valid delivery email is required'),
-  currency: z.enum(['INR', 'USD']).optional().default('INR'),
-  githubUsername: z.string().optional(),
-  referralCode: z.string().optional(),
-});
+interface CreateOrderInput {
+  productSlug: string;
+  tierId: string;
+  customerName: string;
+  customerEmail: string;
+  currency: 'INR' | 'USD';
+  githubUsername?: string;
+  referralCode?: string;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function parseCreateOrderBody(raw: unknown): { ok: true; data: CreateOrderInput } | { ok: false; error: string } {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { ok: false, error: 'Validation error' };
+  }
+  const obj = raw as Record<string, unknown>;
+  const productSlug = typeof obj.productSlug === 'string' ? obj.productSlug.trim() : '';
+  if (productSlug.length < 1) {
+    return { ok: false, error: 'Product slug is required' };
+  }
+  const tierId = obj.tierId === undefined ? 'standard' : typeof obj.tierId === 'string' ? obj.tierId.trim() : '';
+  if (obj.tierId !== undefined && typeof obj.tierId !== 'string') {
+    return { ok: false, error: 'Validation error' };
+  }
+  const customerName = typeof obj.customerName === 'string' ? obj.customerName.trim() : '';
+  if (customerName.length < 1) {
+    return { ok: false, error: 'Full name is required' };
+  }
+  const customerEmail = typeof obj.customerEmail === 'string' ? obj.customerEmail.toLowerCase().trim() : '';
+  if (!EMAIL_RE.test(customerEmail)) {
+    return { ok: false, error: 'Valid delivery email is required' };
+  }
+  const rawCurrency = obj.currency ?? 'INR';
+  if (rawCurrency !== 'INR' && rawCurrency !== 'USD') {
+    return { ok: false, error: 'Validation error' };
+  }
+  if (obj.githubUsername !== undefined && typeof obj.githubUsername !== 'string') {
+    return { ok: false, error: 'Validation error' };
+  }
+  if (obj.referralCode !== undefined && typeof obj.referralCode !== 'string') {
+    return { ok: false, error: 'Validation error' };
+  }
+  return {
+    ok: true,
+    data: {
+      productSlug,
+      tierId,
+      customerName,
+      customerEmail,
+      currency: rawCurrency,
+      githubUsername: typeof obj.githubUsername === 'string' ? obj.githubUsername.trim() : undefined,
+      referralCode: typeof obj.referralCode === 'string' ? obj.referralCode.trim() : undefined,
+    },
+  };
+}
 
 export async function POST(req: Request) {
   try {
@@ -27,10 +73,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
     }
 
-    const parseResult = createOrderSchema.safeParse(body);
-    if (!parseResult.success) {
+    const parseResult = parseCreateOrderBody(body);
+    if (!parseResult.ok) {
       return NextResponse.json(
-        { error: parseResult.error.issues[0]?.message || 'Validation error' },
+        { error: parseResult.error },
         { status: 400 }
       );
     }
@@ -89,52 +135,8 @@ export async function POST(req: Request) {
     const downloadToken = crypto.randomBytes(32).toString('hex');
     const amountInSubunits = Math.round(amount * 100);
 
-    const isDev = process.env.NODE_ENV === 'development';
-
-    // 3. Fallback / mock handling if credentials absent in dev mode
+    // 3. Fail closed if Razorpay credentials or database are absent
     if (!KEY_ID || !KEY_SECRET) {
-      if (isDev) {
-        const mockRzpOrderId = `order_mock_${Date.now()}`;
-        let orderRowId = crypto.randomUUID();
-
-        if (supabase) {
-          const { data: orderData } = await supabase
-            .from('playground_orders')
-            .insert({
-              order_number: orderNumber,
-              product_id: productId,
-              product_slug: product.slug,
-              product_title: product.title,
-              customer_name: customerName.trim(),
-              customer_email: customerEmail.toLowerCase().trim(),
-              tier_id: canonicalTierId,
-              amount: amount,
-              currency: currency,
-              status: 'pending',
-              razorpay_order_id: mockRzpOrderId,
-              download_token: downloadToken,
-              github_username: githubUsername?.trim() || null,
-              referral_code: referralCode?.trim() || null,
-            })
-            .select('id')
-            .single();
-
-          if (orderData?.id) {
-            orderRowId = orderData.id;
-          }
-        }
-
-        return NextResponse.json({
-          isMock: true,
-          orderId: orderRowId,
-          orderNumber,
-          razorpayOrderId: mockRzpOrderId,
-          amount: amountInSubunits,
-          currency,
-          keyId: 'rzp_test_mock',
-        });
-      }
-
       return NextResponse.json(
         { error: 'Payment gateway credentials not configured on server' },
         { status: 500 }
@@ -143,7 +145,12 @@ export async function POST(req: Request) {
 
     // 4. Create pending order in database
     let orderRowId = crypto.randomUUID();
-    if (supabase) {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database service unavailable. Checkout order could not be recorded.' },
+        { status: 503 }
+      );
+    } else {
       const { data: orderData, error: dbErr } = await supabase
         .from('playground_orders')
         .insert({
@@ -222,7 +229,6 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({
-      isMock: false,
       orderId: orderRowId,
       orderNumber,
       razorpayOrderId: orderData.id,

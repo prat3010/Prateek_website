@@ -18,15 +18,14 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Missing scopeCode parameter' }, { status: 400 });
     }
 
-    // Degraded mode check
-    if (!supabase) {
-      return NextResponse.json({ success: true, message: 'Scope deleted (degraded mode).' });
-    }
-
-    // Verify session identity
+    // Verify session identity before checking persistence availability
     const clientEmail = await getVerifiedSessionEmail(req);
     if (!clientEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     // Look up scope to verify ownership and deposit payment status
@@ -40,7 +39,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Scope proposal not found' }, { status: 404 });
     }
 
-    if (scope.client_email && scope.client_email !== clientEmail) {
+    if (!scope.client_email || scope.client_email.toLowerCase() !== clientEmail.toLowerCase()) {
       return NextResponse.json({ error: 'Forbidden: scope belongs to another account' }, { status: 403 });
     }
 

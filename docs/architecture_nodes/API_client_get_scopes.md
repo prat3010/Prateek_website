@@ -46,7 +46,7 @@ downstream:
 - [Lib: sessionVerify.ts](Lib_sessionVerify.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

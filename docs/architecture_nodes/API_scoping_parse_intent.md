@@ -2,7 +2,7 @@
 id: API_scoping_parse_intent
 tier: 4_api_gateway
 platform: Prateek_Website
-status: planned
+status: production
 auth_level: public
 blast_radius: high
 file_path: src/app/api/scoping/parse-intent/route.ts
@@ -40,7 +40,7 @@ downstream:
 
 - **Endpoint:** `POST /api/scoping/parse-intent`
 - **Gateway:** Next.js 16 App Router Route Handler (`src/app/api/scoping/parse-intent/route.ts`)
-- **Backend Target:** FastAPI `https://rag.prateeq.in/v1/chat` (Tenant: `prateeq_scoping`)
+- **Backend Target:** FastAPI `https://rag.prateeq.in/v1/tenants/{tenantId}/intent/classify` (Tenant: `prateeq_scoping`)
 - **Payload:** `{ prompt: string, currency: "INR" | "USD" }`
 - **Output:** `{ engineId, selectedFeatures: string[], suggestedAddons: string[], confidence: number, mathVerification: string }`
 
@@ -54,7 +54,7 @@ downstream:
 - [UI: ArchitectureCartDrawer](UI_ArchitectureCartDrawer.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE](docs/runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE](../runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md)
 
 1. **All pricing figures MUST source strictly from intakeQuestionnaireDefaults.json via calcQuote().**
 2. **Feature dependencies (dependsOn) MUST be transitively resolved before calculating final quote.**

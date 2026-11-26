@@ -165,6 +165,20 @@ describe('Milestone 4: Care Plan Recurring Billing & Subscriptions', () => {
 
   describe('POST /api/client/create-razorpay-subscription', () => {
     it('creates a care plan subscription with scopeCode and subscriptionType', async () => {
+      vi.stubEnv('NEXT_PUBLIC_RAZORPAY_KEY_ID', 'rzp_test_123');
+      vi.stubEnv('RAZORPAY_KEY_ID', 'rzp_test_123');
+      vi.stubEnv('RAZORPAY_KEY_SECRET', 'test_secret_mock_key');
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+        const url = String(input);
+        if (url.includes('/v1/plans') && (!init?.method || init.method === 'GET')) {
+          return new Response(JSON.stringify({ items: [] }), { status: 200 });
+        }
+        if (url.includes('/v1/plans')) {
+          return new Response(JSON.stringify({ id: 'plan_rzp_care_std' }), { status: 200 });
+        }
+        return new Response(JSON.stringify({ id: 'sub_rzp_care_123', plan_id: 'plan_rzp_care_std', status: 'created' }), { status: 200 });
+      });
+
       const req = new Request('http://localhost/api/client/create-razorpay-subscription', {
         method: 'POST',
         headers: authorizedHeaders,
@@ -178,11 +192,14 @@ describe('Milestone 4: Care Plan Recurring Billing & Subscriptions', () => {
       const json = await res.json();
 
       expect(res.status).toBe(200);
-      expect(json.isMock).toBe(true);
+      expect(json.subscriptionId).toBe('sub_rzp_care_123');
       expect(json.planId).toBe('care_standard_inr');
       expect(json.tier).toBe('standard');
       expect(json.subscriptionType).toBe('care_plan');
       expect(json.scopeCode).toBe('SCOPE-10001');
+
+      fetchSpy.mockRestore();
+      vi.unstubAllEnvs();
     });
 
     it('rejects unauthenticated requests in production mode', async () => {
@@ -204,13 +221,19 @@ describe('Milestone 4: Care Plan Recurring Billing & Subscriptions', () => {
 
   describe('POST /api/client/verify-razorpay-subscription', () => {
     it('verifies care plan subscription, updates client_scopes, and skips Retriever engine provisioning', async () => {
+      vi.stubEnv('RAZORPAY_KEY_SECRET', 'test_secret_mock_key');
+      const validSig = crypto
+        .createHmac('sha256', 'test_secret_mock_key')
+        .update('pay_care_456|sub_care_123')
+        .digest('hex');
+
       const req = new Request('http://localhost/api/client/verify-razorpay-subscription', {
         method: 'POST',
         headers: authorizedHeaders,
         body: JSON.stringify({
-          razorpaySubscriptionId: 'sub_mock_care_123',
-          razorpayPaymentId: 'pay_mock_care_456',
-          razorpaySignature: 'test_sub_signature_mock',
+          razorpaySubscriptionId: 'sub_care_123',
+          razorpayPaymentId: 'pay_care_456',
+          razorpaySignature: validSig,
           planId: 'care_standard_inr',
           scopeCode: 'SCOPE-10001',
           subscriptionType: 'care_plan',
@@ -241,6 +264,69 @@ describe('Milestone 4: Care Plan Recurring Billing & Subscriptions', () => {
           currency: 'INR',
         })
       );
+      vi.unstubAllEnvs();
+    });
+
+    it('fails closed with 503 when supabase is unavailable in production on care-plan verify', async () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('RAZORPAY_KEY_SECRET', 'test_secret_mock_key');
+      vi.doMock('@/data/supabase', () => ({ supabase: null }));
+      vi.resetModules();
+      const { POST: verifyWithNullDb } = await import('../client/verify-razorpay-subscription/route');
+
+      const validSig = crypto
+        .createHmac('sha256', 'test_secret_mock_key')
+        .update('pay_mock_care_456|sub_mock_care_123')
+        .digest('hex');
+
+      const req = new Request('http://localhost/api/client/verify-razorpay-subscription', {
+        method: 'POST',
+        headers: authorizedHeaders,
+        body: JSON.stringify({
+          razorpaySubscriptionId: 'sub_mock_care_123',
+          razorpayPaymentId: 'pay_mock_care_456',
+          razorpaySignature: validSig,
+          planId: 'care_standard_inr',
+          scopeCode: 'SCOPE-10001',
+          subscriptionType: 'care_plan',
+        }),
+      });
+
+      const res = await verifyWithNullDb(req);
+      expect(res.status).toBe(503);
+
+      vi.doUnmock('@/data/supabase');
+      vi.unstubAllEnvs();
+    });
+
+    it('rejects attaching a care plan subscription to an unclaimed scope without client_email', async () => {
+      vi.stubEnv('RAZORPAY_KEY_SECRET', 'test_secret_mock_key');
+      const validSig = crypto
+        .createHmac('sha256', 'test_secret_mock_key')
+        .update('pay_care_456|sub_care_123')
+        .digest('hex');
+
+      const originalEmail = mocks.mockScopeRow.client_email;
+      (mocks.mockScopeRow as { client_email: string | null }).client_email = null;
+      try {
+        const req = new Request('http://localhost/api/client/verify-razorpay-subscription', {
+          method: 'POST',
+          headers: authorizedHeaders,
+          body: JSON.stringify({
+            razorpaySubscriptionId: 'sub_care_123',
+            razorpayPaymentId: 'pay_care_456',
+            razorpaySignature: validSig,
+            planId: 'care_standard_inr',
+            scopeCode: 'SCOPE-10001',
+            subscriptionType: 'care_plan',
+          }),
+        });
+        const res = await verifySubPOST(req);
+        expect(res.status).toBe(403);
+      } finally {
+        mocks.mockScopeRow.client_email = originalEmail;
+        vi.unstubAllEnvs();
+      }
     });
   });
 

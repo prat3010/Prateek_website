@@ -21,7 +21,7 @@ invariants:
 test_suites:
   - apps/api/tests/test_architecture.py
 downstream:
-  - Engine_LongLLMLingua_Compression
+  - Engine_Heuristic_Context_Compression
   - Engine_Envelope_Encryption
 ---
 
@@ -35,18 +35,18 @@ downstream:
 > **Context Window Token Compression & Zero-Trust Field Envelope Encryption Router (Milestone 49).**
 
 - **Endpoints:**
-  - `POST /v1/tenants/{tenantId}/context/compress` — LongLLMLingua prompt token compression
+  - `POST /v1/tenants/{tenantId}/context/compress` — Heuristic prompt token compression
   - `POST /v1/tenants/{tenantId}/security/encrypt` — AES-256-GCM field encryption
   - `POST /v1/tenants/{tenantId}/security/decrypt` — AES-256-GCM field decryption
 
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Engine: LongLLMLingua Compression](Engine_LongLLMLingua_Compression.md)
+- [Engine: Heuristic Context Compression](Engine_Heuristic_Context_Compression.md)
 - [Engine: Envelope Encryption](Engine_Envelope_Encryption.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

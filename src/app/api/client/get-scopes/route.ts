@@ -5,16 +5,16 @@ import { isAdminEmail } from '@/lib/auth';
 
 export async function GET(req: Request) {
   try {
-    // Degraded dev/CI mode: no Supabase environment, no persistence to read.
-    if (!supabase) {
-      return NextResponse.json({ scopes: [] });
-    }
-
     // The client-supplied email is ignored; scopes are scoped to the
     // verified session email from the Bearer access token.
-    const clientEmail = await getVerifiedSessionEmail(req);
-    if (!clientEmail) {
+    const verifiedEmail = await getVerifiedSessionEmail(req);
+    if (!verifiedEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+    const clientEmail = verifiedEmail.toLowerCase();
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     const { searchParams } = new URL(req.url);

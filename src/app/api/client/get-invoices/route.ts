@@ -4,13 +4,14 @@ import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 
 export async function GET(req: Request) {
   try {
-    if (!supabase) {
-      return NextResponse.json({ invoices: [] });
-    }
-
-    const clientEmail = await getVerifiedSessionEmail(req);
-    if (!clientEmail) {
+    const verifiedEmail = await getVerifiedSessionEmail(req);
+    if (!verifiedEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+    const clientEmail = verifiedEmail.toLowerCase();
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     try {

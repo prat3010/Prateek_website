@@ -133,4 +133,22 @@ describe('POST /api/client/cancel-razorpay-subscription', () => {
     const res = await POST(req);
     expect(res.status).toBe(403);
   });
+
+  it('forbids cancelling a care plan when scope client_email is unclaimed or belongs to another account', async () => {
+    mocks.state.scopeOwnerEmail = 'other@example.com';
+    const otherReq = new Request('http://localhost/api/client/cancel-razorpay-subscription', {
+      method: 'POST',
+      body: JSON.stringify({ scopeCode: 'SCOPE-101' }),
+    });
+    const otherRes = await POST(otherReq);
+    expect(otherRes.status).toBe(403);
+
+    mocks.state.scopeOwnerEmail = '';
+    const unclaimedReq = new Request('http://localhost/api/client/cancel-razorpay-subscription', {
+      method: 'POST',
+      body: JSON.stringify({ scopeCode: 'SCOPE-101' }),
+    });
+    const unclaimedRes = await POST(unclaimedReq);
+    expect(unclaimedRes.status).toBe(403);
+  });
 });

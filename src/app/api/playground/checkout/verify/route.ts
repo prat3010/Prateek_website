@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 import { supabase } from '@/data/supabase';
 import { getPlaygroundItemBySlug, type PlaygroundItem } from '@/data/playgroundItems';
 import { 
@@ -12,12 +11,39 @@ import {
 } from '@/lib/playgroundCommerce';
 import { sendPlaygroundFulfillmentEmail } from '@/lib/emailNotification';
 
-const verifySchema = z.object({
-  orderId: z.string().min(1, 'Internal order ID is required'),
-  razorpayOrderId: z.string().min(1, 'Razorpay order ID is required'),
-  razorpayPaymentId: z.string().min(1, 'Razorpay payment ID is required'),
-  razorpaySignature: z.string().min(1, 'Razorpay signature is required'),
-});
+interface VerifyOrderInput {
+  orderId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+}
+
+function parseVerifyBody(raw: unknown): { ok: true; data: VerifyOrderInput } | { ok: false; error: string } {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { ok: false, error: 'Validation error' };
+  }
+  const obj = raw as Record<string, unknown>;
+  const orderId = typeof obj.orderId === 'string' ? obj.orderId : '';
+  if (orderId.length < 1) {
+    return { ok: false, error: 'Internal order ID is required' };
+  }
+  const razorpayOrderId = typeof obj.razorpayOrderId === 'string' ? obj.razorpayOrderId : '';
+  if (razorpayOrderId.length < 1) {
+    return { ok: false, error: 'Razorpay order ID is required' };
+  }
+  const razorpayPaymentId = typeof obj.razorpayPaymentId === 'string' ? obj.razorpayPaymentId : '';
+  if (razorpayPaymentId.length < 1) {
+    return { ok: false, error: 'Razorpay payment ID is required' };
+  }
+  const razorpaySignature = typeof obj.razorpaySignature === 'string' ? obj.razorpaySignature : '';
+  if (razorpaySignature.length < 1) {
+    return { ok: false, error: 'Razorpay signature is required' };
+  }
+  return {
+    ok: true,
+    data: { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature },
+  };
+}
 
 export async function POST(req: Request) {
   try {
@@ -30,10 +56,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
     }
 
-    const parseResult = verifySchema.safeParse(body);
-    if (!parseResult.success) {
+    const parseResult = parseVerifyBody(body);
+    if (!parseResult.ok) {
       return NextResponse.json(
-        { error: parseResult.error.issues[0]?.message || 'Validation error' },
+        { error: parseResult.error },
         { status: 400 }
       );
     }
@@ -45,35 +71,24 @@ export async function POST(req: Request) {
       razorpaySignature,
     } = parseResult.data;
 
-    const isMock = process.env.NODE_ENV !== 'production' && razorpayOrderId.startsWith('order_mock_');
+    // 1. Verify timing-safe HMAC signature
+    if (!KEY_SECRET) {
+      return NextResponse.json({ error: 'Server payment secret not configured' }, { status: 500 });
+    }
 
-    // 1. Verify timing-safe HMAC signature unless in mock mode
-    if (!isMock) {
-      if (!KEY_SECRET) {
-        return NextResponse.json({ error: 'Server payment secret not configured' }, { status: 500 });
-      }
+    const isValidSignature = verifyRazorpayPaymentSignature(
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
+      KEY_SECRET
+    );
 
-      const isValidSignature = verifyRazorpayPaymentSignature(
-        razorpayOrderId,
-        razorpayPaymentId,
-        razorpaySignature,
-        KEY_SECRET
-      );
-
-      if (!isValidSignature) {
-        return NextResponse.json({ error: 'Invalid payment signature verification failed' }, { status: 400 });
-      }
+    if (!isValidSignature) {
+      return NextResponse.json({ error: 'Invalid payment signature verification failed' }, { status: 400 });
     }
 
     if (!supabase) {
-      // Degraded / CI mode
-      const mockKey = generatePlaygroundLicenseKey();
-      return NextResponse.json({
-        success: true,
-        licenseKey: mockKey,
-        downloadUrl: `https://mock.storage/playground-releases/mock-package.zip`,
-        orderNumber: 'ORD-PLAY-MOCK-0001',
-      });
+      return NextResponse.json({ error: 'Database persistence unavailable.' }, { status: 503 });
     }
 
     // 2. Concurrency-safe atomic order settlement lock

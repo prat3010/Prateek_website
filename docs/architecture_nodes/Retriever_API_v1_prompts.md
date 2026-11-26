@@ -22,19 +22,15 @@ test_suites:
   - apps/api/tests/test_architecture.py
 ---
 
-# Retriever API: `apps/api/src/routers/prompts.py`
+# Retriever API: Prompt Template Governance
 
 > [!NOTE] Quick IDE Jump
 > ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/routers/prompts.py)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/routers/prompts.py)**
 
-#retriever #api #dspy #prompts #teleprompter
-
-> **DSPy Declarative Prompt Optimization, Few-Shot Demonstrations & Program Lifecycle.**
-
-- **Endpoints:** `/v1/tenants/{tenantId}/prompts/compile`, `/v1/tenants/{tenantId}/prompts/compiled`, `/v1/tenants/{tenantId}/prompts/compiled/active`, `/v1/tenants/{tenantId}/prompts/compiled/{programId}/activate`, `/v1/tenants/{tenantId}/prompts/compiled/{programId}/deactivate`.
+Tenant prompt templates are managed through `SqlPromptTemplateRegistry` (`GET/POST/PUT/DELETE /v1/admin/tenants/{tenantId}/prompts` and `/v1/tenants/{tenantId}/prompts/default`) for deterministic system-prompt governance.
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

@@ -46,14 +46,6 @@ declare global {
   }
 }
 
-function getMockPaymentId(prefix: string): string {
-  return `${prefix}_${Date.now()}`;
-}
-
-function getMockPeriodEndIso(days = 30): string {
-  return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
-}
-
 export default function ClientDashboardPage() {
   const router = useRouter();
   const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
@@ -238,7 +230,6 @@ export default function ClientDashboardPage() {
 
       const selectedStructure = paymentStructure || scope.payment_structure || '50/50';
       const isThreePart = selectedStructure === '40/30/30';
-      const pct = isThreePart ? 0.4 : 0.5;
       const pctText = isThreePart ? '40%' : '50%';
 
       const accessToken = await getAccessToken();
@@ -265,59 +256,6 @@ export default function ClientDashboardPage() {
       }
 
       const orderData = await res.json();
-
-      if (orderData.isMock) {
-        const depositDisplay =
-          scope.currency === 'INR'
-            ? `₹${Math.round(scope.total_cost_inr * pct).toLocaleString('en-IN')}`
-            : `$${Math.round(scope.total_cost_usd * pct).toLocaleString('en-US')}`;
-
-        const confirmSimulated = window.confirm(
-          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate successful ${pctText} deposit lock (${depositDisplay}) for Scope ${scope.scope_code}?`
-        );
-
-        if (confirmSimulated) {
-          try {
-            const token = await getAccessToken();
-            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              body: JSON.stringify({
-                scopeCode: scope.scope_code,
-                razorpayOrderId: orderData.orderId,
-                razorpayPaymentId: `pay_mock_${Date.now()}`,
-                razorpaySignature: 'mock_signature_dev_pass',
-              }),
-            });
-
-            if (verifyRes.ok) {
-              const verifyData = await verifyRes.json();
-              setScopes((prev) =>
-                prev.map((s) =>
-                  s.id === scope.id
-                    ? {
-                        ...s,
-                        deposit_paid: true,
-                        payment_structure: selectedStructure,
-                        delivery_stage: 'engineering',
-                        status: 'Active Sprint — In Engineering',
-                        sow_hash: verifyData.sowHash || s.sow_hash,
-                      }
-                    : s
-                )
-              );
-              await loadInvoices();
-              toast.success(`🎉 ${pctText} Deposit confirmed! Scope has moved to Core Engineering sprint.`);
-            }
-          } catch (verErr) {
-            console.error('Mock verification error:', verErr);
-          }
-        }
-        return;
-      }
 
       if (typeof window === 'undefined' || !window.Razorpay) {
         toast.error('Payment gateway script failed to load. Please refresh and try again.');
@@ -413,7 +351,6 @@ export default function ClientDashboardPage() {
       }
 
       const isThreePart = scope.payment_structure === '40/30/30';
-      const pct = isThreePart ? 0.3 : 0.5;
       const pctText = isThreePart ? '30%' : '50%';
 
       const accessToken = await getAccessToken();
@@ -436,57 +373,6 @@ export default function ClientDashboardPage() {
       }
 
       const orderData = await res.json();
-
-      if (orderData.isMock) {
-        const balanceDisplay =
-          scope.currency === 'USD'
-            ? `$${Math.round(Number(scope.total_cost_usd || 0) * pct).toLocaleString('en-US')}`
-            : `₹${Math.round(Number(scope.total_cost_inr || 0) * pct).toLocaleString('en-IN')}`;
-
-        const confirmSimulated = window.confirm(
-          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate settling ${pctText} final balance (${balanceDisplay}) for Scope ${scope.scope_code}?`
-        );
-
-        if (confirmSimulated) {
-          try {
-            const token = await getAccessToken();
-            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              body: JSON.stringify({
-                scopeCode: scope.scope_code,
-                razorpayOrderId: orderData.orderId,
-                razorpayPaymentId: getMockPaymentId('pay_mock_bal'),
-                razorpaySignature: 'mock_signature_dev_pass',
-              }),
-            });
-
-            if (verifyRes.ok) {
-              setScopes((prev) =>
-                prev.map((s) =>
-                  s.id === scope.id
-                    ? {
-                        ...s,
-                        balance_paid: true,
-                        is_fully_paid: true,
-                        delivery_stage: 'live',
-                        status: 'Project Settled — Production Live',
-                      }
-                    : s
-                )
-              );
-              await loadInvoices();
-              toast.success(`🎉 ${pctText} Final balance settled! Production deployment unlocked.`);
-            }
-          } catch (verErr) {
-            console.error('Mock verification error:', verErr);
-          }
-        }
-        return;
-      }
 
       if (typeof window === 'undefined' || !window.Razorpay) {
         toast.error('Payment gateway script failed to load. Please refresh and try again.');
@@ -591,53 +477,6 @@ export default function ClientDashboardPage() {
       }
 
       const subData = await res.json();
-
-      if (subData.isMock) {
-        const confirmSimulated = window.confirm(
-          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate activating monthly recurring care plan subscription (${planId}) for Scope ${scope.scope_code}?`
-        );
-
-        if (confirmSimulated) {
-          try {
-            const verifyRes = await fetch('/api/client/verify-razorpay-subscription', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              body: JSON.stringify({
-                scopeCode: scope.scope_code,
-                razorpaySubscriptionId: subData.subscriptionId,
-                razorpayPaymentId: getMockPaymentId('pay_mock_care'),
-                razorpaySignature: 'test_sub_signature_mock',
-                planId,
-                subscriptionType: 'care_plan',
-              }),
-            });
-
-            if (verifyRes.ok) {
-              const currentPeriodEnd = getMockPeriodEndIso(30);
-              setScopes((prev) =>
-                prev.map((s) =>
-                  s.id === scope.id
-                    ? {
-                        ...s,
-                        maintenance_subscription_id: subData.subscriptionId,
-                        maintenance_status: 'active',
-                        maintenance_current_period_end: currentPeriodEnd,
-                      }
-                    : s
-                )
-              );
-              await loadInvoices();
-              toast.success('🎉 Monthly maintenance retainer activated! Your SLA guarantee is now active.');
-            }
-          } catch (verErr) {
-            console.error('Mock subscription verification error:', verErr);
-          }
-        }
-        return;
-      }
 
       if (typeof window === 'undefined' || !window.Razorpay) {
         toast.error('Payment gateway script failed to load. Please refresh and try again.');
@@ -751,59 +590,6 @@ export default function ClientDashboardPage() {
       }
 
       const orderData = await res.json();
-
-      if (orderData.isMock) {
-        try {
-          const amountDisplay =
-            invoice.currency === 'INR'
-              ? `₹${Number(invoice.amount).toLocaleString('en-IN')}`
-              : `$${Number(invoice.amount).toLocaleString('en-US')}`;
-
-          const confirmSimulated = window.confirm(
-            `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate settling Invoice #${invoice.invoice_number} (${amountDisplay})?`
-          );
-
-          if (confirmSimulated) {
-            try {
-              const token = await getAccessToken();
-              const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-                body: JSON.stringify({
-                  invoiceId: invoice.id,
-                  invoiceNumber: invoice.invoice_number,
-                  razorpayOrderId: orderData.orderId,
-                  razorpayPaymentId: `pay_mock_${Date.now()}`,
-                  razorpaySignature: 'mock_signature_dev_pass',
-                }),
-              });
-
-              if (verifyRes.ok) {
-                setInvoices((prev) =>
-                  prev.map((inv) =>
-                    inv.id === invoice.id || inv.invoice_number === invoice.invoice_number
-                      ? { ...inv, payment_status: 'paid' }
-                      : inv
-                  )
-                );
-                await loadInvoices();
-                toast.success(`🎉 Invoice #${invoice.invoice_number} settled successfully!`);
-              } else {
-                const err = await verifyRes.json().catch(() => ({}));
-                toast.error(`Verification failed: ${err.error || 'Unknown error'}`);
-              }
-            } catch (verErr) {
-              console.error('Mock invoice verification error:', verErr);
-            }
-          }
-        } finally {
-          setPayingInvoiceId(null);
-        }
-        return;
-      }
 
       if (typeof window === 'undefined' || !window.Razorpay) {
         toast.error('Payment gateway script failed to load. Please refresh and try again.');

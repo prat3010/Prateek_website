@@ -20,9 +20,9 @@ invariants:
 test_suites:
   - src/lib/__tests__/data.test.ts
 downstream:
-  - ../MIDDLEMAN_PARTNERSHIP_AGREEMENT
+  - ../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT
   - UI_MiddlemanAgreement
-  - ../REVENUE_EXECUTION_PLAN
+  - ../commercial/REVENUE_EXECUTION_PLAN
 ---
 
 # Lib: `commission.ts` (Sales Partner Commission SSoT)
@@ -35,17 +35,17 @@ downstream:
 > **Single Source of Truth for Middleman Sales Partner Commission Calculations.**
 
 - **Path:** `src/lib/commission.ts` & `src/data/commissionConfig.json`
-- **Tiers:** Band A (10% on < ₹1.5L / $2k), Band B (12.5% on ₹1.5L–₹3L / $2k–$4k), Band C (15% on > ₹3L / $4k), Recurring Retainer (10%).
+- **Tiers:** Band A (10% up to ₹75,000 / $1,000), Band B (12% on ₹75,001–₹2,49,999 / $1,001–$3,299), Band C (15% on ₹2,50,000+ / $3,300+), Recurring Retainer (10%).
 
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 - [UI: MiddlemanAgreement](UI_MiddlemanAgreement.md)
-- [REVENUE_EXECUTION_PLAN](../REVENUE_EXECUTION_PLAN.md)
+- [REVENUE_EXECUTION_PLAN](../commercial/REVENUE_EXECUTION_PLAN.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

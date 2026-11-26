@@ -22,7 +22,7 @@ test_suites:
 downstream:
   - ../11_Content_Management_System
   - API_revalidate
-  - ../MIDDLEMAN_PARTNERSHIP_AGREEMENT
+  - ../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT
 ---
 
 # Tool: `synchronizer.py` (Local Streamlit Content CMS)
@@ -42,10 +42,10 @@ downstream:
 ## 🔗 Related Architecture & Cross-References
 - [11_Content_Management_System](../11_Content_Management_System.md)
 - [API: revalidate](API_revalidate.md)
-- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

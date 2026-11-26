@@ -5,9 +5,9 @@ platform: Retriever
 status: production
 auth_level: public
 blast_radius: high
-file_path: src/
-ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/retriever/src/"
-ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/retriever/src/"
+file_path: apps/api/src/
+ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/"
+ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/"
 runbook: docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md
 tags:
   - tier/6_retriever_cognitive
@@ -29,7 +29,7 @@ downstream:
 # Engine: Interactive RLM Python REPL Sandbox Studio (Milestone 72)
 
 > [!NOTE] Quick IDE Jump
-> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/src/)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/src/)**
+> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/)**
 
 #engine #rlm #python_repl #sandbox #studio #multi_turn #m72 #retriever
 
@@ -38,7 +38,7 @@ downstream:
 - **Backend Engine:** `RlmExecutionEngine` in `retriever/apps/api/src/domain/rlm/engine.py`
 - **Sandbox Provider:** `RestrictedPythonSandboxAdapter` in `retriever/apps/api/src/adapters/sandbox/python_sandbox_adapter.py`
 - **Router Endpoint:** `POST /v1/tenants/{tenantId}/rlm/analyze` in `retriever/apps/api/src/routers/rlm.py`
-- **Frontend Studio:** `RlmStudioPanel.tsx` in `Prateek_website/src/components/rag/`
+- **Frontend Studio:** Backend RLM endpoint is live; `Prateek_website/src/app/rag/app/page.tsx` mounts 13 core studio tabs (a standalone `RlmStudioPanel` tab remains planned).
 - **Multi-Turn Adaptive Execution:** Automatically routes requests with `max_depth > 1` to `analyze_repl_loop()`, capturing per-turn execution traces, stdout output, and self-correcting logic.
 
 ---
@@ -49,7 +49,7 @@ downstream:
 - [00_ARCHITECTURE_INDEX](../00_ARCHITECTURE_INDEX.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

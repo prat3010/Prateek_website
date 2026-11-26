@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS client_scopes (
 - [UI: ClientWorkspaceDashboard](UI_ClientWorkspaceDashboard.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_DATABASE_MIGRATION](docs/runbooks/RUNBOOK_DATABASE_MIGRATION.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_DATABASE_MIGRATION](../runbooks/RUNBOOK_DATABASE_MIGRATION.md)
 
 1. **All column alterations MUST use non-destructive ADD COLUMN IF NOT EXISTS.**
 2. **Row-Level Security (RLS) MUST be enabled with explicit tenant or email isolation policies.**

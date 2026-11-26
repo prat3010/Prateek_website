@@ -34,49 +34,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || !supabase;
-    const isMock =
-      isDev &&
-      (razorpaySubscriptionId.startsWith('sub_mock_') ||
-        razorpaySignature === 'test_sub_signature_mock');
-
-    if (!isMock && !KEY_SECRET) {
+    if (!KEY_SECRET) {
       return NextResponse.json(
         { error: 'Razorpay secret key not configured on server.' },
         { status: 500 }
       );
     }
 
-    if (!isMock) {
-      if (!razorpayPaymentId || !razorpaySignature) {
-        return NextResponse.json(
-          { error: 'Missing payment verification signature fields.' },
-          { status: 400 }
-        );
-      }
+    if (!razorpayPaymentId || !razorpaySignature) {
+      return NextResponse.json(
+        { error: 'Missing payment verification signature fields.' },
+        { status: 400 }
+      );
+    }
 
-      // Razorpay Subscription verification signature string: payment_id|subscription_id
-      const expectedSignature = crypto
-        .createHmac('sha256', KEY_SECRET)
-        .update(`${razorpayPaymentId}|${razorpaySubscriptionId}`)
-        .digest('hex');
+    // Razorpay Subscription verification signature string: payment_id|subscription_id
+    const expectedSignature = crypto
+      .createHmac('sha256', KEY_SECRET)
+      .update(`${razorpayPaymentId}|${razorpaySubscriptionId}`)
+      .digest('hex');
 
-      const expBuf = Buffer.from(expectedSignature, 'utf-8');
-      const sigBuf = Buffer.from(razorpaySignature, 'utf-8');
+    const expBuf = Buffer.from(expectedSignature, 'utf-8');
+    const sigBuf = Buffer.from(razorpaySignature, 'utf-8');
 
-      if (
-        expBuf.byteLength !== sigBuf.byteLength ||
-        !crypto.timingSafeEqual(expBuf, sigBuf)
-      ) {
-        console.warn('Razorpay subscription signature mismatch:', {
-          expectedSignature,
-          razorpaySignature,
-        });
-        return NextResponse.json(
-          { error: 'Subscription payment signature verification failed.' },
-          { status: 400 }
-        );
-      }
+    if (
+      expBuf.byteLength !== sigBuf.byteLength ||
+      !crypto.timingSafeEqual(expBuf, sigBuf)
+    ) {
+      console.warn('Razorpay subscription signature mismatch:', {
+        expectedSignature,
+        razorpaySignature,
+      });
+      return NextResponse.json(
+        { error: 'Subscription payment signature verification failed.' },
+        { status: 400 }
+      );
     }
 
     const planSpec = resolvePlanSpec(planId);
@@ -89,12 +81,10 @@ export async function POST(req: Request) {
 
     if (isCarePlan) {
       if (!supabase) {
-        return NextResponse.json({
-          success: true,
-          subscriptionType: 'care_plan',
-          planTier,
-          message: 'Maintenance retainer verified in degraded mode.',
-        });
+        return NextResponse.json(
+          { error: 'Database persistence unavailable.' },
+          { status: 503 }
+        );
       }
 
       const nowIso = new Date().toISOString();
@@ -104,21 +94,28 @@ export async function POST(req: Request) {
         id: string;
         scope_code: string;
         client_id: string | null;
+        client_email?: string | null;
         company_name: string;
       } | null = null;
 
       if (scopeCode) {
         const { data } = await supabase
           .from('client_scopes')
-          .select('id, scope_code, client_id, company_name')
+          .select('id, scope_code, client_id, client_email, company_name')
           .eq('scope_code', scopeCode)
           .maybeSingle();
+        if (data && (!data.client_email || data.client_email.toLowerCase() !== sessionUser.email.toLowerCase())) {
+          return NextResponse.json(
+            { error: 'Forbidden: scope belongs to another account.' },
+            { status: 403 }
+          );
+        }
         targetScope = data;
       } else {
         const { data } = await supabase
           .from('client_scopes')
           .select('id, scope_code, client_id, company_name')
-          .eq('client_email', sessionUser.email)
+          .eq('client_email', sessionUser.email.toLowerCase())
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -188,11 +185,10 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      return NextResponse.json({
-        success: true,
-        planTier,
-        message: 'Subscription verified in degraded mode.',
-      });
+      return NextResponse.json(
+        { error: 'Database persistence unavailable.' },
+        { status: 503 }
+      );
     }
 
     const nowIso = new Date().toISOString();

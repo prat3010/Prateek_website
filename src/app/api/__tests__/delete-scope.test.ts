@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => {
     wrongUser: false,
     paidScope: false,
     scopeMissing: false,
+    unclaimedScope: false,
+    nullSupabase: false,
   };
 
   const mockUnpaidScope = {
@@ -31,12 +33,16 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('@/data/supabase', () => ({
   get supabase() {
+    if (mocks.state.nullSupabase) return null;
     return {
       from: vi.fn(() => ({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             maybeSingle: vi.fn().mockImplementation(async () => {
               if (mocks.state.scopeMissing) return { data: null, error: null };
+              if (mocks.state.unclaimedScope) {
+                return { data: { scope_code: 'SCOPE-10003', client_email: null, deposit_paid: false }, error: null };
+              }
               if (mocks.state.paidScope) {
                 return { data: { scope_code: 'SCOPE-10002', client_email: 'client@example.com', deposit_paid: true }, error: null };
               }
@@ -70,6 +76,9 @@ beforeEach(() => {
   mocks.state.wrongUser = false;
   mocks.state.paidScope = false;
   mocks.state.scopeMissing = false;
+  mocks.state.unclaimedScope = false;
+  mocks.state.nullSupabase = false;
+  vi.unstubAllEnvs();
 });
 
 const authorizedHeaders = { Authorization: 'Bearer valid-token' };
@@ -123,5 +132,33 @@ describe('DELETE /api/client/delete-scope', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.success).toBe(true);
+  });
+
+  it('rejects deletion of unclaimed scopes with null client_email', async () => {
+    mocks.state.unclaimedScope = true;
+    const req = new Request('http://localhost/api/client/delete-scope?scopeCode=SCOPE-10003', {
+      method: 'DELETE',
+      headers: authorizedHeaders,
+    });
+    const res = await deleteScopeDELETE(req);
+    expect(res.status).toBe(403);
+  });
+
+  it('enforces auth even when supabase is null and fails closed 503 in production', async () => {
+    mocks.state.nullSupabase = true;
+    vi.stubEnv('NODE_ENV', 'production');
+
+    const unauthReq = new Request('http://localhost/api/client/delete-scope?scopeCode=SCOPE-10001', {
+      method: 'DELETE',
+    });
+    const unauthRes = await deleteScopeDELETE(unauthReq);
+    expect(unauthRes.status).toBe(401);
+
+    const authReq = new Request('http://localhost/api/client/delete-scope?scopeCode=SCOPE-10001', {
+      method: 'DELETE',
+      headers: authorizedHeaders,
+    });
+    const authRes = await deleteScopeDELETE(authReq);
+    expect(authRes.status).toBe(503);
   });
 });

@@ -33,7 +33,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'At least one line item is required.' }, { status: 400 });
     }
 
-    const isDev = process.env.NODE_ENV === 'development';
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
 
@@ -135,17 +134,19 @@ export async function POST(req: Request) {
       }
     }
 
-    if (isDev && !razorpayInvoiceId) {
-      razorpayInvoiceId = `inv_mock_${Date.now()}`;
-      paymentUrl = `https://rzp.io/i/mock_${Date.now()}`;
+    if (!razorpayInvoiceId) {
+      return NextResponse.json(
+        { error: 'Razorpay invoice creation failed or keys are not configured.' },
+        { status: 502 }
+      );
     }
 
     const invoiceRecord = {
       invoice_number: invoiceNumber,
       scope_id: scopeId,
       client_id: clientId,
-      customer_name: payload.customer_name,
-      customer_email: payload.customer_email,
+      customer_name: payload.customer_name.trim(),
+      customer_email: payload.customer_email.toLowerCase().trim(),
       customer_phone: payload.customer_phone || null,
       customer_gstin: payload.customer_gstin || null,
       billing_address: payload.billing_address || null,

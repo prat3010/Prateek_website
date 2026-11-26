@@ -38,7 +38,7 @@ downstream:
 
 - **Paths:** `src/app/rag/page.tsx` & `src/app/rag/app/page.tsx`
 - **Key Features:**
-  - Mini-RAG live interactive sandbox (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`)
+  - Mini-RAG live interactive sandbox (`ChatPanel.tsx`, `DocumentsPanel.tsx`, `SearchPanel.tsx`)
   - Geo-IP pricing calculator (INR/USD)
   - 1-line script embed configurator (`<script src=".../widget.js">`)
   - SaaS Studio sub-views: Chat Studio, Document Library, Search Inspector, Embed Configurator
@@ -53,7 +53,7 @@ downstream:
 - [Retriever_API: v1/search](Retriever_API_v1_search.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

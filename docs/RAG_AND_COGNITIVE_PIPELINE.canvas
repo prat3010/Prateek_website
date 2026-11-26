@@ -73,7 +73,7 @@
     {
       "id": "node-docling",
       "type": "file",
-      "file": "architecture_nodes/Engine_Docling_Layout_OCR.md",
+      "file": "architecture_nodes/Engine_pdfplumber_Layout_Parser.md",
       "x": -480,
       "y": 890,
       "width": 480,
@@ -153,7 +153,7 @@
     {
       "id": "node-compress",
       "type": "file",
-      "file": "architecture_nodes/Engine_LongLLMLingua_Compression.md",
+      "file": "architecture_nodes/Engine_Heuristic_Context_Compression.md",
       "x": 840,
       "y": 890,
       "width": 480,
@@ -218,7 +218,7 @@
       "toNode": "node-chat",
       "toSide": "left",
       "color": "4",
-      "label": "POST /v1/chat (SSE)"
+      "label": "POST /v1/tenants/{id}/chat/completions (SSE)"
     },
     {
       "id": "er3",

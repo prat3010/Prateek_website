@@ -34,7 +34,7 @@ test_suites:
 - **Endpoints:** `/v1/gateway/models`, `/v1/gateway/probe`, `/v1/tenants/{tenantId}/gateway/routes`, `/v1/tenants/{tenantId}/gateway/budget`.
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

@@ -21,7 +21,7 @@ test_suites:
   - src/lib/__tests__/data.test.ts
 downstream:
   - ../09_Section_Specifications/11_Blog
-  - ../BLOG_DEEP_LINKING_MAP
+  - ../playbooks/BLOG_DEEP_LINKING_MAP
   - ../AUTOMATED_AI_BLOGGING_ROADMAP
   - UI_BlogEngine
   - Lib_markdown
@@ -48,7 +48,7 @@ downstream:
 
 ## 🔗 Related Architecture & Cross-References
 - [09_Section_Specifications/11_Blog](../09_Section_Specifications/11_Blog.md)
-- [BLOG_DEEP_LINKING_MAP](../BLOG_DEEP_LINKING_MAP.md)
+- [BLOG_DEEP_LINKING_MAP](../playbooks/BLOG_DEEP_LINKING_MAP.md)
 - [AUTOMATED_AI_BLOGGING_ROADMAP](../AUTOMATED_AI_BLOGGING_ROADMAP.md)
 - [UI: BlogEngine](UI_BlogEngine.md)
 - [Lib: markdown.ts](Lib_markdown.md)
@@ -56,7 +56,7 @@ downstream:
 - [API: blog/publish](API_blog_publish.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

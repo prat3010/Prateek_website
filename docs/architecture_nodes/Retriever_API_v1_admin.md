@@ -21,7 +21,7 @@ invariants:
 test_suites:
   - apps/api/tests/test_architecture.py
 downstream:
-  - ../../../retriever/docs/ADMIN_DASHBOARD_ROADMAP
+  - ../../../retriever/docs/guides/ADMIN_DASHBOARD_GUIDE
   - ../../../retriever/docs/architecture
 ---
 
@@ -39,11 +39,11 @@ downstream:
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: Admin Dashboard Roadmap](../../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)
+- [Retriever: Admin Dashboard Guide](../../../retriever/docs/guides/ADMIN_DASHBOARD_GUIDE.md)
 - [Retriever: Architecture](../../../retriever/docs/architecture.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

@@ -34,7 +34,7 @@ downstream:
 
 > **Interactive Client Chat Studio, Document Library & Search Inspector Panels.**
 
-- **Path:** `src/components/rag/` (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`)
+- **Path:** `src/components/rag/` (`ChatPanel.tsx`, `DocumentsPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`, plus 9 studio panels)
 
 ---
 
@@ -44,7 +44,7 @@ downstream:
 - [Lib: rag-client.ts](Lib_rag_client.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
 2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**

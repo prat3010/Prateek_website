@@ -5,9 +5,9 @@ platform: Retriever
 status: production
 auth_level: public
 blast_radius: high
-file_path: src/
-ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/retriever/src/"
-ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/retriever/src/"
+file_path: apps/api/src/
+ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/"
+ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/"
 runbook: docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md
 tags:
   - tier/6_retriever_cognitive
@@ -23,7 +23,7 @@ test_suites:
 downstream:
   - ../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP
   - ../UNIFIED_MASTER_ROADMAP
-  - ../../../retriever/docs/api/SERVERLESS_GPU_REST_API
+  - ../../../retriever/docs/api/serverless_gpu
   - ../../../retriever/docs/runbooks/RUNBOOK_SERVERLESS_GPU_VLLM_LORA
   - ../../../retriever/docs/decisions/018-serverless-gpu-vllm-lora-pipeline
 ---
@@ -31,7 +31,7 @@ downstream:
 # Engine: Serverless Dedicated GPU Serving & Dynamic vLLM / LoRA Pipeline (Milestone 96)
 
 > [!NOTE] Quick IDE Jump
-> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/src/)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/src/)**
+> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/)**
 
 #engine #serverless_gpu #vllm #lora #modal #bentoml #scale_to_zero #m96 #retriever
 
@@ -50,12 +50,12 @@ downstream:
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: RAG 2026 Roadmap](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 - [Unified Master Roadmap](../UNIFIED_MASTER_ROADMAP.md)
-- [REST API Specification](../../../retriever/docs/api/SERVERLESS_GPU_REST_API.md)
+- [REST API Specification](../../../retriever/docs/api/serverless_gpu.md)
 - [Operational Runbook](../../../retriever/docs/runbooks/RUNBOOK_SERVERLESS_GPU_VLLM_LORA.md)
 - [Architecture Decision Record (ADR-018)](../../../retriever/docs/decisions/018-serverless-gpu-vllm-lora-pipeline.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

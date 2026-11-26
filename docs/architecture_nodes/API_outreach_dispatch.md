@@ -47,7 +47,7 @@ downstream:
 - [Route: /admin](Route_admin.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](../runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
 
 1. **Outreach dispatch MUST strictly verify that caller email is an authorized operator (isAdminEmail).**
 2. **AI pitch generation MUST be grounded in verified prospect company signals.**

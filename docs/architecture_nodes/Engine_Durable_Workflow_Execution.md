@@ -5,9 +5,9 @@ platform: Retriever
 status: production
 auth_level: public
 blast_radius: high
-file_path: src/
-ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/retriever/src/"
-ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/retriever/src/"
+file_path: apps/api/src/
+ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/"
+ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/"
 runbook: docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md
 tags:
   - tier/6_retriever_cognitive
@@ -23,19 +23,18 @@ test_suites:
 downstream:
   - ../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP
   - ../UNIFIED_MASTER_ROADMAP
-  - ../../../retriever/docs/api/DURABLE_WORKFLOWS_REST_API
+  - ../../../retriever/docs/api/durable_workflow
   - ../../../retriever/docs/runbooks/RUNBOOK_DURABLE_WORKFLOWS
   - ../../../retriever/docs/decisions/017-durable-asynchronous-execution
 ---
 
-# Engine: Durable Asynchronous Execution & Background AI Workflow Engine (Milestone 95)
+# Engine: Durable Asynchronous Execution & Background AI Workflow Engine (ARCHIVED — Purged in Remediation R2.7)
 
 > [!NOTE] Quick IDE Jump
-> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/src/)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/src/)**
+> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/retriever/apps/api/src/)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/retriever/apps/api/src/)**
 
-#engine #durable_execution #workflows #checkpoints #memoization #m95 #retriever
-
-> **Event-driven, fault-tolerant background execution engine featuring step-level memoization, resilient automatic retry backoff, and idempotent checkpoint state machines across distributed AI pipelines (Platform Battery #15).**
+> [!WARNING] Archived / Purged Subsystem
+> Replaced by honest Celery + RabbitMQ task queueing (`workers/`) and `DagExecutor` (`apps/api/src/routers/workflow.py`, `apps/api/src/routers/workflow_dag.py`). The `durable_workflow.py` router and `WorkflowsPanel.tsx` UI were removed in Remediation `R2.7`.
 
 - **Domain Core:** `apps/api/src/domain/abstractions/durable_workflow.py` (`WorkflowStatus`, `StepStatus`, `WorkflowStepRecord`, `WorkflowExecution`, `WorkflowDefinition`, `IWorkflowRepository`, `IDurableWorkflowAdapter`) & `apps/api/src/domain/workflow/durable_engine.py` (`DurableWorkflowEngine`).
 - **Adapter & Runner:** `apps/api/src/adapters/workflow/durable_workflow_adapter.py` (`DurableWorkflowAdapter`).
@@ -49,12 +48,12 @@ downstream:
 ## 🔗 Related Architecture & Cross-References
 - [Retriever: RAG 2026 Roadmap](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 - [Unified Master Roadmap](../UNIFIED_MASTER_ROADMAP.md)
-- [REST API Specification](../../../retriever/docs/api/DURABLE_WORKFLOWS_REST_API.md)
+- [REST API Specification](../../../retriever/docs/api/durable_workflow.md)
 - [Operational Runbook](../../../retriever/docs/runbooks/RUNBOOK_DURABLE_WORKFLOWS.md)
 - [Architecture Decision Record (ADR-017)](../../../retriever/docs/decisions/017-durable-asynchronous-execution.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](../runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 
 1. **Every query and database record MUST strictly enforce tenant_id isolation.**
 2. **Tenancy breach attempt triggers instant API key revocation and raises TenantIsolationViolationError.**

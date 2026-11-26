@@ -311,18 +311,6 @@ export async function POST(req: Request) {
     }
 
     if (!KEY_ID || !KEY_SECRET) {
-      if (isDev || !supabase) {
-        return NextResponse.json({
-          isMock: true,
-          subscriptionId: `sub_mock_${Date.now()}`,
-          planId: planSpec.planKey,
-          tier: planSpec.tier,
-          subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
-          scopeCode,
-          tenantId: targetTenantId || 'tn_dev_mock',
-          keyId: KEY_ID || 'rzp_test_mock',
-        });
-      }
       return NextResponse.json({ error: 'Razorpay API credentials not configured on server.' }, { status: 500 });
     }
 
@@ -358,17 +346,6 @@ export async function POST(req: Request) {
       if (!response.ok) {
         const errText = await response.text();
         console.error('Razorpay create subscription API error:', errText);
-        if (isDev) {
-          return NextResponse.json({
-            isMock: true,
-            subscriptionId: `sub_mock_${Date.now()}`,
-            planId: planSpec.planKey,
-            tier: planSpec.tier,
-            subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
-            scopeCode,
-            keyId: KEY_ID,
-          });
-        }
         return NextResponse.json({ error: 'Failed to initialize Razorpay subscription plan.' }, { status: 500 });
       }
 
@@ -386,17 +363,6 @@ export async function POST(req: Request) {
       });
     } catch (fetchErr) {
       console.warn('Razorpay subscription fetch warning:', fetchErr);
-      if (isDev) {
-        return NextResponse.json({
-          isMock: true,
-          subscriptionId: `sub_mock_${Date.now()}`,
-          planId: planSpec.planKey,
-          tier: planSpec.tier,
-          subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
-          scopeCode,
-          keyId: KEY_ID,
-        });
-      }
       return NextResponse.json({ error: 'Unable to connect to Razorpay subscription gateway.' }, { status: 502 });
     }
   } catch (err) {

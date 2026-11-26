@@ -2,7 +2,7 @@
 id: API_scoping_parse_rfp
 tier: 4_api_gateway
 platform: Prateek_Website
-status: planned
+status: production
 auth_level: public
 blast_radius: high
 file_path: src/app/api/scoping/parse-rfp/route.ts
@@ -23,7 +23,7 @@ test_suites:
   - src/lib/__tests__/pdf-smoke.test.ts
 downstream:
   - ../25_SOTA_Scoping_Engine_PRD
-  - Engine_Docling_Layout_OCR
+  - Engine_pdfplumber_Layout_Parser
   - UI_ScopingLab
   - UI_ArchitectureCartDrawer
 ---
@@ -35,11 +35,11 @@ downstream:
 
 #api #multimodal #ocr #pdf #phase_g
 
-> **Multimodal RFP & Wireframe Ingestion Stream using Docling Layout OCR (M42).**
+> **Multimodal RFP & Wireframe Ingestion Stream using pdfplumber Layout Parser (M42).**
 
 - **Endpoint:** `POST /api/scoping/parse-rfp`
 - **Gateway:** Next.js 16 Route Handler with `multipart/form-data`
-- **Processing Engine:** Docling Layout OCR + PyMuPDF AST Chunker
+- **Processing Engine:** pdfplumber Layout Parser + PyMuPDF AST Chunker
 - **Payload:** `FormData` containing `.pdf`, `.docx`, or image wireframes
 - **Output:** Extracted functional specifications, automatically checked cart features, and estimate matrix.
 
@@ -47,12 +47,12 @@ downstream:
 
 ## 🔗 Related Architecture & Cross-References
 - [25_SOTA_Scoping_Engine_PRD](../25_SOTA_Scoping_Engine_PRD.md)
-- [Engine: Docling Layout OCR](Engine_Docling_Layout_OCR.md)
+- [Engine: pdfplumber Layout Parser](Engine_pdfplumber_Layout_Parser.md)
 - [UI: ScopingLab](UI_ScopingLab.md)
 - [UI: ArchitectureCartDrawer](UI_ArchitectureCartDrawer.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
-> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE](docs/runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md)
+> **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE](../runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md)
 
 1. **All pricing figures MUST source strictly from intakeQuestionnaireDefaults.json via calcQuote().**
 2. **Feature dependencies (dependsOn) MUST be transitively resolved before calculating final quote.**

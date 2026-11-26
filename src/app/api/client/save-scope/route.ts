@@ -40,15 +40,15 @@ export async function POST(req: Request) {
     const rawObj = (rawJson && typeof rawJson === 'object' ? rawJson : {}) as Record<string, unknown>;
     const scopeCode = payload.scopeCode;
 
-    // Degraded dev/CI mode: no Supabase environment, skip auth + persistence.
-    if (!supabase) {
-      return NextResponse.json({ success: true, message: 'Scope brief acknowledged (degraded mode).' });
-    }
-
     // Canonical client email always comes from the verified session token.
-    const sessionEmail = await getVerifiedSessionEmail(req);
-    if (!sessionEmail) {
+    const verifiedEmail = await getVerifiedSessionEmail(req);
+    if (!verifiedEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+    const sessionEmail = verifiedEmail.toLowerCase();
+
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database service unavailable.' }, { status: 503 });
     }
 
     const isAdmin = isAdminEmail(sessionEmail);
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: selectErr.message }, { status: 500 });
     }
 
-    if (existingScope && existingScope.client_email && existingScope.client_email !== sessionEmail && !isAdmin) {
+    if (existingScope && existingScope.client_email && existingScope.client_email.toLowerCase() !== sessionEmail && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden: scope belongs to another account.' }, { status: 403 });
     }
 
