@@ -73,5 +73,5 @@ Manageable via **Blog Editor** tab:
 - [Content Strategy & Tone](../07_Content_Strategy.md)
 - [SEO Strategy](../17_SEO_Strategy.md)
 - [Automated AI Content Engine](../AUTOMATED_AI_BLOGGING_ROADMAP.md)
-- [Blog Deep-Linking Map](../BLOG_DEEP_LINKING_MAP.md)
+- [Blog Deep-Linking Map](../playbooks/BLOG_DEEP_LINKING_MAP.md)
 - [Architecture Node: Blog Route](../architecture_nodes/Route_blog.md)

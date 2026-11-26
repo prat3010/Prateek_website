@@ -53,8 +53,8 @@ The generator script reads `src/data/projects.json` at runtime. Any new project 
 
 ## **Related Architecture & Cross-References**
 
-- [Automated AI Content Engine](AUTOMATED_AI_BLOGGING_ROADMAP.md)
-- [Content Strategy](07_Content_Strategy.md)
-- [SEO Strategy](17_SEO_Strategy.md)
-- [Projects Showcase](09_Section_Specifications/04_Projects.md)
-- [Architecture Node: Projects Schema](architecture_nodes/Schema_projects.md)
+- [Automated AI Content Engine](../AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Content Strategy](../07_Content_Strategy.md)
+- [SEO Strategy](../17_SEO_Strategy.md)
+- [Projects Showcase](../09_Section_Specifications/04_Projects.md)
+- [Architecture Node: Projects Schema](../architecture_nodes/Schema_projects.md)

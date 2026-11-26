@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD) — Visual DAG Workflow Canvas & Agentic Graph Composer (Platform Battery #40)
+# Product Requirements Document (PRD) — Visual DAG Workflow Canvas & Agentic Graph Composer (Platform Battery #32)
 
 **Document ID:** PRD-046  
 **Status:** Completed  
@@ -13,8 +13,8 @@
 
 Enterprise AI deployments require composing complex, multi-stage cognitive workflows that combine search, moderation, LLM reasoning, code analysis, and dynamic routing. Previously, constructing these pipelines required procedural backend code, hardcoded configuration files, or external workflow services that breached tenant data boundaries and incurred high runtime latency.
 
-**Milestone 126** introduces **Platform Battery #40 (`visual_dag_workflow_composer`)**, delivering:
-1. **Interactive Visual Workflow Studio in `apps/web`:** React 19 / Next.js 16 interactive SVG canvas featuring pan, zoom (40% to 180%), draggable typed nodes, cubic Bézier spline connection curves, parameter inspector drawer, and live step execution indicator.
+**Milestone 126** introduces **Platform Battery #32 (`visual_dag_workflow_composer`)**, delivering:
+1. **Interactive Visual Workflow Studio in `retriever/apps/web` (`visual-dag-canvas.tsx` / `/orchestration`):** React 19 / Next.js 16 interactive SVG canvas featuring pan, zoom (40% to 180%), draggable typed nodes, cubic Bézier spline connection curves, parameter inspector drawer, and live step execution indicator.
 2. **Declarative Workflow Compiler (`DAGWorkflowCompiler`):** Pure domain compiler leveraging Kahn's topological sorting algorithm for cycle detection, parallel execution stage partitioning, and variable contract binding verification.
 3. **Step-by-Step DAG Execution Stepper (`DAGWorkflowExecutor`):** Stage-by-stage pipeline executor with authentic node handlers (hybrid search, regex PII guardrails, LongLLMLingua compression, prompt assembly, LLM synthesis, faithfulness evaluator, conditional router), and step-level token cost attribution ($/token).
 4. **Pre-Configured Enterprise Templates Catalog (`src/domain/workflow/templates.py`):** 4 out-of-the-box verified production templates (Legal Document Analyzer, Customer Support Copilot, Technical Codebase Assistant, Multimodal Schematic Inspector).
@@ -106,6 +106,6 @@ $$C_{\text{total}} = \sum_{v \in V} C_v$$
 ## 6. Verification Records & Quality Gates
 
 - **Unit Tests:** `apps/api/tests/test_dag_workflow.py` (9 passed in 2.31s).
-- **Battery Tests:** `apps/api/tests/test_batteries.py` (10 passed in 2.38s, Battery #40 verified).
+- **Battery Tests:** `apps/api/tests/test_batteries.py` (Battery #32 `visual_dag_workflow_composer` verified).
 - **Zero-Toy Linter:** `python3 scripts/audit_zero_toy.py` (353 files scanned, 0 violations).
 - **Frontend Build:** `apps/web` compiled with Next.js 16 Turbopack in 2.2s, 0 TypeScript/ESLint errors.

@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 152 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 142 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,7 +13,7 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (24 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (20 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -23,7 +23,6 @@
 | `Route_home` | **Route: `/` (Adaptive Portfolio Home)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_home.md](architecture_nodes/Route_home.md) |
 | `Route_playground` | **Route: `/playground` & `/playground/[slug]` (The Playground)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_playground.md](architecture_nodes/Route_playground.md) |
 | `Route_terminal` | **Route: `/terminal` (Interactive Diagnostics Console)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_terminal.md](architecture_nodes/Route_terminal.md) |
-| `UI_AgentStudioPanel` | **UI Component: `AgentStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AgentStudioPanel.md](architecture_nodes/UI_AgentStudioPanel.md) |
 | `UI_AnalyticsDashboard` | **UI: `AnalyticsDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AnalyticsDashboard.md](architecture_nodes/UI_AnalyticsDashboard.md) |
 | `UI_ApiKeysPanel` | **UI: `ApiKeysPanel.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_ApiKeysPanel.md](architecture_nodes/UI_ApiKeysPanel.md) |
 | `UI_BlogEngine` | **UI: `BlogEngine.tsx` / `BlogPost.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_BlogEngine.md](architecture_nodes/UI_BlogEngine.md) |
@@ -31,12 +30,9 @@
 | `UI_FloatingChatWidget` | **UI: `FloatingChatWidget.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_FloatingChatWidget.md](architecture_nodes/UI_FloatingChatWidget.md) |
 | `UI_GatewayPanel` | **UI Component: `GatewayPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_GatewayPanel.md](architecture_nodes/UI_GatewayPanel.md) |
 | `UI_IntegrationsPanel` | **UI Component: `IntegrationsPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_IntegrationsPanel.md](architecture_nodes/UI_IntegrationsPanel.md) |
-| `UI_McpPanel` | **UI: `McpPanel.tsx` (Universal Model Context Protocol Center)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_McpPanel.md](architecture_nodes/UI_McpPanel.md) |
 | `UI_NoirSkyline` | **UI: `NoirSkyline.tsx` (6-Layer Parallax Backdrop)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_NoirSkyline.md](architecture_nodes/UI_NoirSkyline.md) |
 | `UI_PlaygroundSuite` | **UI: `PlaygroundSuite` (The Playground Component Suite)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PlaygroundSuite.md](architecture_nodes/UI_PlaygroundSuite.md) |
-| `UI_PromptOptimizationPanel` | **UI Component: `PromptOptimizationPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PromptOptimizationPanel.md](architecture_nodes/UI_PromptOptimizationPanel.md) |
 | `UI_QuickLaunchWizardModal` | **UI: `QuickLaunchWizardModal.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_QuickLaunchWizardModal.md](architecture_nodes/UI_QuickLaunchWizardModal.md) |
-| `UI_RlmStudioPanel` | **UI Component: `RlmStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RlmStudioPanel.md](architecture_nodes/UI_RlmStudioPanel.md) |
 | `UI_SegmentedPersonaSection` | **UI: `SegmentedPersonaSection.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_SegmentedPersonaSection.md](architecture_nodes/UI_SegmentedPersonaSection.md) |
 | `UI_TeamPanel` | **UI Component: `TeamPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_TeamPanel.md](architecture_nodes/UI_TeamPanel.md) |
 | `UI_Terminal` | **UI: `Terminal.tsx` (Interactive CLI Engine)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_Terminal.md](architecture_nodes/UI_Terminal.md) |
@@ -126,26 +122,23 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (49 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (43 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
-| `Engine_ColBERT_Late_Interaction` | **Engine Specification: PyTorch Late-Interaction ColBERT Token-Level MaxSim Engine (Milestone 80)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_ColBERT_Late_Interaction.md](architecture_nodes/Engine_ColBERT_Late_Interaction.md) |
+| `Engine_ColBERT_Late_Interaction` | **Engine Specification: Lexical & Optional ONNX Late-Interaction MaxSim Engine (Milestone 80)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_ColBERT_Late_Interaction.md](architecture_nodes/Engine_ColBERT_Late_Interaction.md) |
 | `Engine_ColBERT_MaxSim_Reranker` | **Engine: Late-Interaction (ColBERT) Token-Level MaxSim Reranker (Milestone 70)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_ColBERT_MaxSim_Reranker.md](architecture_nodes/Engine_ColBERT_MaxSim_Reranker.md) |
 | `Engine_Contextual_Retrieval` | **Engine: Pre-Chunk Contextual Retrieval Ingestion Engine (Milestone 69)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Contextual_Retrieval.md](architecture_nodes/Engine_Contextual_Retrieval.md) |
 | `Engine_Corrective_RAG_Agentic_Loop` | **Engine: Corrective RAG (CRAG) & Agentic Reflection Loop (Milestone 71)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Corrective_RAG_Agentic_Loop.md](architecture_nodes/Engine_Corrective_RAG_Agentic_Loop.md) |
-| `Engine_DSPy_Prompt_Compilation` | **Engine: DSPy Declarative Prompt Compilation (Milestone 92)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_DSPy_Prompt_Compilation.md](architecture_nodes/Engine_DSPy_Prompt_Compilation.md) |
 | `Engine_Digital_SOW_Escrow_Freeze` | **Engine: Digital SOW & 50% Escrow Freeze** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md](architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md) |
-| `Engine_Docling_Layout_OCR` | **Engine: Docling Layout OCR & Multimodal Ingestion (Milestone 42)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Docling_Layout_OCR.md](architecture_nodes/Engine_Docling_Layout_OCR.md) |
-| `Engine_Durable_Workflow_Execution` | **Engine: Durable Asynchronous Execution & Background AI Workflow Engine (Milestone 95)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Durable_Workflow_Execution.md](architecture_nodes/Engine_Durable_Workflow_Execution.md) |
+| `Engine_Durable_Workflow_Execution` | **Engine: Durable Asynchronous Execution & Background AI Workflow Engine (ARCHIVED — Purged in Remediation R2.7)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Durable_Workflow_Execution.md](architecture_nodes/Engine_Durable_Workflow_Execution.md) |
 | `Engine_Embedding_Space_Projection` | **Engine Specification: Scikit-Learn 2D/3D Embedding Space Projection Pipeline & SaaS Studio 3D Vector Explorer (Milestone 82)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Embedding_Space_Projection.md](architecture_nodes/Engine_Embedding_Space_Projection.md) |
 | `Engine_GraphRAG_Topology` | **Engine: GraphRAG Knowledge Graph & Dynamic Topology** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_GraphRAG_Topology.md](architecture_nodes/Engine_GraphRAG_Topology.md) |
-| `Engine_Hierarchical_Memory_GoT` | **Engine: Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (Platform Battery #38)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Hierarchical_Memory_GoT.md](architecture_nodes/Engine_Hierarchical_Memory_GoT.md) |
+| `Engine_Heuristic_Context_Compression` | **Engine: Heuristic Context Compression (Milestone 49)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Heuristic_Context_Compression.md](architecture_nodes/Engine_Heuristic_Context_Compression.md) |
 | `Engine_LLM_Gateway_Smart_Router` | **Engine: Enterprise LLM Gateway & Smart Router (Milestone 93)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LLM_Gateway_Smart_Router.md](architecture_nodes/Engine_LLM_Gateway_Smart_Router.md) |
 | `Engine_LlamaGuard_Guardrails` | **Engine: Llama Guard 3 Prompt Injection Filter (Milestone 40)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LlamaGuard_Guardrails.md](architecture_nodes/Engine_LlamaGuard_Guardrails.md) |
-| `Engine_LongLLMLingua_Compression` | **Engine: LongLLMLingua Context Compression (Milestone 49)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LongLLMLingua_Compression.md](architecture_nodes/Engine_LongLLMLingua_Compression.md) |
 | `Engine_MultiAgent_Consensus` | **Engine: Multi-Agent Consensus & Reflection Loops (Milestone 48)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_MultiAgent_Consensus.md](architecture_nodes/Engine_MultiAgent_Consensus.md) |
-| `Engine_NeMo_Conversational_Guardrails` | **Engine: NVIDIA NeMo Guardrails & Conversational Safety Rails (Milestone 94)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_NeMo_Conversational_Guardrails.md](architecture_nodes/Engine_NeMo_Conversational_Guardrails.md) |
+| `Engine_NeMo_Conversational_Guardrails` | **Engine: Programmable Rule & Colang-Style Guardrails (Milestone 94)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_NeMo_Conversational_Guardrails.md](architecture_nodes/Engine_NeMo_Conversational_Guardrails.md) |
 | `Engine_OTel_AutoInstrumentation` | **Engine: Full-Stack OpenTelemetry Auto-Instrumentation (Milestone 75)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_OTel_AutoInstrumentation.md](architecture_nodes/Engine_OTel_AutoInstrumentation.md) |
 | `Engine_RLM_Python_REPL` | **Engine: RLM Python REPL Sandbox (Milestone 47)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RLM_Python_REPL.md](architecture_nodes/Engine_RLM_Python_REPL.md) |
 | `Engine_RLM_Python_REPL_Studio` | **Engine: Interactive RLM Python REPL Sandbox Studio (Milestone 72)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RLM_Python_REPL_Studio.md](architecture_nodes/Engine_RLM_Python_REPL_Studio.md) |
@@ -153,31 +146,28 @@
 | `Engine_Semantic_NLI_Evaluator` | **Engine: Semantic NLI & SLM-as-a-Judge Online Hallucination Engine (Milestone 74)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Semantic_NLI_Evaluator.md](architecture_nodes/Engine_Semantic_NLI_Evaluator.md) |
 | `Engine_Serverless_GPU_vLLM_Serving` | **Engine: Serverless Dedicated GPU Serving & Dynamic vLLM / LoRA Pipeline (Milestone 96)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Serverless_GPU_vLLM_Serving.md](architecture_nodes/Engine_Serverless_GPU_vLLM_Serving.md) |
 | `Engine_Sovereign_Edge_Sync` | **Engine: Sovereign Edge Vector Sync & CRDT SQLite Swarm (Milestone 98)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Sovereign_Edge_Sync.md](architecture_nodes/Engine_Sovereign_Edge_Sync.md) |
-| `Engine_Sovereign_Edge_Voice` | **Engine: Sovereign Edge Voice Streaming & WebRTC (Milestone 100)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Sovereign_Edge_Voice.md](architecture_nodes/Engine_Sovereign_Edge_Voice.md) |
 | `Engine_Sparse_Dense_LoRA` | **Sparse-Dense Hybrid Engine & Contrastive LoRA Domain Adapters** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Sparse_Dense_LoRA.md](architecture_nodes/Engine_Sparse_Dense_LoRA.md) |
 | `Engine_Visual_Grounding_Observability` | **Engine: Visual Claim-by-Claim Grounding Diff & Retriever Admin Observability Cockpit (Milestone 78)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Visual_Grounding_Observability.md](architecture_nodes/Engine_Visual_Grounding_Observability.md) |
+| `Engine_pdfplumber_Layout_Parser` | **Engine: pdfplumber Layout Parser & Multimodal Ingestion (Milestone 42)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_pdfplumber_Layout_Parser.md](architecture_nodes/Engine_pdfplumber_Layout_Parser.md) |
 | `Retriever_API_v1_admin` | **Retriever API: `apps/api/src/routers/admin.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_admin.md](architecture_nodes/Retriever_API_v1_admin.md) |
 | `Retriever_API_v1_agentic` | **Retriever API: `apps/api/src/routers/agentic.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_agentic.md](architecture_nodes/Retriever_API_v1_agentic.md) |
 | `Retriever_API_v1_auth` | **Retriever API: `apps/api/src/routers/auth.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_auth.md](architecture_nodes/Retriever_API_v1_auth.md) |
-| `Retriever_API_v1_chat` | **Retriever API: `POST /v1/chat`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_chat.md](architecture_nodes/Retriever_API_v1_chat.md) |
+| `Retriever_API_v1_chat` | **Retriever API: `POST /v1/tenants/{tenantId}/chat/completions`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_chat.md](architecture_nodes/Retriever_API_v1_chat.md) |
 | `Retriever_API_v1_consensus` | **Retriever API: `apps/api/src/routers/consensus.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_consensus.md](architecture_nodes/Retriever_API_v1_consensus.md) |
-| `Retriever_API_v1_documents` | **Retriever API: `POST /v1/documents`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_documents.md](architecture_nodes/Retriever_API_v1_documents.md) |
+| `Retriever_API_v1_documents` | **Retriever API: `POST /v1/tenants/{tenantId}/documents`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_documents.md](architecture_nodes/Retriever_API_v1_documents.md) |
 | `Retriever_API_v1_edge` | **Retriever API: `apps/api/src/routers/edge.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_edge.md](architecture_nodes/Retriever_API_v1_edge.md) |
-| `Retriever_API_v1_estimation` | **Retriever API: `apps/api/src/routers/estimation.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_estimation.md](architecture_nodes/Retriever_API_v1_estimation.md) |
 | `Retriever_API_v1_gateway` | **Retriever API: `apps/api/src/routers/gateway.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_gateway.md](architecture_nodes/Retriever_API_v1_gateway.md) |
 | `Retriever_API_v1_health` | **Retriever API: `apps/api/src/routers/health.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_health.md](architecture_nodes/Retriever_API_v1_health.md) |
 | `Retriever_API_v1_integrations` | **Retriever API: `apps/api/src/routers/integrations.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_integrations.md](architecture_nodes/Retriever_API_v1_integrations.md) |
 | `Retriever_API_v1_mcp` | **Retriever API: `/v1/mcp` (Model Context Protocol JSON-RPC & SSE)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_mcp.md](architecture_nodes/Retriever_API_v1_mcp.md) |
 | `Retriever_API_v1_payments` | **Retriever API: `apps/api/src/routers/payments.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_payments.md](architecture_nodes/Retriever_API_v1_payments.md) |
-| `Retriever_API_v1_persona` | **Retriever API: `apps/api/src/routers/persona.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_persona.md](architecture_nodes/Retriever_API_v1_persona.md) |
 | `Retriever_API_v1_pricing` | **Retriever API: `apps/api/src/routers/pricing.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_pricing.md](architecture_nodes/Retriever_API_v1_pricing.md) |
-| `Retriever_API_v1_prompts` | **Retriever API: `apps/api/src/routers/prompts.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_prompts.md](architecture_nodes/Retriever_API_v1_prompts.md) |
+| `Retriever_API_v1_prompts` | **Retriever API: Prompt Template Governance** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_prompts.md](architecture_nodes/Retriever_API_v1_prompts.md) |
 | `Retriever_API_v1_rlm` | **Retriever API: `apps/api/src/routers/rlm.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_rlm.md](architecture_nodes/Retriever_API_v1_rlm.md) |
-| `Retriever_API_v1_search` | **Retriever API: `POST /v1/search`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_search.md](architecture_nodes/Retriever_API_v1_search.md) |
+| `Retriever_API_v1_search` | **Retriever API: `POST /v1/tenants/{tenantId}/search`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_search.md](architecture_nodes/Retriever_API_v1_search.md) |
 | `Retriever_API_v1_security_compression` | **Retriever API: `apps/api/src/routers/security_compression.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_security_compression.md](architecture_nodes/Retriever_API_v1_security_compression.md) |
 | `Retriever_API_v1_serverless_gpu` | **Retriever API: `apps/api/src/routers/serverless_gpu.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_serverless_gpu.md](architecture_nodes/Retriever_API_v1_serverless_gpu.md) |
 | `Retriever_API_v1_tenant` | **Retriever API: `apps/api/src/routers/tenant.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_tenant.md](architecture_nodes/Retriever_API_v1_tenant.md) |
-| `Retriever_API_v1_voice` | **Retriever API: `apps/api/src/routers/voice.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_voice.md](architecture_nodes/Retriever_API_v1_voice.md) |
 | `Retriever_API_v1_workflow` | **Retriever API: `apps/api/src/routers/workflow.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_workflow.md](architecture_nodes/Retriever_API_v1_workflow.md) |
 
 ### 🔹 7. ASYNC INFRASTRUCTURE: Workers, Brokers & Security Envelopes (3 Nodes)

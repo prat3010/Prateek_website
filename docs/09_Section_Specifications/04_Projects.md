@@ -102,6 +102,6 @@ Manageable via **Sync Projects** tab:
 ## **Related Architecture & Cross-References**
 
 - [Previous Section: Skills](03_Skills_and_Services.md)
-- [Project Case Studies & Deep Links](../BLOG_DEEP_LINKING_MAP.md)
+- [Project Case Studies & Deep Links](../playbooks/BLOG_DEEP_LINKING_MAP.md)
 - [Next Section: Playground](05_Playground.md)
 - [Architecture Node: Projects Schema](../architecture_nodes/Schema_projects.md)

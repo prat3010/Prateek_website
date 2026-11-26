@@ -209,7 +209,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 ## Testing And Verification
 
-- **Unit & Integration Tests:** Run `npm test` (Vitest) to execute all 660 tests across 86 test files. Uses `pool: 'forks'` for proper `process.env` isolation between test files.
+- **Unit & Integration Tests:** Run `npm test` (Vitest) to execute all tests across test files (97 test files / 797 tests). Uses `pool: 'forks'` for proper `process.env` isolation between test files.
 - **Watch Mode:** Run `npm run test:watch` during development for instant feedback.
 - **Coverage:** Run `npm run test:coverage` to generate a V8 coverage report.
 - **Workspace Verification:** Run `npm run verify` (or `./scripts/verify.sh`) to execute full workspace validation (cleaning caches, checking types, running lints, unit tests, and test builds).

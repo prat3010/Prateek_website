@@ -15,7 +15,7 @@ The line between developer tooling and runtime application code is absolute:
   │         LOCAL TOOLING LAYER       │        │        PUBLIC RUNTIME LAYER       │
   │     (Synchronizer Dashboard)      │        │          (Next.js App)            │
   ├───────────────────────────────────┤        ├───────────────────────────────────┤
-  │ • Gemini-2.5-Flash Integration    │        │ • Pre-generated Static Content    │
+  │ • Gemini-3.6-Flash Integration    │        │ • Pre-generated Static Content    │
   │ • Certificate Analysis            │        │ • Fast cached API fetches         │
   │ • Skill Approval Queue            │        │ • Zero runtime LLM calls          │
   │ • Local ENV Keys Only             │        │ • Client browser security         │

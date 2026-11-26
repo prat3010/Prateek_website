@@ -75,6 +75,6 @@ Keep updated via **Edit Resume Manually** tab in the CMS:
 
 - [Previous Section: Playground](05_Playground.md)
 - [Interactive Scoping Lab](12_Scoping_Lab.md)
-- [Sales Partner Agreement](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Sales Partner Agreement](../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 - [Next Section: Contact](08_Contact.md)
 - [Architecture Node: Commercial PDF Suite](../architecture_nodes/UI_CommercialPDFSuite.md)

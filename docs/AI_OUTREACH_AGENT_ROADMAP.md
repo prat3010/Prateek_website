@@ -140,7 +140,7 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
 - [ ] **Automated Portfolio Knowledge Ingestion (`scripts/sync_outreach_knowledge.py`):**
   - Script & Synchronizer button to chunk and vector-index Prateek's entire portfolio: `projects.json` (architecture, performance benchmarks, URLs, repos), `resume.json` (skills & work history), `docs/99_DECISIONS.md` (ADRs & technical trade-offs), and commercial pricing packages.
 - [ ] **Retriever Outbound Pitch Generation in Synchronizer (`scripts/sync_tabs/outreach.py`):**
-  - Pass shortlisted job descriptions, required stacks, and lead types (`client` SOW vs. `job` full-time) to Retriever's `/api/v1/chat` or `/api/v1/search` endpoint.
+  - Pass shortlisted job descriptions, required stacks, and lead types (`client` SOW vs. `job` full-time) to Retriever's `/v1/tenants/{tenantId}/chat/completions` or `/v1/tenants/{tenantId}/search` endpoint.
   - Generate grounded pitches citing real matching systems and metrics with zero hallucination.
 - [ ] **Streamlit "Evidence Inspector" UI:**
   - Display retrieved chunk citations, system match similarity scores, and referenced project links alongside the editable pitch draft.
@@ -197,7 +197,7 @@ scripts/
 - [Gemini 2.5 Flash Integration](12_AI_Integration_Strategy.md)
 - [OAuth2 & Anti-Ban Rate Limiting](16_Security_and_Privacy.md)
 - [Admin Control Center (`/admin`)](09_Section_Specifications/13_Client_Workspace_Dashboard.md)
-- [Cold Outreach Conversion Scripts](REVENUE_EXECUTION_PLAN.md)
+- [Cold Outreach Conversion Scripts](commercial/REVENUE_EXECUTION_PLAN.md)
 - [Architecture Node: Route /admin](architecture_nodes/Route_admin.md)
 - [Architecture Node: Admin Portal](architecture_nodes/UI_AdminPortal.md)
 - [Architecture Node: Outreach Dispatch API](architecture_nodes/API_outreach_dispatch.md)

@@ -90,7 +90,7 @@ Legend:
 
 ## **Related Architecture & Cross-References**
 
-- [Codebase Modernization Rules](18_Codebase_Modernization_and_Refactoring.md)
-- [Testing & Verification](19_Testing_and_Quality_Assurance.md)
-- [Architecture Dependency Map](ARCHITECTURE_DEPENDENCY_MAP.md)
-- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
+- [Codebase Modernization Rules](../18_Codebase_Modernization_and_Refactoring.md)
+- [Testing & Verification](../19_Testing_and_Quality_Assurance.md)
+- [Architecture Dependency Map](../ARCHITECTURE_DEPENDENCY_MAP.md)
+- [Unified Master Roadmap](../UNIFIED_MASTER_ROADMAP.md)

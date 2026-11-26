@@ -447,6 +447,6 @@ graph TD
 
 ## **Related Architecture & Cross-References**
 
-- [Active SOTA Scoping Engine PRD](25_SOTA_Scoping_Engine_PRD.md)
-- [Scoping Lab Section Spec](09_Section_Specifications/12_Scoping_Lab.md)
-- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
+- [Active SOTA Scoping Engine PRD](../25_SOTA_Scoping_Engine_PRD.md)
+- [Scoping Lab Section Spec](../09_Section_Specifications/12_Scoping_Lab.md)
+- [Unified Master Roadmap](../UNIFIED_MASTER_ROADMAP.md)

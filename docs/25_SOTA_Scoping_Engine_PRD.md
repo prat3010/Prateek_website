@@ -142,7 +142,7 @@ sequenceDiagram
 │    • Item removal with instant 5-second `[Undo]` toast notifications.                           │
 │    • Live currency switch (INR ₹ with 18% GST breakdown / USD $ international).                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 2. "FREQUENTLY BUILT TOGETHER" UPSELLS (`CartUpsellRecommender.tsx`):                            │
+│ 2. "FREQUENTLY BUILT TOGETHER" UPSELLS & BUNDLE SUGGESTIONS (within `ArchitectureCartDrawer`):        │
 │    • Powered by Retriever GraphRAG: analyzes selected nodes to suggest synergistic features.     │
 │    • e.g. "94% of SaaS platforms with Payments also add Role-Based Admin & Automated Invoicing." │
 │    • 1-Click `[➕ Add Bundle & Save 5%]` direct insertion into cart.                             │
@@ -584,7 +584,7 @@ Clients frequently identify new feature requirements mid-development. Rather tha
 1. Client clicks **"Request Additional Feature"** on `/dashboard`.
 2. Opens the embedded SOTA customizer in **Delta Mode** (baseline locked features are marked with 🔒).
 3. Client selects new add-on features (e.g. adding `ai_voice_agent` and `pwa`).
-4. **Delta Calculation**: Retriever's REPL sandbox calculates the incremental delta cost ($+\$3,500$ / $+₹2,80,000$) and estimated timeline extension ($+1.5$ weeks).
+4. **Delta Calculation**: Retriever's REPL sandbox calculates the incremental delta cost ($+\$1,700$ / $+₹1,30,000$ base before volume bundle discounts in `pricing.ts`) and estimated timeline extension ($+1.5$ weeks).
 5. Client clicks **"Generate Change Order"**:
    - Inserts record into `scope_change_orders` (`status = 'pending'`).
    - Generates a dedicated milestone invoice in `invoices` (`invoice_type = 'change_order'`).
@@ -706,8 +706,8 @@ timeline
 - [50% Deposit Lock & Invoicing Ledger](14_Razorpay_Payments_and_Invoicing.md)
 - [RAG SaaS Studio & `prateeq_scoping` Tenant](24_RAG_App_Studio_PRD.md)
 - [Client Workspace Architecture Spec](CLIENT_DASHBOARD_ROADMAP.md)
-- [Sales Partner Commission Engine](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
-- [Revenue Strategy & Client Conversion](REVENUE_EXECUTION_PLAN.md)
+- [Sales Partner Commission Engine](commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Revenue Strategy & Client Conversion](commercial/REVENUE_EXECUTION_PLAN.md)
 - [Architecture Node: Route /scoping](architecture_nodes/Route_scoping.md)
 - [Architecture Node: Scoping Lab Wizard](architecture_nodes/UI_ScopingLab.md)
 - [Architecture Node: Cart Drawer](architecture_nodes/UI_ArchitectureCartDrawer.md)

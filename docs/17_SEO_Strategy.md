@@ -115,7 +115,7 @@ To assist both search crawlers and automated tests (e.g. Playwright or Selenium 
 ## **Related Architecture & Cross-References**
 
 - [Content Strategy & Copywriting](07_Content_Strategy.md)
-- [Blog & Project Cross-Linking](BLOG_DEEP_LINKING_MAP.md)
+- [Blog & Project Cross-Linking](playbooks/BLOG_DEEP_LINKING_MAP.md)
 - [Automated AI Content Engine](AUTOMATED_AI_BLOGGING_ROADMAP.md)
 - [Blog Section Specification](09_Section_Specifications/11_Blog.md)
 - [Architecture Node: Blog Engine](architecture_nodes/Route_blog.md)

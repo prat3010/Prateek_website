@@ -85,7 +85,7 @@ Date:       August 2, 2026                     Date:       _____________________
 
 ## **Related Architecture & Cross-References**
 
-- [Sales Partner Promo Validation & Attribution](25_SOTA_Scoping_Engine_PRD.md)
-- [Synchronizer Middleman Agreement Tab](11_Content_Management_System.md)
+- [Sales Partner Promo Validation & Attribution](../25_SOTA_Scoping_Engine_PRD.md)
+- [Synchronizer Middleman Agreement Tab](../11_Content_Management_System.md)
 - [Affiliate Partner Strategy](REVENUE_EXECUTION_PLAN.md)
-- [Architecture Node: Commission SSoT](architecture_nodes/Lib_commission.md)
+- [Architecture Node: Commission SSoT](../architecture_nodes/Lib_commission.md)

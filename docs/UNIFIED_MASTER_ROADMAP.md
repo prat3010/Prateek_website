@@ -225,8 +225,8 @@ timeline
 - **Deliverable:** Autonomous reflection loop evaluating retrieval candidate confidence and dynamically triggering query reformulations or web search fallback.
 - **Status:** **Completed** (Phase H, Milestone 71)
 
-#### 🧠 Milestone 72: Interactive RLM Python REPL Sandbox Studio
-- **Repo Scope:** Both (`retriever` `/v1/rlm` & `Prateek_website` `/rag/app/rlm`, `RlmStudioPanel.tsx`)
+#### 🧠 Milestone 72: Interactive RLM Python REPL Sandbox
+- **Repo Scope:** `retriever` (`/v1/tenants/{tenantId}/rlm/*` APIs; `/rag/app` mounts 13 active tabs without a separate `RlmStudioPanel.tsx`)
 - **Deliverable:** Productize Recursive Language Models into a dedicated SaaS Studio tab for programmatic, recursive document vault traversal.
 - **Status:** **Completed** (Phase H, Milestone 72)
 
@@ -501,7 +501,7 @@ timeline
 - **Repo Scope:** Both (`retriever` load test scripts & `Prateek_website` blog content)
 - **Gap:** Zero load testing for a SaaS product. No public technical writing or OSS contributions for career credibility.
 - **Deliverable:**
-  1. k6/Locust load tests (10/50/100/200 concurrent users) on `/v1/chat`, `/v1/search`, `/v1/documents` (`apps/api/tests/load/locustfile.py`, `scripts/run_load_benchmark.py`). Document P50/P90/P95/P99.
+  1. k6/Locust load tests (10/50/100/200 concurrent users) on `/v1/tenants/{tenantId}/chat/completions`, `/v1/tenants/{tenantId}/search`, `/v1/tenants/{tenantId}/documents` (`apps/api/tests/load/locustfile.py`, `scripts/run_load_benchmark.py`). Document P50/P90/P95/P99.
   2. Performance regression CI gate and automated latency & throughput report generator.
   3. Publish architecture deep-dive blog posts and case studies.
   4. Submit meaningful PRs to open-source ecosystem projects.
@@ -683,7 +683,7 @@ timeline
 │  [M94] NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails (Done)          │
 │  [M95] Durable Asynchronous Execution & Background AI Workflow Engine (Done)           │
 │  [M96] Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Done)          │
-│  [M97] Autonomous FDE Metaprogrammer & Self-Extending Capability Studio (Done)         │
+│  [M97] Autonomous FDE Metaprogrammer & Self-Extending Studio (Purged — ADR 33)         │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -754,21 +754,8 @@ timeline
   - 100% automated test coverage across Pytest (16/16) and Vitest (8/8).
 - **Status:** **Completed (Phase L / v0.81.0)**
 
-#### 🛠️ Milestone 97: Autonomous FDE Metaprogrammer & Self-Extending Capability Studio
-- **Libraries:** Python `ast`, `pydantic`, `pytest`, `vitest`, `@number-flow/react`, `framer-motion`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/scaffolding/`, `src/adapters/scaffolding/`, `src/routers/scaffold.py`, `retriever-cli`, `apps/web/src/app/(dashboard)/scaffold/` & `Prateek_website` `src/components/rag/FeatureStudioPanel.tsx`, `src/app/rag/app/page.tsx`, `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
-- **Deliverable:**
-  - **Dual-Persona Solution Engine:**
-    1. *For Business / Non-Tech Users:* Natural language requirement analyzer in SaaS Studio that matches requirements against the 16 native platform batteries with match scores and rationales, enabling zero-code adoption.
-    2. *For Forward Deployed Engineers (FDEs):* Autonomous Hexagonal metaprogrammer that synthesizes 6 verified code slices (`domain/abstractions.py`, `domain/service.py`, `adapters/custom_adapter.py`, `routers/router.py`, `tests/test_plugin.py`, and `manifest.json`).
-  - **Static AST Security & Boundary Gate (`boundary_checker.py`):** Enforces **0 framework imports** (`fastapi`, `sqlalchemy`, `celery`, `redis`, etc.) in domain slices and blocks dangerous calls (`exec`, `eval`) via Python `ast.parse()`.
-  - **Git-Isolated Plugin Storage (`apps/api/src/plugins/custom/{plugin_id}/`):** Dedicated workspace directory gitignored with `.gitkeep` to prevent upstream merge conflicts.
-  - **Dynamic In-Process Mounting with Fault Barrier (`plugin_manager.py`):** Dynamic discovery and mounting of `/v1/plugins/{plugin_id}/*` FastAPI routers during application lifespan with isolated error containment.
-  - **Platform Battery #17:** Registered `autonomous_fde_metaprogrammer` in `BatteryService` under `SYSTEM_EXTENSIBILITY` with dynamic battery injection.
-  - **1-Click Community PR Generator:** Automatic branch naming (`feat/plugin-{plugin_id}`) and comprehensive GitHub Pull Request Markdown template generation.
-  - **UI Surfaces:** High-tech panels in Retriever Admin Dashboard (`/scaffold`) and Next.js SaaS Studio (`FeatureStudioPanel.tsx` in `/rag/app`) with Design System 2.0 dual-theme parity.
-  - **100% Automated Test Coverage:** Pytest suite in `retriever` (`test_scaffolding.py`, 15/15) and Vitest suite in `Prateek_website` (`FeatureStudioPanel.test.tsx`, 9/9).
-- **Status:** **Completed (Phase L / v0.82.0)**
+#### 🛠️ Milestone 97: Autonomous FDE Metaprogrammer & Self-Extending Capability Studio *(Purged — ADR 33)*
+- **Status:** **Purged (Zero-Toy Audit)** — Legacy dynamic scaffolding endpoints (`/v1/plugins/*`), `FeatureStudioPanel.tsx`, and runtime AST metaprogramming were removed in favor of static AST boundary enforcement (`apps/api/tests/test_architecture.py`) and verified domain adapters.
 
 ---
 
@@ -779,79 +766,38 @@ timeline
 │                        PHASE M: SOVEREIGN EDGE & MULTI-CLOUD                           │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │  [M98] Sovereign Edge SQLite / Turso Vector Synchronization & Offline Agent (Done)     │
-│  [M99] Distributed Multi-Cloud Failover & Edge Turso LibSQL Replication (Done)         │
-│  [M100] Sovereign Edge Voice & Local Whisper / WebRTC Speech Synthesis (Done)          │
-│  [M101] Zero-Trust Micro-Enclave Encryption & Hardware KMS Remote Attestation (Planned)│
-│  [M102] Autonomous Edge Fleet Swarm Mesh & P2P Gossip Replication (Planned)           │
+│  [M99] Distributed Multi-Cloud Failover & Turso LibSQL (Purged — Zero-Toy Audit)       │
+│  [M100] Sovereign Edge Voice & Local Whisper / WebRTC Speech Synthesis (Backend Done)  │
+│  [M101] Zero-Trust Micro-Enclave Encryption & Hardware KMS (Purged — ADR 37)           │
+│  [M102] Autonomous Edge Fleet Swarm Mesh & P2P Gossip (Purged — ADR 38)                │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### 💾 Milestone 98: Sovereign Edge SQLite / Turso Vector Synchronization & Offline-First Edge Agent
 - **Libraries:** Python standard `sqlite3` + FTS5, `numpy`, `pydantic`, `pytest`, `vitest`, `@number-flow/react`, `framer-motion`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/edge_sync/`, `src/adapters/edge_sync/`, `src/routers/edge.py`, `apps/web/src/app/(dashboard)/edge/` & `Prateek_website` `src/components/rag/EdgeSyncPanel.tsx`, `src/app/rag/app/page.tsx`, `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/edge_sync/`, `src/adapters/edge_sync/`, `src/routers/edge.py`, `apps/web/src/app/(dashboard)/edge/` & `Prateek_website` `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
 - **Deliverable:**
   - **Embedded SQLite 3 Hybrid Storage Engine:** Pure in-process relational database with FTS5 BM25 porter tokenization, binary IEEE 754 float32 vector BLOBs, and in-process NumPy cosine matrix dot products executing in $<2\text{ms}$ with zero background daemons.
   - **Differential Sequence Delta Generator (`EdgeSyncDelta`):** Incremental synchronization using cloud sequence watermarks (`sequence_num`) and SHA-256 state hashes, minimizing edge bandwidth.
   - **1-Click Standalone `.sqlite` Bundle Exporter:** Direct binary `.sqlite` database generation and export for instant air-gapped field deployment via secure media.
   - **Lamport Clock Offline Mutation Reconciler:** Edge action queueing and cloud reconciliation for offline feedback and entity updates with Last-Write-Wins (LWW) conflict guarantees.
-  - **Platform Battery #18 (`sovereign_edge_sync`):** Registered in `BatteryService` under category `EDGE_DISTRIBUTION`.
-  - **UI Surfaces:** Operational edge node control center in Retriever Admin Dashboard (`/edge`) and Next.js Client SaaS Studio (`EdgeSyncPanel.tsx` in `/rag/app`) with Design System 2.0 dual-theme aesthetics, `<MagneticButton>`, and simulated network partition switch.
-  - **100% Automated Test Coverage:** Pytest suite in `retriever` (`test_edge_sync.py`, 13/13) and Vitest suite in `Prateek_website` (`EdgeSyncPanel.test.tsx`, 7/7).
+  - **Platform Battery #17 (`sovereign_edge_sync`):** Registered in `BatteryService` under category `EDGE_DISTRIBUTION`.
+  - **UI Surfaces:** Operational edge node control center in Retriever Admin Dashboard (`/edge`); backend `/v1/admin/edge/*` and `/v1/tenants/{tenantId}/edge/*` APIs are production-active (Next.js `/rag/app` runs 13 core tabs; dedicated `EdgeSyncPanel.tsx` remains planned).
+  - **100% Automated Test Coverage:** Pytest suite in `retriever` (`test_edge_sync.py`, 14/14).
 - **Status:** **Completed (Phase M / v0.83.0)**
 
-#### 🌐 Milestone 99: Distributed Multi-Cloud Failover & Edge Turso LibSQL Replication
-- **Libraries:** `pydantic`, `pytest`, `vitest`, `@number-flow/react`, `framer-motion`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/multicloud.py`, `src/domain/multicloud/`, `src/adapters/multicloud/`, `src/routers/multicloud.py`, `apps/web/src/app/(dashboard)/multicloud/` & `Prateek_website` `src/components/rag/MultiCloudPanel.tsx`, `src/app/rag/app/page.tsx`, `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
-- **Deliverable:**
-  - **Heterogeneous Multi-Cloud Cluster Topology:** Nodes spanning Oracle Cloud Mumbai (`oracle-bom`, Primary Leader), AWS us-east-1 (`aws-iad`, Standby), Fly.io Frankfurt (`fly-fra`, Standby), and Cloudflare Global Anycast Edge (`cf-global`, Routing/Arbiter).
-  - **Mathematical Quorum Majority Consensus:** Strict $>50\%$ quorum election engine enforcing $Q = \lfloor N/2 \rfloor + 1 = 3$ votes before leader promotion, preventing split-brain states during inter-region network splits.
-  - **Monotonic Generation Terms:** Epoch counter incrementing on every election, guaranteeing stale partitioned nodes step down upon reconnecting.
-  - **Dynamic Circuit Breaker & EWMA Latency:** Automatic failover triggered on 3 consecutive probe timeouts or when exponentially weighted moving average latency exceeds $1500\text{ms}$.
-  - **Turso LibSQL Embedded Replicas:** Sub-1ms edge read latency with local embedded SQLite replica databases, asynchronous WAL frame streaming, and write-through HTTP/LibSQL proxying to the active primary.
-  - **Hybrid Simulation & Productionization Roadmap:** Transparent development testing mode with calibrated mock latency probes (`is_simulated=True`) and interactive partition chaos toggles, backed by complete open-source productionization roadmap for physical multi-cloud deployment.
-  - **Platform Battery #19 (`multicloud_failover_libsql`):** Formally registered in `BatteryService` under category `EDGE_DISTRIBUTION`.
-  - **Dual-Surface Web UI:** Full topology and drill visibility in Retriever Admin Dashboard (`/multicloud`) and client SaaS App Studio (`MultiCloudPanel.tsx` in `/rag/app`) with Design System 2.0 dual-theme aesthetics, `<MagneticButton>`, and `<NumberFlow>` metrics.
-  - **100% Automated Test Coverage:** Pytest suites in `retriever` (`test_multicloud_failover.py` 8/8, `test_architecture.py` 5/5) and Vitest suite in `Prateek_website` (`MultiCloudPanel.test.tsx` 6/6).
-- **Status:** **Completed (Phase M / v0.84.0)**
+#### 🌐 Milestone 99: Distributed Multi-Cloud Failover *(Purged — Superseded by Single-Region Core)*
+- **Status:** **Purged (Zero-Toy Audit)** — Legacy `MultiCloudPanel.tsx`, `multicloud_adapter.py`, and simulated multi-cloud quorum endpoints were retired to keep core deployment focused on reliable PostgreSQL + pgvector execution.
 
 #### 🎙️ Milestone 100: Sovereign Edge Voice & Local Whisper / WebRTC Speech Synthesis
-- **Libraries:** `pydantic`, `pytest`, `vitest`, `@number-flow/react`, `framer-motion`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/voice.py`, `src/domain/voice/`, `src/adapters/voice/`, `src/routers/voice.py`, `apps/web/src/app/(dashboard)/voice/` & `Prateek_website` `src/components/rag/VoiceStudioPanel.tsx`, `src/app/rag/app/page.tsx`, `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
-- **Deliverable:**
-  - **Zero-Cloud Audio Egress Invariant:** All audio processing, Whisper ASR transcription, and neural speech synthesis execute locally on edge/VPS nodes, ensuring 100% privacy and compliance (HIPAA, GDPR, SOC2).
-  - **Full-Duplex WebRTC Peer Sessions:** Bidirectional SDP offer/answer signaling and trickle ICE candidate aggregation, supporting real-time conversational barge-in and interruptions.
-  - **Digital Signal Processing (DSP) & VAD Endpointing:** Energy-based Voice Activity Detection using Root-Mean-Square ($E_{\text{RMS}}$) and Zero-Crossing Rate (ZCR) signal analysis for zero-latency speech boundary detection.
-  - **Streaming Neural Speech Synthesis:** Emits PCM16/Opus audio chunks in $\le 180\text{ms}$ per phoneme sentence, delivering sub-250ms Time-to-First-Audio-Byte (TTFAB) across Atlas, Nova, and Echo timbres.
-  - **PostgreSQL Session Isolation & RLS Migrations:** Alembic revision `m1n2o3p4q5r6` provisioned live tables `voice_sessions` and `voice_turns` with Supabase Row-Level Security.
-  - **Platform Battery #20 (`sovereign_edge_voice`):** Formally registered in `BatteryService` under category `MULTIMODAL_COGNITION`.
-  - **Dual-Surface Web UI:** Full voice telemetry and interactive audio deck in Retriever Admin Dashboard (`/voice`) and client SaaS App Studio (`VoiceStudioPanel.tsx` in `/rag/app`) with Design System 2.0 dual-theme aesthetics, `<MagneticButton>`, `@number-flow/react` animated metrics, and offline fallback simulation.
-  - **100% Automated Test Coverage:** Pytest suites in `retriever` (`test_edge_voice.py` 10/10, `test_architecture.py` 5/5) and Vitest suite in `Prateek_website` (`VoiceStudioPanel.test.tsx` 7/7).
-- **Status:** **Completed (Phase M / v0.85.0)**
+- **Repo Scope:** `retriever` (`apps/api/src/domain/abstractions/voice.py`, `src/adapters/voice/`, `src/routers/voice.py`, `apps/api/tests/test_edge_voice.py`)
+- **Status:** **Completed (Backend Production)**
 
-#### 🔐 Milestone 101: Zero-Trust Micro-Enclave Encryption & Hardware KMS Remote Attestation
-- **Libraries:** Python `pydantic`, `cryptography`, `pytest`, React / Next.js 16
-- **Repo Scope:** `retriever` (`apps/api/src/domain/abstractions/enclave.py`, `src/adapters/security/enclave_adapter.py`, `src/adapters/security/memory_sanitizer.py`, `src/routers/enclave.py`, `apps/web/src/app/(dashboard)/edge/page.tsx`)
-- **Deliverable:**
-  - **Hexagonal Domain Layer (`abstractions/enclave.py`):** Pure Pydantic protocols defining `HardwareAttestationProtocol`, `EnclaveKeySealerProtocol`, `MemorySanitizerProtocol`, `AttestationEvidence`, and `EnclaveVerificationReport` with 0 external framework imports.
-  - **Hardware-Rooted Memory Sealing:** Binding edge SQLite databases and vector BLOBs to hardware TPM/KMS chips (Intel SGX, AMD SEV, AWS Nitro Enclaves, Apple Secure Enclave) using AES-256-GCM with HKDF-SHA256 key derivation and 96-bit random IVs.
-  - **Cryptographic Remote Attestation:** Nonce-signed evidence generation and verification using asymmetric Ed25519 signatures and anti-replay challenge nonces, ensuring untrusted hypervisors cannot access tenant vectors.
-  - **Zero-Knowledge RAM Sanitizer:** Automatic in-memory key scrubbing via `ctypes.memset` and OS termination signal hooks (`SIGTERM`, `SIGINT`) to prevent cold-boot memory recovery attacks.
-  - **Platform Battery #21 (`zero_trust_micro_enclave`):** Formally cataloged and registered in `BatteryService` under `SAFETY_DEFENSE`.
-  - **Admin Dashboard UI (`/edge`):** Live confidential micro-enclave monitoring, PCR0 measurement inspection, interactive hardware attestation challenge runner, and AES-256-GCM memory sealing playground.
-  - **100% Automated Test Coverage:** Pytest suite asserting attestation verification, invalid certificate rejection, memory sealing isolation, and Hexagonal boundaries.
-- **Status:** **Completed (Phase M / v0.86.0)**
+#### 🔐 Milestone 101: Zero-Trust Micro-Enclave Encryption *(Purged — See ADR 37)*
+- **Status:** **Purged (Zero-Toy Audit)** — In-memory enclave attestation simulation (`src/routers/enclave.py`, `enclave_adapter.py`) was removed; verifiable grounding is anchored via Battery #26 ZKP Grounding Audit Chain.
 
-#### 🕸️ Milestone 102: Autonomous Edge Fleet Swarm Mesh & P2P Gossip Replication
-- **Libraries:** Python `pydantic`, `pytest`
-- **Repo Scope:** `retriever` (`apps/api/src/domain/abstractions/swarm.py`, `src/adapters/swarm/gossip_mesh_adapter.py`, `src/routers/swarm.py`)
-- **Deliverable:**
-  - **Hexagonal Domain Layer (`abstractions/swarm.py`):** Pure protocols defining `SwarmNode`, `GossipMessage`, `SwarmTopology`, `AntiEntropyProtocol`, and `VectorClock` with Lamport logical timestamp ordering.
-  - **Epidemic P2P Gossip Protocol:** UDP/mDNS local cluster peer discovery, periodic push-pull anti-entropy SQLite frame sync, and SWIM failure detection heartbeats with incarnation refutation.
-  - **Partition-Healing State Reconciliation:** Automatic partition merge when disconnected edge clusters reconnect, using vector clocks and deterministic Last-Write-Wins (LWW) to merge offline mutation ledgers without split-brain corruption.
-  - **FastAPI Endpoints:** Mounted under `/v1/admin/swarm/topology`, `/join`, `/leave`, `/probe`, `/refute`, `/gossip`, `/sync`, and `/partition-heal`.
-  - **Platform Battery #22 (`autonomous_swarm_mesh`):** Formally registered in `BatteryService` under category `EDGE_DISTRIBUTION` and reflected into Model Context Protocol (MCP) server (`swarm_topology`, `swarm_sync`).
-  - **100% Automated Test Coverage:** Pytest suite validating 5-node cluster convergence, network split recovery, vector clock causality math, and anti-entropy synchronization (10/10 passed).
-- **Status:** **Completed (Phase M / v0.87.0)**
+#### 🕸️ Milestone 102: Autonomous Edge Fleet Swarm Mesh *(Purged — See ADR 38)*
+- **Status:** **Purged (Zero-Toy Audit)** — In-memory gossip mesh simulation (`src/routers/swarm.py`, `gossip_mesh_adapter.py`) was removed; consensus is anchored via Battery #22 Multi-Model Dialectic Debate.
 
 ---
 
@@ -861,7 +807,7 @@ timeline
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │             PHASE N: AUTONOMOUS AGENT SWARMS, MEMORY & UNIVERSAL MCP (M103–M109)       │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│  [M103] Universal Model Context Protocol (MCP) Server & 20-Battery Tool Registry       │
+│  [M103] Universal Model Context Protocol (MCP) Server & Tool Registry                  │
 │  [M104] Autonomous Multi-Turn ReAct Tool Loop & Self-Healing Execution Engine          │
 │  [M105] Smart Tool Gateway & Multi-Model Economic Orchestrator (Hybrid Mid/Frontier)   │
 │  [M106] Studio Tool Surface Cockpit & MCP Interactive Playbuilder                      │
@@ -871,12 +817,12 @@ timeline
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 🔌 Milestone 103: Universal Model Context Protocol (MCP) Server & 20-Battery Tool Registry
+#### 🔌 Milestone 103: Universal Model Context Protocol (MCP) Server & Tool Registry
 - **Libraries:** Python `pydantic`, `sse-starlette`, `pytest`, `vitest`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/mcp.py`, `src/adapters/mcp/`, `src/routers/mcp.py`, `apps/web/src/app/(dashboard)/mcp/` & `Prateek_website` `src/components/rag/ToolsPanel.tsx`, `src/app/rag/app/page.tsx`, `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/mcp.py`, `src/adapters/mcp/`, `src/routers/mcp.py`, `packages/retriever-mcp`, `apps/web/src/app/(dashboard)/mcp/` & `Prateek_website` `src/lib/rag-client.ts`, `src/lib/rag-types.ts`, `DeveloperApiSection.tsx`)
 - **Deliverable:**
   - **Hexagonal Domain Layer (`abstractions/mcp.py`):** Pure Pydantic contracts defining `McpToolDefinition`, `McpToolParameter`, `McpToolCallRequest`, `McpToolExecutionResult`, and `McpServerProtocol` conforming strictly to JSON-RPC 2.0 / MCP specifications with 0 framework imports.
-  - **Battery-to-Tool Adapter (`battery_mcp_adapter.py`):** Dynamic reflection engine introspecting `BatteryService` to expose all 20 platform batteries (`retriever_search_hybrid`, `retriever_colbert_rerank`, `retriever_query_graph`, `retriever_run_python_sandbox`, `retriever_voice_synthesize`, `retriever_durable_workflow`, `retriever_compliance_check`) with typed JSON schemas.
+  - **Battery-to-Tool Adapter (`battery_mcp_adapter.py`):** Dynamic reflection engine introspecting `BatteryService` to expose platform batteries (`retriever_search_hybrid`, `retriever_colbert_rerank`, `retriever_query_graph`, `retriever_run_python_sandbox`, `retriever_voice_synthesize`, `retriever_durable_workflow`, `retriever_compliance_check`) with typed JSON schemas.
   - **Multi-Tenant Security Gate:** API-key authenticated sessions (`ret_live_...`) with granular tool authorization bitmasks (`allow_write`, `allow_code_exec`, `allow_voice`).
   - **FastAPI SSE & Stdio Transports:** `/v1/mcp/sse` Server-Sent Events bidirectional channel, `/v1/mcp/messages` JSON-RPC dispatcher, and dynamic 1-click config generator for Claude Desktop and Cursor.
   - **100% Automated Test Coverage:** Pytest suite in `retriever` asserting protocol conformance, parameter validation, and Hexagonal isolation.
@@ -884,7 +830,7 @@ timeline
 
 #### 🔄 Milestone 104: Autonomous Multi-Turn ReAct Tool Loop & Self-Healing Execution Engine
 - **Libraries:** Python `pydantic`, `pytest`, `vitest`, `framer-motion`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/react_engine.py`, `src/routers/chat.py` & `Prateek_website` `src/components/rag/ChatPanel.tsx`, `src/components/rag/ToolsPanel.tsx`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/react_engine.py`, `src/routers/chat.py` & `Prateek_website` `src/components/rag/ChatPanel.tsx`)
 - **Deliverable:**
   - **Cyclic ReAct State Machine:** `REASONING` $\to$ `SELECTING_TOOL` $\to$ `EXECUTING_BATTERY` $\to$ `OBSERVING_RESULT` $\to$ `EVALUATING_COMPLETION` with immutable execution trace recording and strict step caps ($\le 8$ turns, $30\text{s}$ timeout).
   - **Self-Healing Error Recovery:** Autonomous runtime error capture (Python syntax exceptions, empty vector recall, malformed queries) fed back as structured observations, empowering LLMs to self-correct code/queries rather than terminating with an error.
@@ -895,7 +841,7 @@ timeline
 
 #### ⚖️ Milestone 105: Smart Tool Gateway & Multi-Model Economic Orchestrator
 - **Libraries:** `pydantic`, `pytest`, `vitest`, `@number-flow/react`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/smart_tool_router.py`, `src/adapters/cognitive/gateway_router.py` & `Prateek_website` `src/components/rag/GatewayPanel.tsx`, `src/components/rag/ToolsPanel.tsx`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/smart_tool_router.py`, `src/adapters/cognitive/gateway_router.py` & `Prateek_website` `src/components/rag/GatewayPanel.tsx`)
 - **Deliverable:**
   - **Complexity-Based Dynamic Routing:** Evaluates tool dependency depth and query difficulty; dispatches 85% of routine single/two-step queries to fast, cost-effective mid-level models (Llama 3.3 70B, Gemini Flash, Claude Haiku) at $1/50\text{th}$ cost.
   - **Dynamic Mid-Flight Escalation Protocol:** Seamless execution handoff from mid-tier to frontier models (GPT-6 Astra, Claude 3.7 Sonnet) when encountering exceptions, $>3$ steps, or ambiguous requirements, preserving full thread context.
@@ -905,12 +851,11 @@ timeline
 
 #### 🎛️ Milestone 106: Studio Tool Surface Cockpit & MCP Interactive Playbuilder
 - **Libraries:** `@number-flow/react`, `framer-motion`, `lucide-react`, `vitest`
-- **Repo Scope:** Both (`retriever` `apps/web/src/app/(dashboard)/mcp/` & `Prateek_website` `src/components/rag/ToolsPanel.tsx`, `src/app/rag/app/page.tsx`, `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
+- **Repo Scope:** Both (`retriever` `apps/web/src/app/(dashboard)/mcp/` & `Prateek_website` `src/lib/rag-client.ts`, `src/lib/rag-types.ts`, `DeveloperApiSection.tsx`, `IntegrationsPanel.tsx`)
 - **Deliverable:**
-  - **Client SaaS Studio Tool Tab (`ToolsPanel.tsx` in `/rag/app`):** Live 20-battery status pills, per-tool client permission toggles, interactive ReAct trace visualizer with expandable Thought $\to$ Action $\to$ Observation steps, and animated cost-efficiency gauges.
-  - **1-Click Universal MCP Modal:** One-click copyable configuration snippets for Claude Desktop (`claude_desktop_config.json`), Cursor (`.cursorrules` / MCP server), and VS Code.
   - **Retriever Admin MCP Center (`/mcp`):** Fleet-wide MCP active session monitor, tool call frequency heatmap, error rate breakdown, and latency waterfall.
-  - **Design System 2.0 Parity & Verification:** Dual-theme Azure and Noir parity, `<MagneticButton>`, `<TiltCard>`, `<Portal>` modal safety, and 100% passing Vitest coverage.
+  - **1-Click Universal MCP Snippets:** Copyable configuration snippets for Claude Desktop (`claude_desktop_config.json`), Cursor (`.cursorrules` / MCP server), and VS Code surfaced via Developer API & Integrations panels.
+  - **Design System 2.0 Parity & Verification:** Dual-theme Azure and Noir parity, `<MagneticButton>`, `<TiltCard>`, `<Portal>` modal safety.
 - **Status:** **Completed (Phase N / v0.91.0)**
 
 #### 🛡️ Milestone 107: Zero-Toy Invariant Enforcement & Fail-Fast Hardening across All Subsystems
@@ -924,22 +869,22 @@ timeline
 
 #### 🧠 Milestone 108: Cognitive Agent Memory Consolidation & Long-Horizon Experience Distillation
 - **Libraries:** `pydantic`, `pytest`, `pgvector`, `networkx`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/memory/` & `Prateek_website` `src/components/rag/MemoryPanel.tsx`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/memory/` & `Prateek_website` `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
 - **Deliverable:**
   - Episodic & Procedural Memory Synthesis: Offline consolidation daemon compressing multi-turn ReAct interaction traces into high-signal episodic memory nodes and self-healing procedural recovery heuristics.
   - Mathematical Ebbinghaus Retention Decay: $R(t) = \exp(-\Delta t / (S \times 86400))$ with stability expansion $S \leftarrow 1.5S + 0.5$ on successful downstream priming, with zero-compute pruning for $R < 0.15$.
   - Long-Horizon Experience Distillation: Pre-loop cognitive guidance query injecting prior successful tool paths into the ReAct reasoning prompt, eliminating redundant exploratory tool calls.
-  - SaaS Studio Operator Experience Lab: Mounted `MemoryPanel.tsx` in `/rag/app` featuring 4-stat metrics grid, interactive Experience Distillation Simulator, and Consolidated Memory Explorer.
+  - SaaS Studio Operator Integration: Backend `/v1/tenants/{tenantId}/memory/*` APIs are live; dedicated `MemoryPanel.tsx` in `/rag/app` remains planned.
 - **Status:** **Completed (Phase N / v0.92.0)**
 
 #### 🤝 Milestone 109: Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine
 - **Libraries:** `pydantic`, `pytest`, `asyncio`, `networkx`
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/swarm/` & `Prateek_website` `src/components/rag/SwarmPanel.tsx`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/swarm/` & `Prateek_website` `src/lib/rag-client.ts`, `src/lib/rag-types.ts`)
 - **Deliverable:**
   - Multi-Agent Specialization Roles: Orchestrated collaborative agent topologies (Planner, Forensic Auditor, Code Synthesizer, Skeptic/Critic) converging on complex multi-hop solutions via `networkx.DiGraph`.
   - Dynamic Dialectic Debate Protocol: Structured multi-round cross-examination where agents challenge intermediate tool observations and synthesize unified consensus answers.
   - Quorum Voting & Ambiguity Resolution: Role-calibrated weighted confidence voting ($V(A_k) = \frac{\sum_i w_i \cdot c_{i,k} \cdot \mathbf{1}(\text{agree})}{\sum_i w_i}$), automatically pruning unverified hallucinations before final output emission.
-  - Operator Cockpit: Mounted `SwarmPanel.tsx` in `/rag/app` SaaS Studio featuring 4-stat metrics grid (`@number-flow/react`), dialectic debate scrubber, quorum voting meter, and hallucination pruning ledger.
+  - Operator Cockpit: Backend debate and quorum endpoints are active; dedicated `SwarmPanel.tsx` in `/rag/app` remains planned.
 - **Status:** **Completed (Phase N / v0.93.0)**
 
 ---
@@ -965,7 +910,7 @@ timeline
   - **1-Line Quickstart Drop-In (`curl -fsSL https://get.retriever.run | bash`):** Zero-friction POSIX bash installer featuring automated host hardware sensing (Apple Silicon MPS / NVIDIA CUDA / CPU fallback), port availability checks, `.env` initialization, and live search verification ("30-Second Time-to-Dopamine").
   - **Production Docker Compose Stack (`docker-compose.yml`):** Complete self-hosted stack orchestrating PostgreSQL 16 + pgvector, Redis 7, local Ollama with `nomic-embed-text` auto-caching, multi-stage FastAPI backend, and Next.js Admin Dashboard. Zero external API keys needed.
   - **Auto-Seeded Demo Workspace:** Automated database migration and deterministic demo key issuance (`ret_live_demo_00000000000000000000000000000000`) with sample enterprise whitepaper vector embeddings pre-indexed.
-  - **Decoupled TypeScript Client SDK (`@prat3010/retriever-client` v1.0.0):** Published on npm with dual ESM/CJS exports and complete coverage across all 26 batteries (Hybrid Search, ColBERT late interaction, ReAct streaming tool traces, Cognitive Memory, Swarm Quorum debate, Universal MCP, and Micro-Enclaves).
+  - **Decoupled TypeScript Client SDK (`@prat3010/retriever-client` v1.0.0):** Published on npm with dual ESM/CJS exports covering active platform APIs (Hybrid Search, ColBERT late interaction, ReAct execution, Cognitive Memory, Swarm Quorum debate, and Universal MCP — purged enclave/mesh methods removed).
   - **Decoupled Python Client SDK (`retriever-python` v1.0.0):** Published on PyPI with synchronous (`RetrieverClient`) and asynchronous (`AsyncRetrieverClient`) implementations, typed Pydantic models, and streaming SSE generators.
   - **Reconciled Launch Playbook:** Updated `OPEN_SOURCE_LAUNCH_PLAYBOOK.md` and `README.md` reflecting all platform batteries, empirical sub-10ms ColBERT benchmarks, and scale-to-zero serving economics.
 - **Status:** **Completed (Phase O / v1.0.0-rc1)**
@@ -1021,73 +966,73 @@ timeline
 
 #### 🎙️ Milestone 114: Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent
 - **Libraries:** WebSocket, Web Audio API, Whisper, PCM16, Pytest, React 19, TypeScript
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/voice/voice_stream_service.py`, `apps/api/src/routers/voice.py`, `apps/api/tests/test_voice_streaming.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/VoiceStudioPanel.tsx`, `src/components/rag/VoiceStudioPanel.module.css`, `docs/35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/voice/voice_stream_service.py`, `apps/api/src/routers/voice.py`, `apps/api/tests/test_voice_streaming.py`, `packages/retriever-client/`, `packages/retriever-python/`, `apps/web/src/app/(dashboard)/voice/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `docs/35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md`)
 - **Deliverable:**
   - **Ultra-Low Latency Streaming Audio Pipeline:** Bi-directional full-duplex WebSocket streaming endpoint (`/v1/tenants/{tenantId}/voice/stream/{sessionId}`) with sub-300ms Time-to-First-Audio-Byte (TTFAB) and zero-cloud audio egress.
   - **Continuous 20ms PCM16 Ingestion & VAD Endpointing:** Real-time RMS & ZCR voice activity detection and automatic speech endpointing (400ms silence threshold) eliminating manual click-to-stop.
   - **Conversational Barge-In / Interruption Engine:** Instant cancellation of server-side synthesis tasks upon user speech detection ($\ge 3$ frames = 60ms) emitting an `interrupted` event and resetting state to `LISTENING`.
   - **Decoupled Client SDKs Updated:** Exported `createVoiceStream` and full event typing (`onSessionReady`, `onVadState`, `onTranscript`, `onAgentAudioChunk`, `onInterrupted`, `onTurnComplete`) in `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Voice Studio Upgrade:** Integrated genuine Web Audio API `AudioContext` + `AnalyserNode` frequency spectrum visualization in `VoiceStudioPanel.tsx` and purged all fake `Math.random()` bars and timer mocks.
+  - **Control Plane Voice Studio Upgrade:** Live voice deck operating in Retriever Admin Studio (`apps/web/src/app/(dashboard)/voice/page.tsx`); dedicated `VoiceStudioPanel.tsx` in `/rag/app` remains planned.
 - **Status:** **Completed (Phase P / v1.4.0-alpha1)**
 
 #### 📜 Milestone 118: Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding
 - **Libraries:** Cryptography (SHA-256, Ed25519), Binary Merkle Trees, Inclusion Proofs, FastAPI, React 19, TypeScript, Pytest
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/zkp_attestation.py`, `apps/api/src/adapters/security/zkp_attestation_adapter.py`, `apps/api/src/routers/zkp.py`, `apps/api/tests/test_zkp_attestation.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/ZkpAttestationPanel.tsx`, `src/components/rag/ZkpAttestationPanel.module.css`, `docs/39_Zero_Knowledge_Vector_Attestation_PRD.md`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/zkp_attestation.py`, `apps/api/src/adapters/security/zkp_attestation_adapter.py`, `apps/api/src/routers/zkp.py`, `apps/api/tests/test_zkp_attestation.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `docs/39_Zero_Knowledge_Vector_Attestation_PRD.md`)
 - **Deliverable:**
-  - **Platform Battery #33 Registration:** Cataloged `zkp_vector_attestation` in `BatteryService` under `SAFETY_DEFENSE`.
+  - **Platform Battery #26 Registration:** Cataloged `zkp_vector_attestation` in `BatteryService` under `SAFETY_DEFENSE`.
   - **Deterministic Binary Merkle Trees:** Built canonical SHA-256 Merkle tree construction with leaf commitments ($h_i = \text{SHA256}(\text{tenant} \mathbin{\Vert} \text{doc} \mathbin{\Vert} i \mathbin{\Vert} \text{chunk\_sha256})$).
   - **Sub-Millisecond Inclusion Proofs:** Generated authenticated inclusion proof paths ($\pi_i$) enabling rapid zero-disclosure verification of cited chunks.
   - **Ed25519-Signed Grounding Certificates:** Asymmetric digital signature tokens binding query text, response hash, cited chunk commitments, and Merkle root into verifiable compliance certificates.
   - **Public Zero-Knowledge Verification:** Unauthenticated `POST /v1/zkp/verify` endpoint for independent external compliance audits.
-  - **Control Plane Studio Upgraded:** Dedicated `ZkpAttestationPanel.tsx` in `/rag/app` under Design System 2.0 (Merkle Tree Explorer, Live Verifier, Audit Ledger).
+  - **Studio Integration Note:** Dedicated `ZkpAttestationPanel.tsx` in `/rag/app` remains planned (`src/app/rag/app/page.tsx` runs 13 core tabs); backend `/v1/zkp/*` endpoints are production-active.
 - **Status:** **Completed (Phase P / v1.8.0-alpha1)**
 
 #### 🛡️ Milestone 119: Enterprise Identity Federation (SAML 2.0 / SCIM 2.0 Directory Sync) & RB-VAC
 - **Libraries:** Cryptography (X.509, XML Signature SHA-256), RFC 7643/7644 SCIM 2.0, FastAPI, React 19, TypeScript, Pytest
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/identity_federation.py`, `apps/api/src/adapters/security/identity_federation_adapter.py`, `apps/api/src/routers/identity_federation.py`, `apps/api/tests/test_identity_federation.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/IdentityFederationPanel.tsx`, `src/components/rag/IdentityFederationPanel.module.css`, `docs/40_Enterprise_Identity_Federation_and_RBVAC_PRD.md`)
 - **Deliverable:**
-  - **Platform Battery #34 Registration:** Cataloged `enterprise_identity_federation` in `BatteryService` under `SAFETY_DEFENSE`.
-  - **SAML 2.0 IdP Federation Engine:** XML digital signature validation with X.509 certificate parsing, ACS assertion consuming, replay suppression via monotonically tracked assertion IDs, and dynamic SP metadata XML generation (`GET /v1/tenants/{tenantId}/identity/saml/metadata.xml`).
+  - **Platform Battery #27 Registration:** Cataloged `enterprise_identity_federation` in `BatteryService` under `SAFETY_DEFENSE`.
+  - **SAML 2.0 IdP Federation Engine:** XML digital signature validation with X.509 certificate parsing, ACS assertion consuming, replay suppression via monotonically tracked assertion IDs, and dynamic SP metadata XML generation (`GET /v1/tenants/{tenantId}/identity/saml/metadata`).
   - **RFC 7643 / 7644 SCIM 2.0 Directory Sync:** Enterprise IdP lifecycle directory engine with bearer token authorization, User and Group schemas, complex attribute filtering (`userName eq "..."`), RFC 7644 JSON-PATCH operations, and stateful user de-provisioning.
   - **Role-Based Vector Access Control (RB-VAC):** Sub-millisecond pre-retrieval mathematical set intersection ($C_{\text{chunk}} \cap G_{\text{user}} \neq \emptyset$) pruning unauthorized vector chunks before LLM synthesis and emitting audit telemetry (`RbVacPrunedTelemetry`).
-  - **FastAPI Endpoints & SDK Parity:** Mounted 18 REST endpoints and updated client SDKs in `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Studio Upgraded:** Dedicated `IdentityFederationPanel.tsx` in `/rag/app` under Design System 2.0 (SAML 2.0 SSO, SCIM 2.0 Directory Sync, RB-VAC Simulator).
+  - **FastAPI Endpoints & SDK Parity:** Mounted SAML/SCIM/identity REST endpoints and updated client SDKs in `@prat3010/retriever-client` and `retriever-python`.
+  - **Studio Integration Note:** SAML/SCIM/RB-VAC backend APIs and SDK methods are production-active (`src/app/rag/app/page.tsx` runs 13 core tabs; dedicated `IdentityFederationPanel` UI tab remains planned).
 - **Status:** **Completed (Phase P / v1.9.0-alpha1)**
 
 #### 🧪 Milestone 120: Automated Continuous DPO / ORPO Model Fine-Tuning Pipeline
 - **Libraries:** PyTorch/HuggingFace Reference-Free Odds Ratio, Bradley-Terry DPO Loss, FastAPI, React 19, TypeScript, Pytest
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/dpo_tuning.py`, `apps/api/src/adapters/ai/dpo_tuning_adapter.py`, `apps/api/src/routers/tuning.py`, `apps/api/tests/test_dpo_tuning.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/DpoTuningPanel.tsx`, `src/components/rag/DpoTuningPanel.module.css`, `docs/41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md`)
 - **Deliverable:**
-  - **Platform Battery #35 Registration:** Cataloged `continuous_dpo_orpo_tuning` in `BatteryService` under `INTELLIGENCE_COGNITION`.
+  - **Platform Battery #28 Registration:** Cataloged `continuous_preference_tuning` in `BatteryService` under `ML_INTELLIGENCE`.
   - **Autonomous Preference Harvesting:** In-stream telemetry aggregator capturing implicit citation click-throughs ($y_w$) and explicit negative feedback ($y_l$), paired by query context.
   - **Monolithic Reference-Free ORPO & Bradley-Terry DPO:** Hybrid objective loss function combining SFT cross-entropy with relative log odds ratio regularization without needing a frozen reference model.
   - **Automated Validation Gating & Hot LoRA Rollback:** Strict benchmark validation threshold ($\text{accuracy} \ge 0.75$) with hot adapter swap and zero-downtime rollback to baseline checkpoints upon regression.
-  - **Control Plane Studio Upgraded:** Dedicated `DpoTuningPanel.tsx` in `/rag/app` under Design System 2.0 with live telemetry charts, hyperparameter tuning controls, and model checkpoint registry.
+  - **Studio Integration Note:** Backend tuning endpoints (`/v1/tuning/*`, `/v1/tenants/{tenant_id}/tuning/*`) are production-active (dedicated `/rag/app` UI tab remains planned).
 - **Status:** **Completed (Phase P / v1.9.0-alpha2)**
 
 #### 🎯 Milestone 122: Autonomous Continuous Benchmark & Regression Gatekeeper
 - **Libraries:** SciPy (Student's $t$ CDF), NumPy / Math, FastAPI, React 19, TypeScript, Pytest, Vitest
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/benchmark_gatekeeper.py`, `apps/api/src/adapters/eval/benchmark_gatekeeper_adapter.py`, `apps/api/src/routers/benchmark.py`, `apps/api/tests/test_benchmark_gatekeeper.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/ContinuousBenchmarkPanel.tsx`, `src/components/rag/ContinuousBenchmarkPanel.module.css`, `docs/43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md`)
 - **Deliverable:**
-  - **Platform Battery #37 Registration:** Cataloged `autonomous_benchmark_gatekeeper` in `BatteryService` under `ML_INTELLIGENCE`.
+  - **Platform Battery #29 Registration:** Cataloged `autonomous_benchmark_gatekeeper` in `BatteryService` under `ML_INTELLIGENCE`.
   - **Authentic IR & RAG Triad Metrics:** Authentic implementation of NDCG@K (with $2^{rel} - 1$ gain), MRR@K, Recall@K, Precision@K, Faithfulness token-overlap claim grounding, Answer Relevancy, and latency percentiles (P50, P95, P99).
   - **Two-Sample Welch's t-Test Engine:** Hypothesis testing evaluating whether observed candidate metric deltas are statistically significant ($p < \alpha$) without assuming equal variances, computing Welch-Satterthwaite degrees of freedom ($\nu$) and two-tailed $p$-values.
   - **Autonomous Gate Policy & Rollback:** Automated evaluation comparing candidates against golden baselines, emitting discrete verdicts (`PASSED_CLEAN`, `WARNING_DEGRADED`, `REJECTED_REGRESSION`), and triggering automated deployment rollback webhooks upon regression.
-  - **FastAPI Endpoints & SDK Parity:** Mounted 8 REST endpoints under `/v1/benchmarks/*` and `/v1/tenants/{tenant_id}/benchmarks/*` with complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Studio Upgraded:** Dedicated `ContinuousBenchmarkPanel.tsx` in `/rag/app` under Design System 2.0 with 4 sub-views (Benchmark Suites & Runs Ledger, Comparative Regression Diff, Item-Level Query Inspector, Interactive Welch's t-Test Simulator).
+  - **FastAPI Endpoints & SDK Parity:** Mounted 6 benchmark REST endpoints under `/v1/benchmarks/*` and `/v1/tenants/{tenant_id}/benchmarks/*` with client SDK support in `@prat3010/retriever-client` and `retriever-python`.
+  - **Studio Integration Note:** Backend benchmark gatekeeper APIs are production-active (`ContinuousBenchmarkPanel` tab in `/rag/app` remains planned).
 - **Status:** **Completed (Phase P / v2.1.0-alpha1)**
 
 #### 🕸️ Milestone 123: Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning
 - **Libraries:** Python Standard Math, FastAPI, React 19, TypeScript, Pytest, Vitest, Framer Motion, NumberFlow
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/got_planner.py`, `apps/api/src/adapters/cognitive/got_planner_adapter.py`, `apps/api/src/routers/got_planning.py`, `apps/api/tests/test_got_planning.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/GotPlanningPanel.tsx`, `src/components/rag/GotPlanningPanel.module.css`, `docs/44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md`)
 - **Deliverable:**
-  - **Platform Battery #38 Registration:** Cataloged `hierarchical_memory_got_planner` in `BatteryService` under `COMPUTATION_GRAPH`.
+  - **Graph-of-Thoughts Planner Battery:** Cataloged `hierarchical_memory_got_planner` in `BatteryService` (canonical active battery registry total: 33; `/v1/got/health` reports legacy `battery_number: 38`).
   - **Graph-of-Thoughts DAG Engine:** Non-linear cognitive planning supporting multi-parent thought aggregation ($M \to 1$), recursive thought refinement ($1 \to 1$), exploratory branch generation ($1 \to N$), and heuristic pruning below confidence $\tau_{\text{prune}}$.
   - **Kahn's Topological Sort & DP Optimal Path:** Enforces strict acyclicity and uses memoized dynamic programming to compute the globally optimal reasoning path from root origin to converged synthesis.
   - **3-Tier Hierarchical Memory Model:** Structured memory hierarchy across volatile L1 Scratchpad, decaying L2 Episodic memory governed by Hermann Ebbinghaus's exponential forgetting curve ($R(t) = e^{-t/S}$), and persistent L3 Semantic memory graphs.
   - **Cognitive Graph Distillation:** Distills converged reasoning DAGs into contracted semantic knowledge nodes with contraction ratio reporting ($C = 1 - |V_{\text{dist}}| / |V_{\text{raw}}|$).
   - **FastAPI Endpoints & SDK Parity:** Mounted 9 REST endpoints under `/v1/got/*` and `/v1/tenants/{tenantId}/got/*` with complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Studio Upgraded:** Dedicated `GotPlanningPanel.tsx` in `/rag/app` under Design System 2.0 with 4 sub-views (Graph Topology DAG Canvas, Hierarchical Memory Pyramid L1/L2/L3, Thought Transformation Ledger, Interactive GoT & Aggregation Math Simulator).
+  - **Studio Integration Note:** Frontend `GotPlanningPanel.tsx` remains planned (`src/app/rag/app/page.tsx` runs 13 core tabs); backend GoT API endpoints (`/v1/got/health`, `/v1/tenants/{tenantId}/got/*`) are production-active.
 - **Status:** **Completed (Phase P / v2.2.0-alpha1)**
 
 #### 🧠 Milestone 124: Agent-Native Enterprise Modernization (Cognitive Persistence, Dual-Channel Fan-Out & Resilient Inference)

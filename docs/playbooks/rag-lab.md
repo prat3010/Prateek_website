@@ -43,22 +43,22 @@ RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, se
 │  Vercel (Portfolio)  │ │  Vercel (Admin Dashboard)            │
 │  prateeq.in/rag      │ │  admin.rag.prateeq.in                │
 │  Next.js             │ │  Next.js · shadcn/ui · React Query   │
-│  RagInterface        │ │  Login → tenants/docs/users/keys/…   │
+│  RagLandingPage      │ │  Login → tenants/docs/users/keys/…   │
 └──────────┬───────────┘ └────────────┬─────────────────────────┘
            │                          │
            │      HTTPS · X-Admin-Master-Key
            │                          │
            ▼                          ▼
 │  ┌─────────────────────────────────────────────────────────────┐ │
-│  │  Portfolio (prateeq.in/rag)                                  │ │
-│  │  page.tsx → <RagInterface />                                 │ │
+│  │  Portfolio (prateeq.in/rag & /rag/app)                       │ │
+│  │  page.tsx → <RagLandingPage /> / <RagAppStudioPage />        │ │
 │  │                                                               │ │
 │  │  Admin Dashboard (admin.rag.prateeq.in)                      │ │
 │  │  Next.js app from apps/web/ in retriever repo                │ │
 │  │  Login, tenants, documents, users, API keys, prompts,        │ │
 │  │  config, audit logs, playground                              │ │
 │  └─────────────────────────────────────────────────────────────┘ │
-│  │  ├── ConfigPanel  (localStorage persistence)                 │ │
+│  │  ├── ConfigPanel  (localStorage / session persistence)       │ │
 │  │  ├── ChatPanel    (SSE streaming reader)                    │ │
 │  │  ├── SearchPanel  (one-shot hybrid search)                  │ │
 │  │  └── DocumentsPanel (upload + list + refresh)               │ │
@@ -97,9 +97,9 @@ RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, se
 
 | File | Purpose |
 |------|---------|
-| `src/app/rag/page.tsx` | Route entry — renders `<RagInterface />` + Admin button |
-| `src/components/rag/RagInterface.tsx` | Main client component — tabs, state, all panels |
-| `src/components/rag/rag.module.css` | CSS Modules — 30 class names, uses theme custom properties |
+| `src/app/rag/page.tsx` | Route entry — renders `<RagLandingPage />` showcase + Admin link |
+| `src/app/rag/app/page.tsx` | App Studio entry — mounts 13 dedicated sub-views (`<RagAppStudioPage />`) |
+| `src/components/rag/rag.module.css` | CSS Modules — styling using theme custom properties |
 | `src/lib/rag-client.ts` | API client class, config localStorage helpers, TypeScript types |
 
 ### Admin Dashboard
@@ -384,7 +384,7 @@ LLM API keys stored in the tenant `configurations` table are encrypted at rest u
 - **Branch:** `main` — auto-deploys on push
 - **Route:** `prateeq.in/rag`
 - **Framework:** Next.js App Router (`src/app/rag/page.tsx`)
-- **Client component:** `RagInterface` — rendered on the client after initial page load
+- **Client component:** `RagLandingPage` (`src/app/rag/page.tsx`) and `RagAppStudioPage` (`src/app/rag/app/page.tsx`) — rendered on the client after initial page load
 - **Config:** No API keys are hardcoded; all credentials entered by the user and stored in `localStorage`
 
 **Admin Dashboard**
@@ -591,7 +591,7 @@ The public product showcase at `/rag` is engineered with **Design System 2.0** a
 2. **`ArchitectureComparisonCanvas`**:
    - Visual comparison contrasting the fragmented multi-vendor mesh (LangChain + Pinecone + Cohere + LiteLLM + OpenAI) against Retriever's single hexagonal pgvector core.
 3. **`BatteriesBentoMatrix`**:
-   - Interactive Bento Grid showcasing all 38 production batteries with category filters (*Core Retrieval*, *Cognitive Reasoning*, *Long-Horizon Memory*, *Multimodal Ingestion*, *Enterprise Scale & Security*).
+   - Interactive Bento Grid showcasing 38 capability cards (mapped to the platform's 33 registered backend batteries) with category filters (*Core Retrieval*, *Cognitive Reasoning*, *Long-Horizon Memory*, *Multimodal Ingestion*, *Enterprise Scale & Security*).
 4. **`TcoCalculator`**:
    - Presentation-tier infrastructure economics calculator illustrating the 90%+ annual savings of $0 local Ollama embeddings vs Pinecone/OpenAI.
 5. **`InteractiveWidgetCustomizer` (Upgraded)**:
@@ -603,7 +603,7 @@ The public product showcase at `/rag` is engineered with **Design System 2.0** a
 
 ## **Related Architecture & Cross-References**
 
-- [RAG SaaS Studio Workspace PRD](24_RAG_App_Studio_PRD.md)
-- [Scoping Dogfooding Tenant](25_SOTA_Scoping_Engine_PRD.md)
-- [Telemetry & Semantic Cache Tracking](13_Telemetry_and_Analytics.md)
-- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
+- [RAG SaaS Studio Workspace PRD](../24_RAG_App_Studio_PRD.md)
+- [Scoping Dogfooding Tenant](../25_SOTA_Scoping_Engine_PRD.md)
+- [Telemetry & Semantic Cache Tracking](../13_Telemetry_and_Analytics.md)
+- [Unified Master Roadmap](../UNIFIED_MASTER_ROADMAP.md)

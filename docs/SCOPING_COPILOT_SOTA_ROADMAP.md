@@ -57,7 +57,7 @@ flowchart LR
 * **Architecture:**
   * Ingest the actual portfolio projects (`projects.json`), GitHub case studies, and `/playground` interactive tools into the `prateeq_scoping` Retriever tenant.
   * When a user asks about complex capabilities (WebSockets, RAG, pgvector, real-time audio), the copilot cites concrete proof:
-    > *"Prateek has implemented this exact pattern: our Retriever SaaS engine uses pgvector hybrid search and sub-200ms audio streaming. You can test a live working demo right now in the [Playground](/playground)."*
+    > *"Prateek has implemented this exact pattern: our Retriever SaaS engine uses pgvector hybrid search and sub-200ms audio streaming. You can test a live working demo right now in the [Playground](https://prateeq.in/playground)."*
 
 ### Milestone 2.3: 1-Click "Executive Scoping Memo" PDF Export
 * **Problem:** Clients must navigate through 4 form steps to download a proposal PDF.

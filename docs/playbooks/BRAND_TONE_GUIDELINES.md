@@ -51,7 +51,7 @@ Every generated blog post must follow this structure:
 
 ## **Related Architecture & Cross-References**
 
-- [Content Strategy](07_Content_Strategy.md)
-- [Vision & Philosophy](01_Vision_and_Philosophy.md)
-- [Adaptive Identity System](06_Adaptive_Identity_System.md)
-- [AI Content Brand Voice](AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Content Strategy](../07_Content_Strategy.md)
+- [Vision & Philosophy](../01_Vision_and_Philosophy.md)
+- [Adaptive Identity System](../06_Adaptive_Identity_System.md)
+- [AI Content Brand Voice](../AUTOMATED_AI_BLOGGING_ROADMAP.md)

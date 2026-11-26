@@ -561,7 +561,7 @@ This document serves as the registry of critical architectural design decisions 
 
 * **Status**: Approved & Implemented
 * **Context**: Industrial, maritime, healthcare, and field deployments frequently operate in disconnected environments with intermittent WAN links or strict data sovereignty regulations forbidding raw data egress to public clouds. Traditional vector database daemons (Qdrant, Milvus) have high memory footprints (>500MB) and cannot run reliably on lightweight edge devices (field laptops, Raspberry Pis, POS terminals).
-* **Decision**: Architected Sovereign Edge SQLite as **Platform Battery #18** (`apps/api/src/adapters/database/edge_sync_adapter.py`, `src/routers/edge.py`, `src/components/rag/EdgeSyncPanel.tsx`):
+* **Decision**: Architected Sovereign Edge SQLite as **Platform Battery #17** (`apps/api/src/adapters/database/edge_sync_adapter.py`, `src/routers/edge.py`, `apps/web/src/app/(dashboard)/edge/page.tsx`):
   1. Zero-Daemon Embedded Engine: Self-contained SQLite 3 runtime combining native FTS5 BM25 keyword search, memory-aligned IEEE 754 float32 vector BLOBs, and in-process NumPy cosine similarity executing in $<2\text{ms}$.
   2. Differential Delta Synchronization: Low-bandwidth synchronization using monotonic sequence watermarks (`sequence_num`) and SHA-256 state hashes, transferring only changed document chunks.
   3. 1-Click Standalone Bundles: Compiles the complete tenant vector store into a portable `.sqlite` file for instant air-gapped field deployment.
@@ -574,9 +574,9 @@ This document serves as the registry of critical architectural design decisions 
 
 # **ADR 35: Multi-Cloud Active-Active Replication & Turso LibSQL Distributed Quorum (Milestone 99)**
 
-* **Status**: Approved & Implemented
+* **Status**: Superseded & Purged (Zero-Toy Grounding Audit — retired in favor of reliable single-region Oracle VPS PostgreSQL + `pgvector` execution)
 * **Context**: Hosting the cognitive engine in a single cloud datacenter creates a single point of failure (SPOF) during regional outages and adds 150–250ms WAN latency for global users. Proprietary multi-region cloud databases (AWS Aurora Global, Spanner) introduce severe vendor lock-in and high monthly idle costs, while naive failover without cryptographic quorum risks split-brain database corruption.
-* **Decision**: Architected Distributed Multi-Cloud Failover & Edge Turso LibSQL Replication as **Platform Battery #19** (`apps/api/src/adapters/database/multicloud_adapter.py`, `src/routers/multicloud.py`, `src/components/rag/MultiCloudPanel.tsx`):
+* **Decision**: Originally architected Distributed Multi-Cloud Failover & Edge Turso LibSQL Replication (`apps/api/src/adapters/database/multicloud_adapter.py`, `src/routers/multicloud.py`, `MultiCloudPanel.tsx`); later **removed** during the Zero-Toy Grounding Audit:
   1. Distributed Multi-Cloud Topology: Active-active edge clusters spanning Oracle Cloud (Mumbai), AWS (us-east-1), Fly.io (Frankfurt), and Cloudflare Global Edge Workers.
   2. Mathematical Quorum Consensus ($Q = \lfloor N/2 \rfloor + 1$): Enforces strict majority quorum and monotonic generation terms ($1, 2, 3\dots$) to mathematically eliminate split-brain states during network partitions.
   3. Embedded Turso LibSQL Replicas: Sub-1ms local read latency via continuous asynchronous Write-Ahead Log (WAL) frame streaming with transparent write-through proxying to the active primary.
@@ -591,7 +591,7 @@ This document serves as the registry of critical architectural design decisions 
 
 * **Status**: Approved & Implemented
 * **Context**: Commercial voice APIs (OpenAI Realtime, ElevenLabs) stream raw end-user audio across public clouds, violating HIPAA, GDPR, and enterprise confidentiality agreements. Furthermore, REST-based audio uploads force clumsy half-duplex walkie-talkie interactions with high turn latency (>1200ms TTFAB), destroying natural conversation cadence.
-* **Decision**: Built Sovereign Edge Voice as **Platform Battery #20** (`apps/api/src/adapters/voice/whisper_voice_adapter.py`, `src/routers/voice.py`, `src/components/rag/VoiceStudioPanel.tsx`):
+* **Decision**: Built Sovereign Edge Voice as **Platform Battery #18** (`apps/api/src/adapters/voice/whisper_transcription_adapter.py`, `speech_synthesis_adapter.py`, `webrtc_signaling_adapter.py`, `src/routers/voice.py`, `retriever/apps/web/src/app/(dashboard)/voice/page.tsx`):
   1. Full-Duplex WebRTC Peer Sessions: Standard SDP offer/answer signaling and trickle ICE candidate exchange over WebSocket for bidirectional audio streaming.
   2. Local Whisper C++ ASR: On-device speech-to-text running directly on local VPS/edge hardware with zero cloud audio egress.
   3. Mathematical Voice Activity Detection (VAD): High-speed energy thresholding ($E_\text{RMS} > 0.015$) and Zero-Crossing Rate (ZCR) analysis for natural turn endpointing without heavy neural network overhead.
@@ -638,7 +638,7 @@ This document serves as the registry of critical architectural design decisions 
 
 * **Status**: Approved & Implemented
 * **Context**: Complex customer queries and cognitive retrieval tasks often require iterative deduction, parameter adjustment, and multi-step tool execution. Single-shot RAG either fails on missing context or returns unverified hallucinations. When tool execution fails due to transient API issues, bad arguments, or database timeouts, traditional systems abort immediately. Additionally, generative LLMs often get caught in infinite repetitive tool invocation loops without progress.
-* **Decision**: Architected the Autonomous ReAct cyclic state machine and self-healing engine as **Platform Battery #23** (`react_engine.py`, `POST /v1/tenants/{tenantId}/agentic/stream`, `ChatPanel.tsx`):
+* **Decision**: Architected the Autonomous ReAct cyclic state machine and self-healing engine as **Platform Battery #20** (`react_engine.py`, `POST /v1/tenants/{tenantId}/agentic/stream`, `ChatPanel.tsx`):
   1. Pure Hexagonal Domain Engine: Cyclic state machine (`REASONING` $\to$ `SELECTING_TOOL` $\to$ `EXECUTING_BATTERY` $\to$ `OBSERVING` $\to$ `EVALUATING_COMPLETION`) in `src/domain/abstractions/react.py`.
   2. Cryptographic Anti-Loop Circuit Breaker: Tracks tool invocation signatures via SHA-256 hashes of `(tool_name, sorted_json_args)`. If repeated count $\ge 2$, trips the circuit breaker and injects advisory guidance to prevent infinite loops.
   3. Self-Healing Exception Interception: Catches runtime tool errors, marks `self_healing_applied = True`, and injects structured diagnostic prompts back to the model for autonomous recovery.
@@ -654,7 +654,7 @@ This document serves as the registry of critical architectural design decisions 
 
 * **Status**: Approved & Implemented
 * **Context**: Routing every user query or agent turn to a frontier foundation model (e.g. Claude 3.5 Sonnet or GPT-4o at ~$5.00/1K tokens) imposes extreme operating costs on enterprise tenants. Conversely, routing indiscriminately to low-cost mid-tier models (e.g. Gemini 2.5 Flash at ~$0.15/1K tokens) fails on complex forensic analysis, mathematical synthesis, code debugging, or multi-turn error recovery. Tenants require an automated economic router that pre-classifies task difficulty, routes routine tasks to mid-tier models, seamlessly escalates to frontier models mid-flight when needed, and accounts for verified counterfactual cost savings.
-* **Decision**: Architected the Smart Tool Gateway & Economic Orchestrator as **Platform Battery #24** (`smart_tool_router.py`, `economic_orchestrator.py`, `GatewayPanel.tsx`, `ChatPanel.tsx`):
+* **Decision**: Architected the Smart Tool Gateway & Economic Orchestrator (`smart_tool_router.py`, `economic_orchestrator.py`, `GatewayPanel.tsx`, `ChatPanel.tsx`; part of the gateway routing stack — separate from Platform Battery #24 `kubernetes_native_operator`):
   1. Pure Hexagonal Domain Models: Defined `ModelTier`, `TaskComplexity`, `EscalationReason`, `EconomicLedgerRecord`, `EconomicLedgerSummary`, and `EconomicOrchestratorProtocol` in `src/domain/abstractions/economic_orchestrator.py` with zero framework dependencies.
   2. Heuristic Complexity Pre-Classification: Fast indicator evaluator scoring context length, code execution requirements, multi-hop forensic comparisons, and mathematical synthesis to route queries ($\le 0.65 \implies \text{MID\_TIER}, > 0.65 \implies \text{FRONTIER}$).
   3. Dynamic Mid-Flight Escalation Decider: Automatically escalates active mid-tier threads to frontier reasoning upon step count threshold ($\ge 3$), anti-loop circuit breaker trips, or persistent tool errors following self-healing diagnostics.
@@ -668,13 +668,13 @@ This document serves as the registry of critical architectural design decisions 
 
 * **Status**: Approved & Implemented
 * **Context**: Autonomous ReAct agent systems generate valuable problem-solving experience across multi-turn tool trajectories (e.g. schema discovery, Python REPL data pipelines, error diagnosis). However, sessions historically started with blank slate amnesia: agents repeated identical exploratory steps, forgot transient tool error self-healing recoveries, and wasted excessive tokens re-discovering tool patterns. Naively appending complete raw conversational transcripts causes context window bloat and attention dilution.
-* **Decision**: Architected the Cognitive Agent Memory Consolidation & Experience Distillation Engine as **Platform Battery #25** (`memory.py`, `engine.py`, `POST /v1/tenants/{tenantId}/agentic/memory/consolidate`, `POST /v1/tenants/{tenantId}/agentic/memory/guidance`, `MemoryPanel.tsx`):
+* **Decision**: Architected the Cognitive Agent Memory Consolidation & Experience Distillation Engine as **Platform Battery #21** (`memory.py`, `engine.py`, `POST /v1/tenants/{tenantId}/memory/consolidate`, `POST /v1/tenants/{tenantId}/memory/guidance`; dedicated `MemoryPanel.tsx` UI tab remains planned alongside the 13 active `/rag/app` panels):
   1. Pure Hexagonal Domain Models: Defined `MemoryType`, `EpisodicMemoryNode`, `MemoryQuery`, `DistilledGuidance`, `ConsolidationRequest`, and `CognitiveMemoryProtocol` in `src/domain/abstractions/memory.py` with zero framework or database dependencies.
   2. Mathematical Ebbinghaus Retention Decay: Models memory retention over time via $R(t) = \exp(-\Delta t / (S \times 86400))$. When memory primes a downstream agent session, its stability expands: $S_{\text{new}} = 1.5 \times S_{\text{old}} + 0.5$.
   3. Autonomous Procedural Heuristic Synthesis: Automatically analyzes ReAct execution traces to identify error recovery transitions ($\text{turn}_k \to \text{error}, \text{turn}_{k+1} \to \text{success}$), distilling them into `PROCEDURAL` memory nodes with elevated importance ($0.85$).
   4. Native ReAct Pre-Loop Experience Ingestion: Automatically queries cognitive memory before the ReAct loop starts and injects a compact experience block (`DISTILLED EXPERIENCE FROM PRIOR SESSIONS`) preventing redundant tool calls and known failure modes.
   5. Zero-Compute Decayed Memory Pruning: Prunes stale exploratory traces where $R < 0.15$ to maintain high signal density and zero storage bloat.
-  6. Frontend SaaS Studio Experience Lab (`MemoryPanel.tsx`): Built high-aesthetic operator panel featuring 4-stat metrics grid (`@number-flow/react`), interactive Experience Distillation Simulator, and Consolidated Memory Explorer with `<TiltCard>` and `<MagneticButton>`.
+  6. Frontend SaaS Studio Experience Lab *(Planned)*: Target operator panel spec (`MemoryPanel.tsx` — not yet mounted in 13-tab `/rag/app`) featuring 4-stat metrics grid (`@number-flow/react`), interactive Experience Distillation Simulator, and Consolidated Memory Explorer with `<TiltCard>` and `<MagneticButton>`.
 * **Consequences**:
   * **Pros**: Cross-session knowledge persistence without context window bloat; mathematical forgetting of obsolete exploratory paths; automatic retention of self-healing error recoveries; multi-tenant isolation.
   * **Cons**: Additional pre-loop cosine vector query latency (~3-5ms) before agent reasoning begins.
@@ -685,18 +685,18 @@ This document serves as the registry of critical architectural design decisions 
 
 * **Status**: Approved & Implemented
 * **Context**: Single-agent autonomous loops suffer from cognitive blind spots: once an LLM proposes an unverified assumption or hallucinated citation in early reasoning turns, self-reflection often compounds the error due to confirmation bias. Simple two-agent generator-critic reflection lacks specialization—critics lack the domain focus required to simultaneously audit statistical/computational logic, legal/compliance boundaries, and dependency execution DAGs.
-* **Decision**: Architected the Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine as **Platform Battery #26** (`agent_swarm.py`, `engine.py`, `agent_swarm.py` router, `SwarmPanel.tsx` in `/rag/app`):
+* **Decision**: Architected the Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine as **Platform Battery #22** (`agent_swarm.py`, `engine.py`, `agent_swarm.py` router; dedicated `SwarmPanel.tsx` UI tab remains planned alongside the 13 active `/rag/app` panels):
   1. Pure Hexagonal Domain Models: Defined `SwarmAgentRole`, `DebateStance`, `CandidateClaim`, `DebateTurn`, `DebateRound`, `AgentBallot`, `CandidateResolution`, `QuorumConsensusResult`, and `SwarmDebateProtocol` in `src/domain/abstractions/agent_swarm.py` with 0 framework imports.
   2. Directed Debate Topology (`networkx.DiGraph`): Connects 4 specialized agent roles (Strategic Planner, Forensic Auditor, Code & Logic Synthesizer, Adversarial Skeptic) along structured cross-examination edges (`PLANNER -> SKEPTIC`, `SKEPTIC -> SYNTHESIZER`, `SYNTHESIZER -> AUDITOR`, `AUDITOR -> PLANNER`).
   3. Structured 3-Stage Dialectic Debate Protocol:
-     - Stage 1 (Opening Theses): Each agent formulates strategic propositions grounded by Battery #25 cognitive memory guidance.
+     - Stage 1 (Opening Theses): Each agent formulates strategic propositions grounded by Battery #21 cognitive memory guidance.
      - Stage 2 (Dialectic Cross-Examination): Agents challenge peer assertions along DAG review channels; Forensic Auditor verifies claims.
      - Stage 3 (Rebuttal & Quorum Voting): Agents adjust confidence and cast weighted ballots on candidate resolutions.
   4. Role-Calibrated Weighted Quorum Voting:
      $$V(A_k) = \frac{\sum_{i \in \text{Agents}} w_i \cdot c_{i,k} \cdot \mathbf{1}(\text{agree})}{\sum_{i \in \text{Agents}} w_i}$$
      where role weights reflect specialized authority (Auditor 1.4x, Skeptic 1.3x, Synthesizer 1.2x, Planner 1.1x). Quorum requires $V \ge \tau_{\text{quorum}}$ ($0.70$ default).
   5. Automated Forensic Hallucination Pruning: Any claim flagged during audit as lacking factual grounding is quarantined from the final ballot and archived into `hallucinations_pruned`.
-  6. Frontend SaaS Studio Cockpit (`SwarmPanel.tsx`): Built high-aesthetic operator panel featuring 4-stat metrics grid (`@number-flow/react`), interactive persona grid, dialectic debate timeline scrubber, quorum voting meter bar, and hallucination pruning ledger.
+  6. Frontend SaaS Studio Cockpit *(Planned)*: Target operator panel spec (`SwarmPanel.tsx` — not yet mounted in 13-tab `/rag/app`) featuring 4-stat metrics grid (`@number-flow/react`), interactive persona grid, dialectic debate timeline scrubber, quorum voting meter bar, and hallucination pruning ledger.
 * **Consequences**:
   * **Pros**: Eliminates single-agent cognitive confirmation bias; verifiable consensus thresholds; automated quarantine of ungrounded hallucinations; real-time SSE streaming.
   * **Cons**: Multi-agent debates increase total token throughput across rounds (~3x to 4x standard single-turn completion).

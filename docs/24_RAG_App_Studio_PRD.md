@@ -203,31 +203,27 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **🪐 WebGL Point Cloud:** Interactive 3D visualization of high-dimensional document chunks reduced via PCA/UMAP.
 - **🎯 Real-Time Query Raycasting:** Interactive inspection of document clusters, semantic centroids, and live query vector distances.
 
-#### View 15: Capability Studio & Autonomous FDE Metaprogrammer (`FeatureStudioPanel` — Milestone 97)
-- **🛠️ Dual-Persona Solution Engine:** Zero-code battery matching for business operators and AST-verified Hexagonal code synthesis (6 slices) for Forward Deployed Engineers.
-- **🛡️ AST Security Boundary Gate:** Guarantees 0 framework imports in domain logic, isolating custom plugins with live in-process mounting and 1-click community PR generation.
+> **Implementation Reality Note (`/rag/app`):** The live client studio at [`src/app/rag/app/page.tsx`](../src/app/rag/app/page.tsx) currently mounts **13 active frontend tabs** (`OverviewPanel`, `ChatPanel`, `DocumentsPanel`, `SearchPanel`, `CachePanel`, `ConfigPanel`, `ApiKeysPanel`, `TeamPanel`, `VectorVisualizerPanel`, `WorkflowsPanel`, `IntegrationsPanel`, `GatewayPanel`, `GuardrailsPanel`). Views 16, 18, 21, 22, and 23 document active backend engine capabilities (`33` canonical batteries in `BatteryService`) with planned frontend panels (`EdgeSyncPanel`, `VoiceStudioPanel`, `ZkpAttestationPanel`, `IdentityFederationPanel`, `ContinuousTuningPanel` are not yet mounted in `/rag/app`); **View 15 (`FeatureStudioPanel` / M97), View 17 (`MultiCloudPanel` / M99), View 19 micro-enclave/mesh features, and View 20 (`VectorShardingPanel` / M117) were purged under the Zero-Toy Grounding Audit (ADRs 33, 35, 37–38)**, and there is no standalone `McpPanel.tsx` component (MCP configuration is surfaced via `DeveloperApiSection` and the `/v1/mcp/*` API + `@prat3010/retriever-mcp`).
+
+#### View 15: Capability Studio & Autonomous FDE Metaprogrammer *(Purged in Zero-Toy Grounding Audit — ADR 33)*
+- *(Retired in favor of static AST Hexagonal enforcement via `tests/test_architecture.py` and verified backend adapters.)*
 
 #### View 16: Sovereign Edge SQLite & Offline-First Node Sync (`EdgeSyncPanel` — Milestone 98)
 - **💾 Embedded Edge Hybrid Search:** Zero-daemon in-process SQLite 3 FTS5 BM25 search combined with binary float32 vector BLOBs executing in $<2\text{ms}$.
 - **📦 1-Click Standalone Database Export:** Direct generation of standalone `.sqlite` bundles with SHA-256 state checksums and Lamport LWW offline mutation reconciler.
 
-#### View 17: Distributed Multi-Cloud Failover & Turso LibSQL Quorum (`MultiCloudPanel` — Milestone 99)
-- **🌐 Active-Active Multi-Cloud Resiliency:** Heterogeneous cluster topology spanning Oracle Cloud Mumbai, AWS us-east-1, Fly.io Frankfurt, and Cloudflare Global Anycast.
-- **⚖️ Mathematical Quorum Majority Consensus:** Strict $>50\%$ election majority ($Q = \lfloor N/2 \rfloor + 1 = 3/4$), monotonic generation term incrementation, and EWMA latency circuit breaker with embedded Turso LibSQL WAL frame synchronization.
+#### View 17: Distributed Multi-Cloud Failover *(Purged — Superseded by Single-Region PgVector Core)*
+- *(Removed during Zero-Toy Grounding Audit: `MultiCloudClusterNodeDb` / `multicloud` frontend panel and enclave/mesh simulations were retired in favor of reliable single-region Oracle VPS PostgreSQL + pgvector execution.)*
 
 #### View 18: Sovereign Edge Voice & WebRTC Neural Synthesis (`VoiceStudioPanel` — Milestone 100)
 - **🎙️ Full-Duplex WebRTC Voice Deck:** Bidirectional conversational speech with zero third-party cloud audio egress, preserving strict HIPAA/GDPR data sovereignty.
 - **🎯 RMS Energy & ZCR VAD Endpointing:** Real-time mathematical speech boundary detection, local Whisper ASR, streaming neural TTS with sub-250ms TTFAB, animated 16-bar frequency visualizer, and turn latency ledger.
 
-#### View 19: Universal MCP Server & Distributed Tool Mesh (`McpPanel` — Milestones 103, 106, 115, 116)
-- **🕸️ Decentralized Tool Mesh:** Multi-cluster tool discovery, peer routing, and HMAC-SHA256 authenticated trust envelopes.
-- **⚖️ Dynamic Load Balancing & Autoscaling:** Power-of-Two-Choices (P2C) balancing, EWMA latency decay ($\alpha = 0.2$), 95% saturation load shedding, and scale-to-zero enclave provisioning.
+#### View 19: Universal MCP Server (Backend `/v1/mcp/*` & `packages/retriever-mcp` — Milestones 103, 106)
+- **🔌 Model Context Protocol Discovery & Invocation:** Standard JSON-RPC 2.0 / REST MCP server exposing platform battery tools via `/v1/mcp/tools`, `/v1/mcp/call`, and `packages/retriever-mcp`. *(Distributed Tool Mesh and scale-to-zero Micro-Enclave features were purged in the Zero-Toy Grounding Audit; no standalone `McpPanel.tsx` exists in `/rag/app`.)*
 
-#### View 20: Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus (`VectorShardingPanel` — Milestone 117)
-- **💎 32-Bit FNV-1a Hash Ring:** 64 virtual nodes per shard on a circular $[0, 2^{32}-1]$ integer ring with $O(\log N)$ binary search partition lookup.
-- **🗳️ Distributed Raft Consensus:** In-memory Raft state machine with leader elections, majority quorum voting ($\lfloor N/2 \rfloor + 1$), AppendEntries log replication, and write-quorum validation.
-- **⚡ Scatter-Gather Retrieval & RRF Fusion:** Concurrent multi-shard vector query dispatch with local cosine similarity filtering, Reciprocal Rank Fusion (RRF, $k=60$) score normalization, and shard breakdown analytics.
-- **🔄 Online 2-Phase Rebalancer:** Zero-downtime 2-phase migration (`PREPARING` $\rightarrow$ delta sync $\rightarrow$ `SYNCHRONIZING` $\rightarrow$ atomic cutover) preventing data loss during cluster scale-out.
+#### View 20: Decentralized Multi-Tenant Vector Sharding *(Purged in Zero-Toy Grounding Audit — Milestone 117 Retired)*
+- *(Removed during Zero-Toy Grounding Audit in favor of unified PostgreSQL 16 + `pgvector` HNSW indexes with database-level Row-Level Security across single-region multi-tenant tables.)*
 
 #### View 21: Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding (`ZkpAttestationPanel` — Milestone 118)
 - **👑 Merkle Tree Explorer:** Real-time visual DAG inspector for tenant documents, displaying root commitments ($R_{\text{doc}}$), leaf node commitments ($h_i$), depth metrics, and sub-millisecond inclusion paths ($\pi_i$).
@@ -300,7 +296,7 @@ To give subscribers flexibility, Retriever SaaS supports two operational billing
 | **Phase 4** | Subscription & Trial Integration | 7-day trial countdown engine & Razorpay soft paywall lockout | ✅ Complete |
 | **Phase 5** | End-to-End Verification | Build verification, contract audits, unit tests, and final certification | ✅ Complete |
 | **Phase 6** | Commercial Plumbing & Key Issuance | Razorpay subscription webhooks (`subscription.charged`, `activated`, `halted`), HMAC verification, dual-database provisioning to Oracle Cloud engine, and scoped API key issuance (`ret_live_...`) | ✅ Complete |
-| **Phase 7** | Onboarding UX & Marketing Overhaul | Progressive disclosure (5 Core Essentials vs 24 Advanced Batteries), Quick Launch 3-step modal (`QuickLaunchWizardModal`), API Keys & SDKs panel, outcome-first hero copy, segmented personas section, and live dogfooding chat widget | ✅ Complete |
+| **Phase 7** | Onboarding UX & Marketing Overhaul | Progressive disclosure (Core Essentials vs Advanced Batteries across 33 Canonical Platform Batteries), Quick Launch 3-step modal (`QuickLaunchWizardModal`), API Keys & SDKs panel, outcome-first hero copy, segmented personas section, and live dogfooding chat widget | ✅ Complete |
 | **Phase 8** | AI Persona & Governance Policy Lock | Tenant-level Master System Prompt editing via `GET/PUT /v1/tenants/{id}/prompts/default`, Enterprise Governance Policy Lock (`is_locked: bool`) toggleable by cluster admins, 4 one-click persona presets, and locked alert banner | ✅ Complete |
 
 ---
@@ -388,8 +384,8 @@ To eliminate cognitive overload for new subscribers, the SaaS Studio implements 
    - 💬 **Chat Studio:** Interactive RAG testing playground with citation highlights.
    - ⚙️ **AI Persona & Widget:** Persona preset configurator & live side-by-side widget preview.
    - 🔑 **API Keys & SDK:** Scoped tenant keys (`ret_live_...`) with Python/TypeScript snippets.
-2. **24 Advanced Batteries (Toggleable Accordion):**
-   - RLM REPL Studio, GraphRAG Topology, ZKP Grounding, NeMo Guardrails, etc.
+2. **Advanced Batteries (Toggleable Accordion):**
+   - Visualizes and links to the 33 canonical engine batteries (RLM REPL Studio, GraphRAG Topology, ZKP Grounding, NeMo Guardrails, Durable Workflows, etc.).
 3. **🚀 Quick Launch Wizard (`QuickLaunchWizardModal`):**
    - 3-step modal auto-triggered post-onboarding: Upload sample file $\to$ Run query test $\to$ Copy embed tag.
 
@@ -397,7 +393,7 @@ To eliminate cognitive overload for new subscribers, the SaaS Studio implements 
 
 ## **Related Architecture & Cross-References**
 
-- [RAG Lab Showcase Overview](rag-lab.md)
+- [RAG Lab Showcase Overview](playbooks/rag-lab.md)
 - [Scoping Lab Dogfooding Tenant (`prateeq_scoping`)](25_SOTA_Scoping_Engine_PRD.md)
 - [Client Workspace & RAG Studio Auth](CLIENT_DASHBOARD_ROADMAP.md)
 - [SaaS Plan Subscriptions](14_Razorpay_Payments_and_Invoicing.md)
@@ -405,5 +401,5 @@ To eliminate cognitive overload for new subscribers, the SaaS Studio implements 
 - [Master Roadmap (Phases B, D, G)](UNIFIED_MASTER_ROADMAP.md)
 - [Architecture Node: SaaS Studio](architecture_nodes/Route_rag_app.md)
 - [Architecture Node: RAG Client SDK](architecture_nodes/Lib_rag_client.md)
-- [Architecture Node: /v1/chat](architecture_nodes/Retriever_API_v1_chat.md)
+- [Architecture Node: /v1/tenants/{tenantId}/chat/completions](architecture_nodes/Retriever_API_v1_chat.md)
 - [Architecture Node: Tenants Schema](architecture_nodes/Schema_rag_tenants.md)

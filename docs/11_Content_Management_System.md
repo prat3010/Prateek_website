@@ -97,6 +97,6 @@ To maintain a clean separation of concerns, Python environments are kept local:
 
 - [Content Platform Architecture](10_Content_Platform_Architecture.md)
 - [Gemini AI Synchronizer Integration](12_AI_Integration_Strategy.md)
-- [Middleman Agreement Tab](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Middleman Agreement Tab](commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 - [Scoping Questionnaire Editor](09_Section_Specifications/12_Scoping_Lab.md)
 - [Architecture Node: Streamlit CMS Dashboard](architecture_nodes/Tool_Synchronizer.md)

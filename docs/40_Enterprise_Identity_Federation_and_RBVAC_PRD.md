@@ -2,7 +2,7 @@
 
 > **Product Requirement Document (PRD 40)**  
 > **Milestone:** Milestone 119 (`v1.9.0-alpha1`)  
-> **Platform Battery:** #34 (`enterprise_identity_federation`)  
+> **Platform Battery:** #27 (`enterprise_identity_federation`)  
 > **Category:** `SAFETY_DEFENSE`  
 > **Target Repositories:** `retriever` & `Prateek_website`  
 > **Status:** Production  
@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary & Objective
 
-In enterprise enterprise deployments (Fortune 500, banking, healthcare, legal), organizations manage thousands of employees across diverse departments (Engineering, Sales, Finance, Legal, Executive Board). When deploying internal AI and RAG knowledge assistants, enterprise IT departments enforce two non-negotiable security requirements:
+In enterprise deployments (Fortune 500, banking, healthcare, legal), organizations manage thousands of employees across diverse departments (Engineering, Sales, Finance, Legal, Executive Board). When deploying internal AI and RAG knowledge assistants, enterprise IT departments enforce two non-negotiable security requirements:
 
 1. **Centralized Identity & Directory Lifecycle (SAML 2.0 & SCIM 2.0)**:
    - Employees must log in through corporate Identity Providers (Okta, Azure AD / Microsoft Entra ID, Google Workspace, PingIdentity) without separate credentials.
@@ -20,7 +20,7 @@ In enterprise enterprise deployments (Fortune 500, banking, healthcare, legal), 
    - High-clearance documents (executive compensation, pending M&A agreements, board minutes, patent drafts) must **never** be retrieved or summarized for unauthorized employees.
    - Access control must be enforced *mathematically before generation* during vector candidate retrieval, eliminating cross-department data leakage.
 
-**Milestone 119** ships **Platform Battery #34: `enterprise_identity_federation`**, integrating standard SAML 2.0 assertions, RFC 7643/7644 SCIM 2.0 directory management, and sub-millisecond RB-VAC pre-retrieval filtering.
+**Milestone 119** ships **Platform Battery #27: `enterprise_identity_federation`**, integrating standard SAML 2.0 assertions, RFC 7643/7644 SCIM 2.0 directory management, and sub-millisecond RB-VAC pre-retrieval filtering.
 
 ---
 
@@ -29,7 +29,7 @@ In enterprise enterprise deployments (Fortune 500, banking, healthcare, legal), 
 ```mermaid
 graph TD
     subgraph EnterpriseIdP["1. Enterprise Identity Provider (Okta / Azure AD / Entra ID)"]
-        IdP[Corporate IdP] -->|SAML 2.0 XML Assertion| ACS[/v1/identity/saml/acs]
+        IdP[Corporate IdP] -->|SAML 2.0 XML Assertion| ACS[/v1/tenants/{tenantId}/identity/saml/acs]
         IdP -->|SCIM 2.0 RFC 7644 Push| SCIM[/v1/scim/v2/tenants/{tenantId}/Users]
     end
 
@@ -77,7 +77,7 @@ graph TD
 
 ---
 
-## 4. SaaS Studio Cockpit (`IdentityFederationPanel.tsx`)
+## 4. Planned SaaS Studio Cockpit Views (Backend Active / Frontend Panel Planned)
 
 Built under **Design System 2.0** with strict **Azure** (paper/graphite) and **Noir** (obsidian/cyan) theme parity:
 1. **SAML 2.0 View**:
@@ -102,6 +102,6 @@ Built under **Design System 2.0** with strict **Azure** (paper/graphite) and **N
 - [x] SAML ACS validates expired assertions and raises `ValueError`.
 - [x] SCIM 2.0 endpoints pass RFC 7644 User and Group lifecycle tests (Create, Get, List, Patch, Delete).
 - [x] RB-VAC pre-filtering verifies public chunks (`*`) are accessible to all, while department-restricted chunks are strictly pruned for non-members.
-- [x] Platform Battery #34 (`enterprise_identity_federation`) cataloged in `BatteryService` under `SAFETY_DEFENSE`.
-- [x] Web Studio compiles 52/52 routes cleanly with zero TypeScript or lint errors.
+- [x] Platform Battery #27 (`enterprise_identity_federation`) cataloged in `BatteryService` under `SAFETY_DEFENSE`.
+- [x] Web Studio (`Prateek_website` 16 pages / 59 API routes + `retriever/apps/web`) compiles cleanly with zero TypeScript or lint errors.
 - [x] All 10 automated quality gates report 100% green.

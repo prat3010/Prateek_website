@@ -89,8 +89,8 @@ Accepting 2 business integrations for custom AI document hubs this week. DM for 
 
 ## **Related Architecture & Cross-References**
 
-- [Product Goals & Metrics](03_Product_Goals_Objectives_and_Success_Metrics.md)
-- [High-Ticket Scoping Lab](25_SOTA_Scoping_Engine_PRD.md)
-- [Retriever SaaS Revenue](24_RAG_App_Studio_PRD.md)
+- [Product Goals & Metrics](../03_Product_Goals_Objectives_and_Success_Metrics.md)
+- [High-Ticket Scoping Lab](../25_SOTA_Scoping_Engine_PRD.md)
+- [Retriever SaaS Revenue](../24_RAG_App_Studio_PRD.md)
 - [Sales Affiliate Program](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
-- [Client Demo Showcase](DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)
+- [Client Demo Showcase](../playbooks/DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)

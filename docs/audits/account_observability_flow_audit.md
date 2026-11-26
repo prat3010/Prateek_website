@@ -1042,4 +1042,17 @@ npm test src/app/auth/__tests__/callback.test.ts \
 ```
 
 ---
+
+## 8. Remediation Status & Architectural Attestation (ADR 51)
+
+> **Implementation Note:** All architectural gaps and risks identified in Section 5 (RSK-01 through RSK-07) have been formally remediated and test-verified under **[ADR 51: Account Observability, RLS Isolation, and End-to-End Lifecycle Integrity](../99_DECISIONS.md#adr-51-account-observability-rls-isolation-and-end-to-end-lifecycle-integrity)**:
+> 1. **RSK-01 (Dangling Async Session Stitching):** Fully awaited inside `try/catch` with performance timing instrumentation in `src/app/auth/callback/route.ts` before HTTP 303 redirection.
+> 2. **RSK-02 (Inbound Contact Lead Loss):** Created `contact_submissions` table with RLS enabled; `/api/contact` persists to DB *prior* to external Resend email delivery.
+> 3. **RSK-03 (Tenant Workspace Orphanage):** Deposit verification webhooks automatically upsert clients into `rag_tenant_members` as `owner`.
+> 4. **RSK-04 (Unshielded Tables & Key Exposure):** Applied migration `20261106_enable_missing_rls.sql` enforcing RLS across legacy tables and isolating master keys in `rag_tenant_credentials`.
+> 5. **RSK-05 (Missing Client Self-Service Cancellation):** Implemented `/api/client/cancel-razorpay-subscription` with verified session token checks.
+> 6. **RSK-06 (Unmonitored Lifecycle Transitions):** Implemented `/api/cron/lifecycle-checks` authenticated with `CRON_SECRET` to monitor expiring 7-day trials and overdue invoices.
+> 7. **RSK-07 (Client Dashboard Error Cascades):** Wrapped dashboard views in `SectionErrorBoundary`, added Settings tab, and enabled workspace switching via `?tenantId=`.
+
+---
 *End of Audit Report.*

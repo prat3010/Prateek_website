@@ -341,6 +341,6 @@ Everything else is secondary.
 - [Vision & Philosophy](01_Vision_and_Philosophy.md)
 - [Telemetry & Performance Metrics](13_Telemetry_and_Analytics.md)
 - [Core Web Vitals Standards](15_Performance_and_Accessibility.md)
-- [Revenue Execution Plan](REVENUE_EXECUTION_PLAN.md)
+- [Revenue Execution Plan](commercial/REVENUE_EXECUTION_PLAN.md)
 - [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
 - [Architecture Node: Analytics Route](architecture_nodes/Route_analytics.md)

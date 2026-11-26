@@ -87,54 +87,23 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
 ### Portal B: RAG SaaS Studio Workspace (`/rag/app`)
 * **Overview & Telemetry Tab:**
   * Real-time token consumption, monthly quotas, and semantic cache hit rates (`@number-flow/react`).
-  * **Active Engine Batteries & Capabilities Matrix (M86.5):** Live capability cards displaying active retrieval (ColBERT, BM25, HNSW), cognitive (GraphRAG, RLM, Docling), and defense (Token Shield, Sentinel, LlamaGuard 3) engines.
-* **Chat Studio Tab:**
-  * Real-time SSE token streaming from `rag.prateeq.in`.
-  * Response latency indicators and token count breakdown.
-  * Clickable presigned citation links to download source PDFs.
-  * Thumbs up / down feedback submission.
-* **Document Library Tab:**
-  * Drag-and-drop file uploader (`.pdf`, `.txt`, `.md`, `.docx`).
-  * Ingestion status indicators (`INDEXED`, `PROCESSING`, `FAILED`).
-  * Permanent file deletion with cascading vector purges.
-* **Search Inspector Tab:**
-  * One-shot hybrid search debugger (pgvector HNSW + BM25 keyword + Cohere rerank).
-  * Score inspection cards showing rank order and relevance scores.
-* **3D Vector Explorer Tab (`VectorVisualizerPanel.tsx`, M82):**
-  * Interactive 3D WebGL point cloud rendering document embeddings via PCA/UMAP projections.
-* **Semantic Cache Management Tab (`CachePanel.tsx`):**
-  * Sub-50ms semantic cache hit-rate telemetry, similarity threshold controls, and vector store purging.
-* **Durable Workflows & Background Jobs Tab (`WorkflowsPanel.tsx`, M95):**
-  * Step-level memoization, automatic exponential backoff retries, visual step DAG timeline, execution ledger, and checkpoint state inspection via `<Portal>`.
-* **RLM Python REPL Studio Tab (`RlmStudioPanel.tsx`):**
-  * Sandboxed Python execution environment for recursive multi-turn document vault traversal and structured tabular synthesis.
-* **Agent Studio Tab (`AgentStudioPanel.tsx`, M91):**
-  * Stateful LangGraph cyclic computation graphs, time-travel thread history, and interactive Human-in-the-Loop (HITL) approval gates.
-* **DSPy Prompt Optimization Studio Tab (`PromptOptimizationPanel.tsx`, M92):**
-  * Metric-driven automated prompt compilation (`BootstrapFewShot`, `MIPROv2`) and versioned program activation.
-* **Smart Router & Gateway Tab (`GatewayPanel.tsx`, M93):**
-  * Unified multi-model routing (Gemini, OpenAI, Anthropic, Ollama), dynamic fallback cascades, and virtual tenant budget enforcement.
-* **NeMo Guardrails & Safety Tab (`GuardrailsPanel.tsx`, M94):**
-  * Colang `.co` conversational dialogue steering, sub-20ms fast-path input jailbreak screening, and factual grounding output rails.
-* **Embed Configurator Tab (`ConfigPanel.tsx`):**
-  * 1-line script generator and custom interactive widget preview.
-* **Team & Compliance Tab (`TeamPanel.tsx`):**
-  * Invite team members by email with role assignment (`owner`, `admin`, `member`) and compliance policy management.
-* **Plugins & Integrations Tab (`IntegrationsPanel.tsx`, M90):**
-  * Slack bot integration, Chrome web capture extension, and 2-way Google Drive document synchronization.
-* **Capability Studio & Autonomous FDE Metaprogrammer Tab (`FeatureStudioPanel.tsx`, M97):**
-  * Dual-persona solution studio: Zero-code native battery matching with confidence scores for business operators, and AST-verified Hexagonal code synthesis (6 slices) for Forward Deployed Engineers.
-  * AST security gate (0 framework imports in domain), multi-slice code tabs, 1-click workspace deployment, and 1-click community PR generator with Git branch checkout.
-* **Sovereign Edge Sync Tab (`EdgeSyncPanel.tsx`, M98):**
-  * Embedded SQLite 3 distributed vector synchronization, sub-2ms local hybrid search simulator (FTS5 BM25 + float32 BLOB vector cosine), 1-click standalone `.sqlite` bundle exporter, simulated network partition switch, and Lamport LWW offline mutation reconciler (Platform Battery #18).
-* **Sovereign Edge Voice Studio Tab (`VoiceStudioPanel.tsx`, M100):**
-  * Full-duplex conversational voice deck with zero third-party cloud audio egress, animated 16-bar frequency visualizer, real-time VAD energy sensitivity slider ($E_{\text{RMS}}$), neural timbre selector (Atlas, Nova, Echo), streaming speech synthesis tester with sub-250ms TTFAB validation, and interactive conversational turn ledger (Platform Battery #18).
-* **Autonomous Agent Tool Surface & MCP Studio Tab (`ToolsPanel.tsx`, M106):**
-  * Live status indicators, per-tenant capability permissions, interactive multi-turn ReAct trace visualizer with expandable Thought $\to$ Action $\to$ Observation steps, 1-click universal configuration exporter for Claude Desktop (`claude_desktop_config.json`) and Cursor, and real-time economic cost-efficiency meters (Platform Battery #19).
-* **Cryptographic Grounding & Tamper-Proof Audit Chain Tab (`ZkpAttestationPanel.tsx`, M118):**
-  * Deterministic binary Merkle tree explorer with leaf commitments ($h_i$) and sub-millisecond inclusion paths ($\pi_i$), interactive zero-knowledge grounding verifier with Ed25519 digital signature validation, and compliance audit ledger with 1-click JSON certificate export (Platform Battery #26).
-* **Enterprise Identity Federation & RB-VAC Tab (`IdentityFederationPanel.tsx`, M119):**
-  * SAML 2.0 Identity Provider SSO federation (Okta, Microsoft Entra ID / Azure AD, Google Workspace), X.509 XML certificate verification, dynamic SP metadata XML generation, RFC 7643/7644 SCIM 2.0 enterprise directory sync with bearer token auth, and sub-millisecond pre-retrieval Role-Based Vector Access Control (RB-VAC) simulation with chunk audit pruning telemetry (Platform Battery #27).
+  * **Active Engine Batteries & Capabilities Matrix (M86.5):** Public `/rag` Bento Grid displaying 38 capability cards (mapped to the 33 registered backend batteries in `BatteryService`).
+* **Active `/rag/app` Studio Tabs (13 Mounted Sub-Views in `src/app/rag/app/page.tsx`):**
+  * **Overview Tab (`OverviewPanel.tsx`):** Tenant usage summary, subscription state, quick metrics.
+  * **Chat Studio Tab (`ChatPanel.tsx`):** Real-time SSE token streaming from `rag.prateeq.in`, latency & token breakdown, clickable presigned citations, thumbs up/down feedback.
+  * **Document Library Tab (`DocumentsPanel.tsx`):** Drag-and-drop upload (`.pdf`, `.txt`, `.md`, `.docx`), ingestion status, deletion with vector purges.
+  * **Search Inspector Tab (`SearchPanel.tsx`):** One-shot hybrid search debugger (pgvector HNSW + BM25 + MaxSim/RRF).
+  * **Semantic Cache Tab (`CachePanel.tsx`):** Sub-50ms semantic cache telemetry, threshold controls, cache purge.
+  * **Embed Configurator Tab (`ConfigPanel.tsx`):** 1-line `https://rag.prateeq.in/widget.js` script generator and custom widget preview.
+  * **API Keys Tab (`ApiKeysPanel.tsx`):** Scoped `ret_live_...` API key management and quickstart snippets.
+  * **Team & Compliance Tab (`TeamPanel.tsx`):** Invite team members by email with role assignment (`owner`, `admin`, `member`).
+  * **3D Vector Explorer Tab (`VectorVisualizerPanel.tsx`, M82):** Interactive WebGL point cloud rendering embeddings via PCA/UMAP projections.
+  * **Workflows Tab (`WorkflowsPanel.tsx`, M95):** Step-level memoization, retries, DAG timeline, checkpoint inspection via `<Portal>`.
+  * **Integrations Tab (`IntegrationsPanel.tsx`, M90):** Slack bot, 1-Click Chrome Extension (`.zip` bundle at `/v1/integrations/extension/bundle`), Google Drive sync, Notion/GitHub connectors.
+  * **Smart Router & Gateway Tab (`GatewayPanel.tsx`, M93):** Unified multi-model routing, fallback cascades, virtual tenant budgets.
+  * **NeMo Guardrails & Safety Tab (`GuardrailsPanel.tsx`, M94):** Colang `.co` steering, fast-path input screening, grounding output rails.
+* **Backend-Ready / Target Studio Modules *(Backend APIs Live; Not Separate Frontend Tabs in `/rag/app`)*:**
+  * RLM Python REPL (`/v1/tenants/{tenantId}/rlm/*`), LangGraph Agentic HITL (`/v1/tenants/{tenantId}/agentic/*`), DSPy Prompt Compilation (`/v1/tenants/{tenantId}/prompts/*`), Sovereign Edge Sync & Voice (`/v1/edge/*`, `/v1/voice/*`), MCP Tool Discovery (`/v1/mcp/*`), ZKP Grounding (`/v1/zkp/*`), Identity Federation (`/v1/sso/*`, `/v1/scim/*`). *(Note: Multi-Cloud Failover, Micro-Enclaves, and Swarm Mesh were retired during the Zero-Toy Grounding Audit per ADRs 37–38.)*
 
 ---
 

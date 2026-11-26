@@ -78,7 +78,7 @@ If none are met, keep the original implementation intact.
 
 ## **Related Architecture & Cross-References**
 
-- [Master Codebase Audit Checklist](MASTER_CODEBASE_AUDIT_CHECKLIST.md)
+- [Master Codebase Audit Checklist](playbooks/MASTER_CODEBASE_AUDIT_CHECKLIST.md)
 - [Architecture Dependency Map](ARCHITECTURE_DEPENDENCY_MAP.md)
 - [Architecture Decision Records](99_DECISIONS.md)
 - [Automated Test Baselines](19_Testing_and_Quality_Assurance.md)

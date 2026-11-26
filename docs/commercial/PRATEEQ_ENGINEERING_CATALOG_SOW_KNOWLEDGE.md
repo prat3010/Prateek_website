@@ -162,18 +162,18 @@ The Scoping Lab groups typical project requirements into proven archetypes:
 
 ## 5. Brand Identity & Creative Asset Tiers
 
-1. **Client-Provided Brand Kit (`id: provided`)**: ₹0 INR / $0 USD — Client provides ready Figma designs, logos, typography, and copywriting.
-2. **Essential Visual Identity Package (`id: basic`)**: ₹15,000 INR / $200 USD — Color palette tokens, typography pairing, logo vectorization, and responsive favicon suite.
-3. **Full Custom Design System & Copywriting (`id: comprehensive`)**: ₹45,000 INR / $600 USD — Complete Figma design system, bespoke UI component library, professional B2B value-proposition copywriting, and custom illustrations.
+1. **Client-Provided Brand Kit (`id: ready`)**: ₹0 INR / $0 USD — Client provides ready Figma/Adobe XD designs, vector logo, color palette, and copywriting.
+2. **Technical Copywriting & Section Formatting (`id: copy`)**: ₹15,000 INR / $200 USD — Professional tech copywriting, tagline crafting, and bullet formatting across up to 5 pages.
+3. **Starting from Scratch (`id: scratch`)**: ₹45,000 INR / $600 USD — Starter Brand Kit including custom logo concepts, color palette, typography pairing, and copywriting.
 
 ---
 
 ## 6. Maintenance, Security & SLA Retainer Plans
 
-1. **Zero Retainer (`id: none`)**: ₹0/month — 30-day post-launch bug warranty included on all projects.
-2. **Standard Infrastructure & Security Care (`id: standard`)**: ₹10,000/month INR ($135/month USD) — 99.9% uptime monitoring, weekly dependency updates, database backups, and 24-hour SLA critical bug fixes.
-3. **Growth SLA & Dedicated Feature Sprints (`id: growth`)**: ₹35,000/month INR ($475/month USD) — Includes Standard Care + 10 hours of monthly custom feature engineering and Priority 8-hour SLA.
-4. **Enterprise Mission-Critical SLA & AI Retainer (`id: premium`)**: ₹75,000/month INR ($1,000/month USD) — 24/7 incident response (2-hour SLA), vector database fine-tuning, automated weekly RAG evaluation benchmarks, and continuous feature expansion.
+1. **Self-Managed (`id: self`)**: ₹0/month — Complimentary 30-day post-launch bug warranty included on all projects.
+2. **Basic Care Plan (`id: basic`)**: ₹5,000/month INR ($70/month USD) — Vercel/Supabase uptime monitoring, daily database backups, SSL renewals, security patches, and up to 1 hour dev time.
+3. **Standard Care Plan (`id: standard`)**: ₹10,000/month INR ($140/month USD) — Everything in Basic + 3–4 hours monthly developer support for text/media updates and Core Web Vitals performance tuning.
+4. **Premium AI & Dev SLA Care Plan (`id: premium`)**: ₹35,000/month INR ($475/month USD) — Priority 24-hour SLA response, AI vector DB & LLM latency monitoring, up to 8 hours dedicated feature development, and SEO health reports.
 
 ---
 

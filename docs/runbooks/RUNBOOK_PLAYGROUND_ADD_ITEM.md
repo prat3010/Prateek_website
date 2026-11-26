@@ -19,7 +19,7 @@ The Playground operates as a dual-engine platform: a free viral interactive labo
 | **Catalog Showcase Grid** | `src/app/playground/page.tsx` & `PlaygroundGrid.tsx` | Search, 4-tier taxonomy filter pills, adaptive responsive cards |
 | **Dynamic Runner Route** | `src/app/playground/[slug]/page.tsx` | Arcade cabinet shell, media inspector, architecture stage, and commercial runner |
 | **Arcade Cabinet Shell** | `src/components/playground/viewers/ArcadeCabinetShell.tsx` | Retro bezel, CRT scanlines, 8-bit sound synthesizer, fullscreen |
-| **Authentic Architecture Stage** | `src/components/playground/PlaygroundArchitectureStage.tsx` | Verifiable quickstart guide (`./launch.sh`), repo file tree, and system specs |
+| **SaaS Showcase Surface** | `src/app/playground/[slug]/page.tsx` (`saasCard`) | Verifiable quickstart guide (`./launch.sh`), repo link, and system specs |
 | **Prompt Engineering Lightbox** | `src/components/playground/viewers/MediaPromptLightbox.tsx` | 1-click prompt copier, negative prompt, generation parameters (<Portal> escape) |
 | **Guest Checkout Modal** | `src/components/playground/PlaygroundCheckoutModal.tsx` | Frictionless guest checkout (Name + Email + Razorpay UPI/Cards/LUT-export) |
 | **Digital Fulfillment Engine** | `/api/playground/checkout/*` & `/api/playground/download` | Concurrency-safe atomic settlement, perpetual licensing, tokenized re-downloads |
@@ -188,7 +188,7 @@ Always prefer the Streamlit Synchronizer dashboard for managing catalog items an
      "status": "live"
    }
    ```
-   *(Setting `componentName: null` automatically activates the authentic `PlaygroundArchitectureStage`, presenting genuine quickstart commands, architecture trees, and system requirements).*
+   *(Setting `componentName: null` renders the native showcase card in `src/app/playground/[slug]/page.tsx`, presenting genuine quickstart commands, architecture highlights, and system requirements).*
 
 ---
 

@@ -71,11 +71,9 @@ export type PlaygroundTaxonomy =
              │      └── MediaPromptLightbox (<Portal> containing block escape)
              │
              ├──► /playground/[slug] (Dynamic Runner)
-             │      ├── ArcadeCabinetShell (CRT, 8-Bit Audio, Fullscreen)
+             │      ├── ArcadeCabinetShell (CRT, 8-Bit Audio, Fullscreen for Interactive Toys)
              │      ├── PlaygroundStageRenderer & Component Registry (registry.ts)
-             │      ├── PlaygroundArchitectureStage (File Tree, Specs, Quickstart)
-             │      ├── StickyCommercialBar (Price in INR/USD, Checkout CTA)
-             │      └── PlaygroundCheckoutModal (<Portal>, Lenis scroll-lock, Razorpay)
+             │      └── Native Detail Viewers (Generative Media, Saas Showcases, Cognitive Tools)
              │
              ├──► /api/playground/checkout/* (Order Creation & Atomic Signature Verification)
              ├──► /api/playground/download (Tokenized Guest Re-download & Quota Guardrail)

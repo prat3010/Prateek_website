@@ -60,10 +60,10 @@ This playbook documents the productized commercial framework embedded across `pr
 | **Landing Page Core Engine (`landing`)** | Single-page product launch, 3D Canvas skyline, lead capture. | ₹30,000 | $400 | 5–7 Days |
 | **Multi-Page Web App Core Engine (`multipage`)** | Enterprise CMS, blog newsjacking, dynamic case studies, team portal. | ₹55,000 | $750 | 10–14 Days |
 | **Full-Stack SaaS MVP Core Engine (`saas`)** | Supabase Auth, Razorpay subscriptions, PostgreSQL RLS, dashboard workspace. | ₹1,75,000 | $2,400 | 21–28 Days |
-| **Autonomous AI RAG Engine (`saas` + `ai_rag`)** | Multi-tenant hybrid search, pgvector, GraphRAG, local Ollama embeddings. | ₹2,80,000 | $3,600 | 30–45 Days |
+| **Autonomous AI RAG Engine (`saas` + `ai_rag`)** | Multi-tenant hybrid search, pgvector, GraphRAG, local Ollama embeddings. | ₹3,00,000 | $4,100 | 30–45 Days |
 
 ### Feature Add-On Pricing Rules
-- **Transitive Dependency Resolution:** Adding advanced features automatically includes necessary infrastructure prerequisites (e.g. `vector_db` ➔ requires `postgresql_persistence`).
+- **Transitive Dependency Resolution:** Adding advanced features automatically includes necessary infrastructure prerequisites (e.g. `commerce` ➔ requires `auth` + `payments`, `booking` ➔ requires `auth` + `email`).
 - **Currency Parity:** Fixed conversion exchange rate of 85 INR per USD enforced across all calculation endpoints to eliminate international credit card checkout friction.
 
 ---
@@ -94,7 +94,7 @@ External consultants, agencies, and network connectors earn recurring revenue by
 
 ## 6. Cross-References & Documents
 
-- **Master Product Requirements Document:** [[Prateek_Website/docs/27_Client_Workspace_and_Escrow_Ledger_PRD|PRD: Client Workspace & Escrow Ledger]]
-- **Payment Gateway Architecture:** [[Prateek_Website/docs/14_Razorpay_Payments_and_Invoicing|Razorpay Payments & Invoicing]]
-- **Legal Sales Agreement:** [[Prateek_Website/docs/MIDDLEMAN_PARTNERSHIP_AGREEMENT|Middleman Partnership Agreement]]
-- **Commercial PDF Exporters:** [[Prateek_Website/docs/29_Commercial_PDF_Generation_Engine_PRD|PRD: Commercial PDF Suite]]
+- **Master Product Requirements Document:** [PRD: Client Workspace & Escrow Ledger](../27_Client_Workspace_and_Escrow_Ledger_PRD.md)
+- **Payment Gateway Architecture:** [Razorpay Payments & Invoicing](../14_Razorpay_Payments_and_Invoicing.md)
+- **Legal Sales Agreement:** [Middleman Partnership Agreement](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- **Commercial PDF Exporters:** [PRD: Commercial PDF Suite](../29_Commercial_PDF_Generation_Engine_PRD.md)

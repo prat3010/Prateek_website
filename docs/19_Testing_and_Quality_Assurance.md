@@ -15,7 +15,7 @@ Executes a comprehensive, non-interactive suite ensuring zero runtime failures:
 1. **Cache Cleansing**: Clears `.next` compilation caches.
 2. **Type Checking**: Runs `npx tsc --noEmit` to verify type safety.
 3. **Lint Quality**: Runs `npm run lint` for ESLint Next.js 16 & React 19 standards.
-4. **Unit & Integration Suite**: Runs `npm test` (Vitest: 83 test files, 640 tests).
+4. **Unit & Integration Suite**: Runs `npm test` (Vitest: 97 test files, 797 tests).
 5. **Dead Code & Dependency Pruning**: Runs `npx knip` to detect unused exports, orphaned files, and bloated dependencies.
 6. **Portal Containing-Block Safety (ADR 05)**: Runs `python3 scripts/audit_portal_safety.py` to ensure overlays escape `ScrollSection` containing blocks.
 7. **Secret & Credential Leak Audit**: Runs `python3 scripts/audit_secrets.py` to scan diffs for leaked API keys, tokens, or private certificates.
@@ -109,6 +109,6 @@ For interactive visual changes, developers must complete this checklist:
 
 ## **Related Architecture & Cross-References**
 
-- [Audit Checklist & Test Baselines](MASTER_CODEBASE_AUDIT_CHECKLIST.md)
+- [Audit Checklist & Test Baselines](playbooks/MASTER_CODEBASE_AUDIT_CHECKLIST.md)
 - [Codebase Modernization Rules](18_Codebase_Modernization_and_Refactoring.md)
 - [CI/CD & Deployment Verification](20_Deployment_Strategy.md)

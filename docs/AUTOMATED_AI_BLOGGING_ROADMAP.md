@@ -54,7 +54,7 @@ graph TD
 
 - [Master Roadmap (Milestone 59)](UNIFIED_MASTER_ROADMAP.md)
 - [Brand Voice & Writing Style](07_Content_Strategy.md)
-- [Deep-Linking Taxonomy](BLOG_DEEP_LINKING_MAP.md)
+- [Deep-Linking Taxonomy](playbooks/BLOG_DEEP_LINKING_MAP.md)
 - [Zero-Penalty SEO Safeguards](17_SEO_Strategy.md)
 - [Blog Section Specification](09_Section_Specifications/11_Blog.md)
 - [Architecture Node: Publish API](architecture_nodes/API_blog_publish.md)

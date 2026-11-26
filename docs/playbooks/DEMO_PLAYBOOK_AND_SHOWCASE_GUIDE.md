@@ -185,6 +185,6 @@ flowchart LR
 
 ## **Related Architecture & Cross-References**
 
-- [RAG SaaS Studio Demo Script](24_RAG_App_Studio_PRD.md)
-- [Scoping Lab Live Walkthrough](25_SOTA_Scoping_Engine_PRD.md)
-- [High-Ticket Client Conversion](REVENUE_EXECUTION_PLAN.md)
+- [RAG SaaS Studio Demo Script](../24_RAG_App_Studio_PRD.md)
+- [Scoping Lab Live Walkthrough](../25_SOTA_Scoping_Engine_PRD.md)
+- [High-Ticket Client Conversion](../commercial/REVENUE_EXECUTION_PLAN.md)

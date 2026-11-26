@@ -2,7 +2,7 @@
 
 > **Product Requirement Document (PRD 45)**  
 > **Milestone:** Milestone 125 (`v2.3.0`)  
-> **Platform Battery:** #39 (`enterprise_saas_connectors_acl`)  
+> **Platform Battery:** #31 (`enterprise_saas_connectors_acl`)  
 > **Category:** `SYSTEM_EXTENSIBILITY`  
 > **Target Repositories:** `retriever` & `Prateek_website`  
 > **Status:** Production  
@@ -16,7 +16,7 @@ In enterprise knowledge deployments, retrieval systems must ingest data from het
 2. **Document-Level Authorization Risks:** Naive RAG engines index documents into a single flat vector store without preserving access control lists (ACLs). This allows unauthorized users or contractors to retrieve sensitive executive salaries, SOC2 audit findings, or M&A disclosures.
 3. **Post-Retrieval Leakage & Recall Drop:** Post-filtering unauthorized vector hits after retrieval reduces effective top-$k$ recall (often yielding zero results).
 
-**Milestone 125** introduces **Platform Battery #39: `enterprise_saas_connectors_acl`**, establishing:
+**Milestone 125** introduces **Platform Battery #31: `enterprise_saas_connectors_acl`**, establishing:
 1. **Five Turn-Key SaaS Connectors:**
    - **Google Workspace (Drive & Docs):** Recursive folder crawler, Service Account JWT and OAuth 2.0 PKCE, automated Docs-to-Markdown export, and incremental delta sync via `modifiedTime`.
    - **Notion Enterprise Workspace:** Recursive child page extractor, table block (`table` and `table_row`) parser rendering standard Markdown tables, and differential change tracking using database `last_edited_time` query filters.
